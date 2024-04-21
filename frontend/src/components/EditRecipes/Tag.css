@@ -1,0 +1,54 @@
+.tag-section {
+	margin: 20px 0px;
+}
+
+.tag-section .tag {
+	margin-right: 10px;
+	color: white;
+}
+
+.tag {
+	font-family: Cairo, sans-serif;
+	font-weight: 800;
+}
+
+.tag .tag-name {
+	padding: 2px 15px;
+	background-color: rgb(148, 150, 24);
+}
+
+.tag .remove-tag {
+	padding: 2px 10px;
+	background-color: rgb(118, 119, 27);
+}
+
+.tag .remove-tag:hover {
+	cursor: pointer;
+	color: rgb(255, 87, 87);
+}
+
+.tag-suggestions {
+	position: absolute;
+	border: 1px solid #999;
+	border-top-width: 0;
+	list-style: none;
+	margin-top: 0;
+	padding-left: 0;
+	width: calc(300px + 1rem);
+}
+
+.tag-suggestions li {
+	padding: 0.5rem;
+}
+
+.suggestion-active,
+.tag-suggestions li:hover {
+	background-color: #008f68;
+	color: #fae042;
+	cursor: pointer;
+	font-weight: 700;
+}
+
+.tag-suggestions li:not(:last-of-type) {
+	border-bottom: 1px solid #999;
+}

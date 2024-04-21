@@ -1,0 +1,27 @@
+.menu-nav {
+	text-align: center;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+}
+
+.week-number {
+	font-size: 2em;
+}
+.week-button {
+	margin: 0px 20px;
+	background-color: grey;
+}
+
+.generate-button {
+	text-align: center;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+}
+
+.menu-nav-container {
+	margin-bottom: 35px;
+}

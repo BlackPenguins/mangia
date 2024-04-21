@@ -1,0 +1,42 @@
+.category-label {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	color: aliceblue;
+	padding: 3px;
+	font-weight: 500;
+}
+
+.v-status.dessert {
+	background-color: rgb(255, 124, 185);
+	color: rgb(102, 15, 66);
+	border: 1px solid rgb(102, 15, 66);
+}
+
+.v-status.dinner {
+	background-color: rgb(110, 168, 255);
+	color: rgb(21, 15, 102);
+	border: 1px solid rgb(21, 15, 102);
+}
+
+.v-status.sidedish {
+	background-color: rgb(224, 255, 110);
+	color: rgb(93, 102, 15);
+	border: 1px solid rgb(93, 102, 15);
+}
+
+.v-status.appetizer {
+	background-color: rgb(110, 255, 122);
+	color: rgb(15, 102, 22);
+	border: 1px solid rgb(15, 102, 22);
+}
+
+.v-status.none {
+	background-color: rgb(187, 187, 187);
+	color: rgb(88, 88, 88);
+	border: 1px solid rgb(88, 88, 88);
+}
+
+.edit-category-dropdown option {
+	padding: 5px;
+}

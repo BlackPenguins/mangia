@@ -1,0 +1,117 @@
+.browse {
+	position: relative;
+}
+
+.editInput {
+	background-color: #ffffff;
+}
+
+.editLabel {
+	margin: 30px 0px 15px 0px;
+}
+
+.editLabel .name {
+	padding: 4px;
+	border: 1px solid rgb(89, 133, 81);
+	border-radius: 10px;
+	background-color: rgb(141, 207, 128);
+}
+.rating-empty {
+	filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);
+}
+
+.save-button {
+	width: 100%;
+	padding: 50px;
+	margin: 15px 0px;
+}
+
+.edit-book-dropdown {
+	vertical-align: top;
+	display: inline-block;
+}
+
+.edit-book-button {
+	display: inline-block;
+}
+
+.title h3 {
+	display: inline-block;
+	margin-right: 30px;
+}
+
+.recipe-name-section {
+	position: relative;
+}
+.recipe-name-results {
+	z-index: 3000;
+	position: absolute;
+	left: 0;
+	margin-top: 5px;
+	padding: 10px;
+	background-color: aliceblue;
+	max-height: 300px;
+	overflow-y: scroll;
+}
+
+.recipe-name-results .recipe-name-option {
+	padding: 10px;
+	font-weight: bold;
+	border-bottom: 1px solid #3b3b3b;
+}
+
+.form-floating.tag {
+	display: inline-block;
+}
+
+#recipe-tag .input {
+	width: auto;
+	display: inline-block;
+	margin-left: 10px;
+}
+
+.form-control:focus {
+	border-color: #7fad39;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(30, 255, 0, 0.6);
+}
+
+body {
+	background-image: url('/src/assets/images/kitchen_background.png');
+	background-repeat: repeat;
+}
+.edit-recipe-section .form-floating input,
+.edit-recipe-section .form-floating select,
+.edit-recipe-section .form-floating textarea {
+	font-size: 14px;
+	color: #3b3b3b;
+}
+
+.edit-recipe-section .form-floating {
+	margin: 10px 0px;
+}
+
+.recipe-edit-btn {
+	display: flex;
+}
+
+.recipe-edit-btn button {
+	flex: auto;
+	margin: 10px;
+}
+
+.bottom-buttons {
+	text-align: center;
+}
+
+.bottom-buttons button {
+	margin: 0px 10px;
+}
+
+.book-list ul {
+	margin: 25px;
+}
+
+.book-list .recipe-edit-btn button {
+	flex: auto;
+	margin: 0;
+}

@@ -1,0 +1,115 @@
+.description {
+	font-style: italic;
+	padding: 10px 0px;
+}
+
+.ingredients {
+	margin: 15px 0px 30px 0px;
+}
+
+.ingredients ul {
+	margin: 15px 25px;
+}
+.ingredients li {
+	list-style: square;
+}
+
+.ingredients h4 {
+	font-weight: bold;
+}
+
+.form-floating.ingredients textarea {
+	height: auto;
+}
+
+.form-floating.steps textarea {
+	height: auto;
+}
+
+.form-floating.notes textarea {
+	height: auto;
+}
+
+.steps {
+	margin: 15px 0px 30px 0px;
+}
+
+.steps h4 {
+	font-weight: bold;
+}
+
+.steps .step {
+	align-items: flex-start;
+	flex-direction: row;
+	padding-top: 16px;
+
+	display: flex;
+	-webkit-box-align: center;
+	flex: 2 1 0%;
+	gap: 32px;
+	margin-bottom: 20px;
+}
+
+.steps .step .number {
+	display: flex;
+}
+
+.steps .step .number div {
+	width: 30px;
+	height: 30px;
+	display: flex;
+	-webkit-box-align: center;
+	align-items: center;
+	-webkit-box-pack: center;
+	justify-content: center;
+	background-color: #7fad39;
+	color: #fff;
+	border-radius: 50%;
+	text-align: center;
+	font-weight: 800;
+	font-family: 'Cairo', sans-serif;
+}
+
+.notes {
+	margin: 15px 0px 30px 0px;
+}
+
+.notes h4 {
+	font-weight: bold;
+}
+
+.notes ul {
+	margin: 15px 25px;
+}
+
+li {
+	padding: 5px 0px;
+}
+
+.mainSection,
+.topSection {
+	margin-top: 20px;
+	display: flex;
+}
+
+.statisticLabel {
+	font-weight: bold;
+	padding-right: 10px;
+}
+
+.statistics div {
+	margin: 10px 0px;
+}
+
+.title h2 {
+	display: inline-block;
+}
+
+.title {
+	margin: 20px 0px;
+}
+
+.title button {
+	margin-left: 20px;
+	vertical-align: text-bottom;
+}

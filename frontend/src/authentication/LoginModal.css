@@ -1,0 +1,14 @@
+.register {
+	padding-top: 15px;
+	text-align: center;
+}
+
+.register a.link {
+	padding: 0px 5px;
+	color: blue;
+	cursor: pointer;
+}
+
+.register a.link:hover {
+	color: rgb(23, 119, 39);
+}

@@ -1,0 +1,67 @@
+.defrost {
+	margin-left: -27px;
+	color: #b7daff;
+}
+
+.day-header {
+	width: 100%;
+	text-align: center;
+	background-color: #82ae46;
+	color: white;
+	padding: 15px;
+}
+
+.prep-footer {
+	width: 100%;
+	text-align: center;
+	background-color: #5e70ac;
+	color: white;
+	padding: 15px;
+}
+
+.prep-notes {
+	margin: 10px 0px;
+}
+
+.prep-footer .prep-title {
+	font-weight: bold;
+	font-size: 1.1em;
+	text-transform: uppercase;
+	margin-bottom: 15px;
+}
+
+.day-header.today {
+	background-color: goldenrod;
+}
+
+.day-settings {
+	cursor: pointer;
+	position: absolute;
+	top: 10px;
+	left: 25px;
+	color: white;
+}
+
+.day-settings:hover {
+	opacity: 0.7;
+	-webkit-animation: spin 2s linear infinite;
+	-moz-animation: spin 2s linear infinite;
+	animation: spin 2s linear infinite;
+}
+
+@-moz-keyframes spin {
+	100% {
+		-moz-transform: rotate(360deg);
+	}
+}
+@-webkit-keyframes spin {
+	100% {
+		-webkit-transform: rotate(360deg);
+	}
+}
+@keyframes spin {
+	100% {
+		-webkit-transform: rotate(360deg);
+		transform: rotate(360deg);
+	}
+}
