@@ -11,7 +11,7 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 		recipeName = recipe.Name;
 	}
 
-	const thumbnailImage = (recipe?.Image && !isLeftovers && `http://localhost:6200/thumbs/${recipe?.Image}`) || 'images/no-thumb.png';
+	const thumbnailImage = (recipe?.Image && !isLeftovers && `http://mangia.penguinore.net:6200/thumbs/${recipe?.Image}`) || 'images/no-thumb.png';
 
 	const thumbnailStyle = {
 		backgroundImage: `url(${thumbnailImage})`,

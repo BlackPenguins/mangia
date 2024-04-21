@@ -175,7 +175,7 @@ const Controls = ({ recipe }) => {
 	);
 };
 const HeaderImage = ({ recipe }) => {
-	const thumbnailImage = (recipe?.Image && `http://localhost:6200/thumbs/${recipe?.Image}`) || '/images/no-thumb.png';
+	const thumbnailImage = (recipe?.Image && `http://mangia.penguinore.net:6200/thumbs/${recipe?.Image}`) || '/images/no-thumb.png';
 
 	const thumbnailStyle = {
 		backgroundImage: `url(${thumbnailImage})`,
