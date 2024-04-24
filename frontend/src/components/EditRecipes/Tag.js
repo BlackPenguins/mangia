@@ -1,10 +1,14 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { Button, Col, Input, Row } from 'reactstrap';
 import { Tag as TagIcon } from 'react-feather';
 
 import './Tag.css';
+import AuthContext from '../../authentication/auth-context';
 
 const Tag = ({ recipeID }) => {
+	const authContext = useContext(AuthContext);
+	const tokenFromStorage = authContext.token;
+
 	const fetchTags = useCallback(async () => {
 		const response = await fetch('/api/tags', {
 			method: 'GET',
@@ -23,12 +27,12 @@ const Tag = ({ recipeID }) => {
 		const data = await response.json();
 		console.log('Retrieved Recipe Tags from Server', data);
 		setRecipeTags(data);
-	}, []);
+	}, [recipeID]);
 
 	useEffect(() => {
 		fetchTags();
 		fetchRecipeTags();
-	}, [fetchTags]);
+	}, [fetchTags, fetchRecipeTags]);
 
 	const [allTags, setAllTags] = useState([]);
 	const [filteredTags, setFilteredTags] = useState([]);
@@ -54,6 +58,7 @@ const Tag = ({ recipeID }) => {
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
 				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
 			},
 		});
 
@@ -68,6 +73,7 @@ const Tag = ({ recipeID }) => {
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
 				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
 			},
 		});
 
@@ -77,7 +83,7 @@ const Tag = ({ recipeID }) => {
 
 	const inputKeyDownHandler = (e) => {
 		console.log('KEY', { code: e.keyCode, tagSuggestion, filteredTags, oh: filteredTags[tagSuggestion] });
-		if (e.keyCode == 13) {
+		if (e.keyCode === 13) {
 			if (showSuggestions && filteredTags.length) {
 				// use the suggestions
 				addTagHandler(filteredTags[tagSuggestion].Name);

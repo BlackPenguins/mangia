@@ -18,12 +18,11 @@ export const checkAdminMiddleware = async (req, res, next) => {
 		return res.status(response.status).json(data);
 	}
 
-	console.log('DA', data);
+	console.log('Auth Information from Server', data);
 
 	if (data.isAdmin) {
-		next();
+		return next();
 	}
 
-	console.log('Unauthorized');
 	return res.status(401).json(data);
 };

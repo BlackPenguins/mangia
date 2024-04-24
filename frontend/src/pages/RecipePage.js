@@ -92,7 +92,7 @@ const Statistics = ({ recipe, book }) => {
 		const data = await response.json();
 		console.log('Retrieved Recipe Tags from Server', data);
 		setRecipeTags(data);
-	}, []);
+	}, [recipe]);
 
 	useEffect(() => {
 		fetchRecipeTags();
@@ -175,7 +175,7 @@ const Controls = ({ recipe }) => {
 	);
 };
 const HeaderImage = ({ recipe }) => {
-	const thumbnailImage = (recipe?.Image && `http://mangia.penguinore.net:6200/thumbs/${recipe?.Image}`) || '/images/no-thumb.png';
+	const thumbnailImage = (recipe?.Image && `http://${process.env.REACT_APP_HOST_NAME}:6200/thumbs/${recipe?.Image}`) || '/images/no-thumb.png';
 
 	const thumbnailStyle = {
 		backgroundImage: `url(${thumbnailImage})`,
@@ -257,6 +257,9 @@ const Notes = ({ title, notes }) => {
 };
 
 const ConfirmDeleteModal = ({ recipeID, closeModalHandler }) => {
+	const authContext = useContext(AuthContext);
+	const tokenFromStorage = authContext.token;
+
 	const navigate = useNavigate();
 
 	const deleteHandler = async () => {
@@ -265,6 +268,7 @@ const ConfirmDeleteModal = ({ recipeID, closeModalHandler }) => {
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
 				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
 			},
 		});
 		navigate('/home');

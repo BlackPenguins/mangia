@@ -8,8 +8,10 @@ const FilteredRecipesControl = ({ CardType, layoutClass, onClickHandler, categor
 		const data = await response.json();
 		if (response.status === 200) {
 			console.log('Retrieved Recipes from Server', data);
+			const activeData = data.filter((r) => r.IsActive);
+
 			setAllRecipes(data);
-			setFilteredRecipes(data);
+			setFilteredRecipes(activeData);
 		} else {
 			console.log('ERR', data);
 		}
@@ -28,9 +30,13 @@ const FilteredRecipesControl = ({ CardType, layoutClass, onClickHandler, categor
 		const lowercaseSearchString = searchString.toLowerCase();
 		setFilteredRecipes(
 			allRecipes.filter((recipe) => {
-				const matchesCategory = !categoryFilter || (categoryFilter && recipe.Category === categoryFilter);
-				const matchesName = recipe && recipe.Name.toLowerCase().indexOf(lowercaseSearchString) !== -1;
-				return matchesCategory && matchesName;
+				if (lowercaseSearchString === 'hidden') {
+					return !recipe.IsActive;
+				} else {
+					const matchesCategory = !categoryFilter || (categoryFilter && recipe.Category === categoryFilter);
+					const matchesName = recipe && recipe.Name.toLowerCase().indexOf(lowercaseSearchString) !== -1;
+					return matchesCategory && matchesName && recipe.IsActive;
+				}
 			})
 		);
 	};
@@ -42,7 +48,7 @@ const FilteredRecipesControl = ({ CardType, layoutClass, onClickHandler, categor
 			setFilteredRecipes(allRecipes);
 		}
 		setSearch('');
-	}, [categoryFilter]);
+	}, [categoryFilter, allRecipes]);
 
 	return (
 		<section class="hero">
@@ -90,7 +96,7 @@ const SearchBox = ({ search, setSearch, filteredRecipes, filterRecipesHandler })
 							<Input
 								id="recipe-category"
 								type="text"
-								placeholder={`Search all ${filteredRecipes?.length || ''} recipes...`}
+								placeholder={!search && `Search all ${filteredRecipes?.length || ''} recipes...`}
 								onChange={(e) => {
 									setSearch(e.target.value);
 									filterRecipesHandler(e.target.value);

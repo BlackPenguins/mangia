@@ -1,10 +1,14 @@
-import { useRef } from 'react';
+import { useContext, useRef } from 'react';
 import { Button, Col, Input, Row } from 'reactstrap';
+import AuthContext from '../../authentication/auth-context';
 import Modal from '../Modal';
 import './EditBooksModal.css';
 
 // TODO: Rename books, set description
 const EditBooksModal = ({ books, fetchBooks, closeModalHandler }) => {
+	const authContext = useContext(AuthContext);
+	const tokenFromStorage = authContext.token;
+
 	const addBookInputRef = useRef();
 
 	const onAddBookHandler = async () => {
@@ -18,6 +22,7 @@ const EditBooksModal = ({ books, fetchBooks, closeModalHandler }) => {
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
 				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
 			},
 		});
 		const data = await response.json();

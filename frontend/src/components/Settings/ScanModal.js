@@ -1,9 +1,13 @@
-import { useRef, useState } from 'react';
+import { useContext, useState } from 'react';
 import { Button, Col, FormText, Input, Row } from 'reactstrap';
+import AuthContext from '../../authentication/auth-context';
 import Modal from '../Modal';
 import './EditBooksModal.css';
 
 const ScanModal = ({ attachments, fetchRecipe, closeModalHandler, recipeID }) => {
+	const authContext = useContext(AuthContext);
+	const tokenFromStorage = authContext.token;
+
 	const [imageFile, setImageFile] = useState('');
 	const [text, setText] = useState(null);
 	const [progress, setProgress] = useState(0);
@@ -27,6 +31,9 @@ const ScanModal = ({ attachments, fetchRecipe, closeModalHandler, recipeID }) =>
 			await fetch(`/api/recipes/attachments/${recipeID}`, {
 				method: 'POST',
 				body: imageData,
+				header: {
+					Authorization: `Bearer ${tokenFromStorage}`,
+				},
 			});
 			// const data = await response.json();
 		}
@@ -69,12 +76,12 @@ const ScanModal = ({ attachments, fetchRecipe, closeModalHandler, recipeID }) =>
 					<ul>
 						{attachments.length === 0 && <div>No books found</div>}
 						{attachments &&
-							attachments.map((attachment) => {
+							attachments.map((attachment, i) => {
 								const imageURL = `http://localhost:6200/attachments/${recipeID}/${attachment}`;
 								const clickHandler = () => {
 									parseText(attachment);
 								};
-								return <img onClick={clickHandler} width={100} src={imageURL} />;
+								return <img alt={`attachment-${i}`} onClick={clickHandler} width={100} src={imageURL} />;
 							})}
 					</ul>
 					<Row>

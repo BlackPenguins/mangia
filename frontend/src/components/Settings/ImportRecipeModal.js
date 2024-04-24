@@ -1,10 +1,14 @@
-import { useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import { Button, Input } from 'reactstrap';
 import Modal from '../Modal';
 import { useNavigate } from 'react-router-dom';
 import './ImportRecipeModal.css';
+import AuthContext from '../../authentication/auth-context';
 
 const ImportRecipeModal = ({ closeModalHandler }) => {
+	const authContext = useContext(AuthContext);
+	const tokenFromStorage = authContext.token;
+
 	const navigate = useNavigate();
 	const [importURL, setImportURL] = useState('');
 	const [status, setStatus] = useState('');
@@ -29,6 +33,7 @@ const ImportRecipeModal = ({ closeModalHandler }) => {
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
 				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
 			},
 		});
 		const data = await response.json();

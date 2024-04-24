@@ -1,8 +1,12 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Button, Input } from 'reactstrap';
+import AuthContext from '../../../authentication/auth-context';
 import Modal from '../../Modal';
 
 const SkipModal = ({ page, menu, fetchMenu, closeModalHandler }) => {
+	const authContext = useContext(AuthContext);
+	const tokenFromStorage = authContext.token;
+
 	const [skipReason, setSkipReason] = useState(menu?.skipReason);
 
 	const skipHandler = async () => {
@@ -12,6 +16,7 @@ const SkipModal = ({ page, menu, fetchMenu, closeModalHandler }) => {
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
 				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
 			},
 		});
 		fetchMenu(page);

@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Button, Input } from 'reactstrap';
+import AuthContext from '../../../authentication/auth-context';
 import Modal from '../../Modal';
 import FilteredRecipesControl from '../../Recipes/FilteredRecipesControl';
 import RecipeRow from '../../Recipes/RecipeRow';
 import './ChangeModal.css';
 
 const ChangeModal = ({ menu, fetchMenu, page, availableSwapDays, closeModalHandler }) => {
+	const authContext = useContext(AuthContext);
+	const tokenFromStorage = authContext.token;
+
 	const [swapMenuID, setSwapDay] = useState(null);
 
 	const changeHandler = async (recipe) => {
@@ -18,6 +22,7 @@ const ChangeModal = ({ menu, fetchMenu, page, availableSwapDays, closeModalHandl
 				headers: {
 					// This is required. NodeJS server won't know how to read it without it.
 					'Content-Type': 'application/json',
+					Authorization: `Bearer ${tokenFromStorage}`,
 				},
 			});
 			fetchMenu(page);
@@ -33,6 +38,7 @@ const ChangeModal = ({ menu, fetchMenu, page, availableSwapDays, closeModalHandl
 				headers: {
 					// This is required. NodeJS server won't know how to read it without it.
 					'Content-Type': 'application/json',
+					Authorization: `Bearer ${tokenFromStorage}`,
 				},
 			});
 			fetchMenu(page);

@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react';
-import { Menu, User, Users } from 'react-feather';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Menu, Users } from 'react-feather';
+import { useNavigate } from 'react-router-dom';
 import AuthContext from '../authentication/auth-context';
 import LoginDisplay from '../authentication/LoginDisplay';
 import ImportRecipeModal from './Settings/ImportRecipeModal';
@@ -11,9 +11,6 @@ const Header = () => {
 
 	const [showImportModal, setShowImportModal] = useState(false);
 	const [showSidebar, setShowSidebar] = useState(false);
-
-	const showImportModalHandler = () => setShowImportModal(true);
-	const hideImportModalHandler = () => setShowImportModal(false);
 
 	const overlayClasses = ['humberger__menu__overlay'];
 	const sidebarClasses = ['humberger__menu__wrapper'];
@@ -37,7 +34,7 @@ const Header = () => {
 		<ul>
 			<li>
 				<div className="nav-link" onClick={() => navigateTo('home')}>
-					<span>Book</span>
+					<span>Recipe Book</span>
 				</div>
 			</li>
 			<li>
@@ -64,7 +61,7 @@ const Header = () => {
 
 	return (
 		<>
-			{showImportModal && <ImportRecipeModal closeModalHandler={hideImportModalHandler} />}
+			{showImportModal && <ImportRecipeModal closeModalHandler={() => setShowImportModal(true)} />}
 			<div className={overlayClasses.join(' ')} onClick={() => setShowSidebar(false)}></div>
 			<div className={sidebarClasses.join(' ')}>
 				<div class="humberger__menu__logo">MANGIA!</div>

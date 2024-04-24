@@ -7,6 +7,7 @@ import AuthContext from '../../authentication/auth-context';
 
 const MenuNav = ({ menus, weekOfYear, page, setPage, fetchMenu }) => {
 	const authContext = useContext(AuthContext);
+	const tokenFromStorage = authContext.token;
 
 	const [showConfirmGenerate, setShowConfirmGenerate] = useState(false);
 
@@ -16,6 +17,7 @@ const MenuNav = ({ menus, weekOfYear, page, setPage, fetchMenu }) => {
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
 				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
 			},
 		});
 		fetchMenu(page);

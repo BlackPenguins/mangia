@@ -21,7 +21,7 @@ const MadeButton = ({ fetchMenu, menu, page, recipe }) => {
 			},
 		});
 		fetchMenu(page);
-	}, [page, menu, fetchMenu, isMade, recipe]);
+	}, [page, menu, fetchMenu, isMade, recipe, tokenFromStorage]);
 
 	const madeHandler = isSkipped ? null : made;
 	let classes = ['made-button'];

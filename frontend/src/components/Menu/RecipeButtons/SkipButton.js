@@ -1,9 +1,13 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import { Play, Slash } from 'react-feather';
+import AuthContext from '../../../authentication/auth-context.js';
 import BottomButton from './BottomButton.js';
 import SkipModal from './SkipModal';
 
 const SkipButton = ({ fetchMenu, menu, page }) => {
+	const authContext = useContext(AuthContext);
+	const tokenFromStorage = authContext.token;
+
 	const isSkipped = menu?.isSkipped;
 
 	const [showSkipModal, setShowSkipModal] = useState(false);
@@ -17,13 +21,14 @@ const SkipButton = ({ fetchMenu, menu, page }) => {
 				headers: {
 					// This is required. NodeJS server won't know how to read it without it.
 					'Content-Type': 'application/json',
+					Authorization: `Bearer ${tokenFromStorage}`,
 				},
 			});
 			fetchMenu(page);
 		} else {
 			setShowSkipModal(true);
 		}
-	}, [page, menu, fetchMenu, isSkipped]);
+	}, [page, menu, fetchMenu, isSkipped, tokenFromStorage]);
 
 	let label = 'SKIP';
 	let className = 'skip-button';

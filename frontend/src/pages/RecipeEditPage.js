@@ -1,13 +1,13 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Button, Col, Form, FormGroup, FormText, Input, InputGroup, InputGroupText, Label, Row } from 'reactstrap';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Button, Col, FormGroup, FormText, Input, Label, Row } from 'reactstrap';
 
 import './RecipeEditPage.css';
 import EditBooksModal from '../components/Settings/EditBooksModal';
 import Rating from '../components/Settings/Rating';
 import Category from '../components/Recipes/Category';
 import Tag from '../components/EditRecipes/Tag';
-import { Book, Eye, Heart, PlusCircle, Printer, Save } from 'react-feather';
+import { Book, Eye, PlusCircle, Printer, Save } from 'react-feather';
 import ScanModal from '../components/Settings/ScanModal';
 import AuthContext from '../authentication/auth-context';
 
