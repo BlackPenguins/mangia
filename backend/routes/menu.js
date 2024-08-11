@@ -2,6 +2,8 @@ import express from 'express';
 import { selectAllRecipes, selectRecipeByID, updateRecipe } from '../database/recipes.js';
 import { insertMenu, selectMenuByDay, selectMenuByMenuID, swapMenu, updateMenu } from '../database/menu.js';
 import { checkAdminMiddleware } from './auth.js';
+import { addIngredientsToRecipe } from './recipes.js';
+import { insertWeek } from '../database/week.js';
 
 const DAYS_OF_WEEK = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
 const MONTHS_OF_YEAR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -9,6 +11,12 @@ const MONTHS_OF_YEAR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug'
 const getMenuForWeek = async (req, res) => {
 	let weekOffset = req.params.weekOffset;
 
+	const responseObject = await getMenuForWeekOffset(weekOffset);
+	// No DB calls, no promises needed because there is no async
+	res.status(200).json(responseObject);
+};
+
+export const getMenuForWeekOffset = async (weekOffset) => {
 	const daysArray = getDaysForAWeek(weekOffset);
 
 	let formattedDaysArray = [];
@@ -35,12 +43,14 @@ const getMenuForWeek = async (req, res) => {
 			const menuFromDB = doesExistPromise[0];
 			if (menuFromDB?.RecipeID) {
 				const recipeFromDB = await selectRecipeByID(menuFromDB.RecipeID);
+				await addIngredientsToRecipe(recipeFromDB);
 				menuExistsDetails = {
 					menuID: menuFromDB.MenuID,
 					isMade: menuFromDB.IsMade,
 					isSkipped: menuFromDB.IsSkipped,
 					isLeftovers: menuFromDB.IsLeftovers,
 					skipReason: menuFromDB.skipReason,
+					weekID: menuFromDB.WeekID,
 					recipe: recipeFromDB,
 				};
 			}
@@ -56,13 +66,10 @@ const getMenuForWeek = async (req, res) => {
 		});
 	}
 
-	const responseObject = {
+	return {
 		weekOfYear,
 		days: formattedDaysArray,
 	};
-
-	// No DB calls, no promises needed because there is no async
-	res.status(200).json(responseObject);
 };
 
 const moveMenuItem = async (req, res) => {
@@ -98,6 +105,7 @@ const generateMenu = async (req, res) => {
 	}
 
 	const daysArray = getDaysForAWeek(weekOffset);
+	const newWeekID = (await insertWeek()).id;
 
 	let recipes = await selectAllRecipes();
 
@@ -111,7 +119,7 @@ const generateMenu = async (req, res) => {
 		const existingMenu = await selectMenuByDay(formattedDateForDB);
 
 		if (existingMenu.length === 0) {
-			await insertMenu(day, pickedRecipe.RecipeID);
+			await insertMenu(day, pickedRecipe.RecipeID, newWeekID);
 			console.log(`Day inserted into Menu - ${pickedRecipe.RecipeID}, ${pickedRecipe.Name}, ${pickedRecipe.weight}`);
 		} else {
 			const updatedMenu = {

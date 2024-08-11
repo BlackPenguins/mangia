@@ -7,6 +7,7 @@ const AuthContext = React.createContext({
 	name: null,
 	loginHandler: (username, password, setErrorMessage, closeModalFunction) => {},
 	logoutHandler: () => {},
+	isNotAdmin: () => {},
 });
 
 export const AuthContextProvider = ({ children }) => {
@@ -105,9 +106,12 @@ export const AuthContextProvider = ({ children }) => {
 				return response.json();
 			})
 			.then((json) => {
-				console.log('USERE', json);
 				setUsers(json);
 			});
+	};
+
+	const isNotAdmin = () => {
+		return userID !== 0 && !isAdmin;
 	};
 
 	return (
@@ -120,6 +124,7 @@ export const AuthContextProvider = ({ children }) => {
 				loginHandler,
 				logoutHandler,
 				users,
+				isNotAdmin,
 			}}
 		>
 			{children}

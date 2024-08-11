@@ -66,7 +66,7 @@ const ChangeModal = ({ menu, fetchMenu, page, availableSwapDays, closeModalHandl
 									return null;
 								} else {
 									return (
-										<option value={day.menuID}>
+										<option key={day.menuID} value={day.menuID}>
 											{day.dayOfWeek} - {day.recipeName}
 										</option>
 									);

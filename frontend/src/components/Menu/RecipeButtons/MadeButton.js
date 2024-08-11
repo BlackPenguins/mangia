@@ -10,7 +10,6 @@ const MadeButton = ({ fetchMenu, menu, page, recipe }) => {
 	const isSkipped = menu?.isSkipped;
 	const isMade = menu?.isMade;
 	const made = useCallback(async () => {
-		console.log('HEAD', tokenFromStorage);
 		await fetch(`/api/menu/made/${menu?.menuID}`, {
 			method: 'POST',
 			body: JSON.stringify({ isMade: !isMade, recipeID: recipe?.RecipeID }),

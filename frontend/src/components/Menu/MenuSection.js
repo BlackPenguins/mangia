@@ -34,8 +34,8 @@ const MenuSection = () => {
 
 	if (menus === null) {
 		return (
-			<section class="hero">
-				<div class="container">
+			<section className="hero">
+				<div className="container">
 					<Spinner
 						color="success"
 						style={{
@@ -57,8 +57,8 @@ const MenuSection = () => {
 		}));
 
 		return (
-			<section class="hero">
-				<div class="container">
+			<section className="hero">
+				<div className="container">
 					<MenuNav menus={menus} weekOfYear={weekOfYear} page={page} setPage={setPage} fetchMenu={fetchMenu} />
 					{menus?.length === 0 && <span>No menu found. This should not happen!</span>}
 					<MenuRow menus={menus} fetchMenu={fetchMenu} page={page} currentRecipeIDs={currentRecipeIDs} size={5} availableSwapDays={availableSwapDays} />
@@ -108,14 +108,16 @@ const MenuCard = ({ menu, fetchMenu, page, currentRecipeIDs, tomorrowsRecipe, av
 
 	const bottomButtons = [];
 	if (authContext.isAdmin) {
-		bottomButtons.push(<MadeButton fetchMenu={fetchMenu} menu={menu} page={page} recipe={menu?.recipe} />);
-		bottomButtons.push(<SkipButton fetchMenu={fetchMenu} menu={menu} page={page} />);
-		bottomButtons.push(<LeftoversButton fetchMenu={fetchMenu} menu={menu} page={page} />);
-		bottomButtons.push(<RerollButton fetchMenu={fetchMenu} menuID={menu.menuID} page={page} currentRecipeIDs={currentRecipeIDs} isSkipped={menu?.isSkipped} />);
+		bottomButtons.push(<MadeButton key="made" fetchMenu={fetchMenu} menu={menu} page={page} recipe={menu?.recipe} />);
+		bottomButtons.push(<SkipButton key="skip" fetchMenu={fetchMenu} menu={menu} page={page} />);
+		bottomButtons.push(<LeftoversButton key="leftovers" fetchMenu={fetchMenu} menu={menu} page={page} />);
+		bottomButtons.push(
+			<RerollButton key="reroll" fetchMenu={fetchMenu} menuID={menu.menuID} page={page} currentRecipeIDs={currentRecipeIDs} isSkipped={menu?.isSkipped} />
+		);
 	}
 
 	return (
-		<div class="col-md-6 col-lg-3 ftco-animate fadeInUp ftco-animated recipe-card">
+		<div className="col-md-6 col-lg-3 ftco-animate fadeInUp ftco-animated recipe-card">
 			<div className={cardClasses.join(' ')}>
 				{authContext.isAdmin && <ChangeButton fetchMenu={fetchMenu} menu={menu} page={page} availableSwapDays={availableSwapDays} />}
 				<div>{menu.week}</div>
@@ -149,17 +151,21 @@ const DayPreparation = ({ tomorrowsRecipe }) => {
 
 	return (
 		<div className="prep-footer">
-			<div class="prep-title">Tomorrow's Prep</div>
+			<div className="prep-title">Tomorrow's Prep</div>
 			<div>
-				{defrostSplit.map((defrost) => {
+				{defrostSplit.map((defrost, index) => {
 					return (
-						<div className="defrost">
+						<div key={index} className="defrost">
 							<AcUnit /> {defrost}
 						</div>
 					);
 				})}
-				{dayPrepSplit.map((dayPrep) => {
-					return <div class="prep-notes">{dayPrep}</div>;
+				{dayPrepSplit.map((dayPrep, index) => {
+					return (
+						<div key={index} className="prep-notes">
+							{dayPrep}
+						</div>
+					);
 				})}
 			</div>
 		</div>

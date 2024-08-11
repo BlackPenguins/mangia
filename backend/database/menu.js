@@ -26,19 +26,23 @@ export const selectMenuByMenuID = (menuID) => {
 	});
 };
 
-export const insertMenu = (day, recipeID) => {
+export const insertMenu = (day, recipeID, newWeekID) => {
 	return new Promise((resolve, reject) => {
-		pool.query('INSERT INTO MENU_DAY (Day, RecipeID, IsMade, IsSkipped, IsLeftovers) VALUES (?, ?, ?, ?, ?)', [day, recipeID, 0, 0, 0], (error, result) => {
-			if (error) {
-				return reject(error.sqlMessage);
-			} else {
-				const responseObject = {
-					id: result.insertId,
-				};
+		pool.query(
+			'INSERT INTO MENU_DAY (Day, RecipeID, IsMade, IsSkipped, IsLeftovers, WeekID) VALUES (?, ?, ?, ?, ?, ?)',
+			[day, recipeID, 0, 0, 0, newWeekID],
+			(error, result) => {
+				if (error) {
+					return reject(error.sqlMessage);
+				} else {
+					const responseObject = {
+						id: result.insertId,
+					};
 
-				return resolve(responseObject);
+					return resolve(responseObject);
+				}
 			}
-		});
+		);
 	});
 };
 

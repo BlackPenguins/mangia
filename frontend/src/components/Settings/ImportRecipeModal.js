@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import './ImportRecipeModal.css';
 import AuthContext from '../../authentication/auth-context';
 
-const ImportRecipeModal = ({ closeModalHandler }) => {
+const ImportRecipeModal = ({ closeModalHandler, currentRecipeID }) => {
 	const authContext = useContext(AuthContext);
 	const tokenFromStorage = authContext.token;
 
@@ -17,8 +17,6 @@ const ImportRecipeModal = ({ closeModalHandler }) => {
 
 	const [importFile, setImportFile] = useState('');
 
-	const addBookInputRef = useRef();
-
 	const viewRecipeHandler = () => {
 		closeModalHandler();
 		navigate(`/recipe/${newRecipeID}`);
@@ -29,7 +27,7 @@ const ImportRecipeModal = ({ closeModalHandler }) => {
 		console.log('Importing', url);
 		const response = await fetch(`/api/recipes/import`, {
 			method: 'POST',
-			body: JSON.stringify({ url }),
+			body: JSON.stringify({ url, currentRecipeID }),
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
 				'Content-Type': 'application/json',
@@ -46,8 +44,6 @@ const ImportRecipeModal = ({ closeModalHandler }) => {
 			setStatusClasses('status failure');
 			setStatus(data.status);
 		}
-
-		addBookInputRef.current.value = '';
 	};
 
 	const importRecipeFile = async () => {

@@ -39,25 +39,25 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 		classes.push('menu');
 	}
 	return (
-		<div class={classes.join(' ')}>
+		<div className={classes.join(' ')}>
 			<CardStatus isSkipped={isSkipped} skipReason={skipReason} recipe={recipe} isMade={isMade} isLeftovers={isLeftovers} />
-			<a href="#" class="img-prod">
+			<a href="#" className="img-prod">
 				{thumbnail}
 			</a>
-			<div class="text py-3 pb-4 px-3 text-center">
+			<div className="text py-3 pb-4 px-3 text-center">
 				<h3 className={`card-title ${categoryClass}`}>
 					<span>{recipeName}</span>
 				</h3>
 				<DaysAgo lastMade={recipe?.lastmade} />
-				<div class="d-flex">
-					<div class="pricing">
-						<p class="price">
-							<span class="mr-2 price-dc">{recipe?.Description}</span>
+				<div className="d-flex">
+					<div className="pricing">
+						<p className="price">
+							<span className="mr-2 price-dc">{recipe?.Description}</span>
 						</p>
 					</div>
 				</div>
-				<div class="bottom-area d-flex px-3">
-					<div class="m-auto d-flex">{bottomButtons}</div>
+				<div className="bottom-area d-flex px-3">
+					<div className="m-auto d-flex">{bottomButtons}</div>
 				</div>
 			</div>
 		</div>
@@ -65,7 +65,6 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 };
 
 const DaysAgo = ({ lastMade }) => {
-	console.log('HIT', lastMade);
 	if (!lastMade) {
 		return null;
 	}

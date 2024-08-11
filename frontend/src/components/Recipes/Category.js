@@ -4,7 +4,7 @@ import './Category.css';
 const Category = ({ category, setCategory }) => {
 	if (setCategory) {
 		return (
-			<div class="form-floating">
+			<div className="form-floating">
 				<Input
 					className="edit-category-dropdown"
 					type="select"

@@ -10,7 +10,7 @@ const ScanModal = ({ attachments, fetchRecipe, closeModalHandler, recipeID }) =>
 
 	const [imageFile, setImageFile] = useState('');
 	const [text, setText] = useState(null);
-	const [progress, setProgress] = useState(0);
+	const [progress, setProgress] = useState(null);
 
 	const fileChangeHandler = (event) => {
 		setImageFile(event.target.files[0]);
@@ -19,7 +19,6 @@ const ScanModal = ({ attachments, fetchRecipe, closeModalHandler, recipeID }) =>
 	const fetchProgress = async () => {
 		const response = await fetch('/api/recipes/parseTextProgress');
 		const data = await response.json();
-		console.log('GO', data);
 		setProgress(data.progress);
 	};
 
@@ -31,18 +30,17 @@ const ScanModal = ({ attachments, fetchRecipe, closeModalHandler, recipeID }) =>
 			await fetch(`/api/recipes/attachments/${recipeID}`, {
 				method: 'POST',
 				body: imageData,
-				header: {
+				headers: {
 					Authorization: `Bearer ${tokenFromStorage}`,
 				},
 			});
-			// const data = await response.json();
+
+			setImageFile('');
 		}
 		fetchRecipe();
 	};
 
 	const parseText = async (attachment) => {
-		console.log('PARSE', attachment);
-
 		setText(null);
 		setProgress(0);
 
@@ -56,10 +54,10 @@ const ScanModal = ({ attachments, fetchRecipe, closeModalHandler, recipeID }) =>
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
 				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
 			},
 		});
 		const data = await response.json();
-		console.log('SCAN BACK');
 		if (data) {
 			setText(data.text);
 		}
@@ -74,14 +72,14 @@ const ScanModal = ({ attachments, fetchRecipe, closeModalHandler, recipeID }) =>
 				<div className="container book-list">
 					<h3>Scanned Files</h3>
 					<ul>
-						{attachments.length === 0 && <div>No books found</div>}
+						{attachments.length === 0 && <div>No attachments found</div>}
 						{attachments &&
-							attachments.map((attachment, i) => {
+							attachments.map((attachment, index) => {
 								const imageURL = `http://localhost:6200/attachments/${recipeID}/${attachment}`;
 								const clickHandler = () => {
 									parseText(attachment);
 								};
-								return <img alt={`attachment-${i}`} onClick={clickHandler} width={100} src={imageURL} />;
+								return <img key={index} alt={`attachment-${index}`} onClick={clickHandler} width={100} src={imageURL} />;
 							})}
 					</ul>
 					<Row>
@@ -100,8 +98,8 @@ const ScanModal = ({ attachments, fetchRecipe, closeModalHandler, recipeID }) =>
 					</Row>
 					<div className="parsed-text">
 						{lines &&
-							lines.map((line) => {
-								return <div>{line}</div>;
+							lines.map((line, index) => {
+								return <div key={index}>{line}</div>;
 							})}
 						{!lines && <Progress progress={progress} />}
 					</div>
@@ -112,6 +110,10 @@ const ScanModal = ({ attachments, fetchRecipe, closeModalHandler, recipeID }) =>
 };
 
 const Progress = ({ progress }) => {
+	if (progress === null) {
+		return null;
+	}
+
 	const progressValue = Math.round(progress * 100);
 	return <span>Progress {progressValue}%</span>;
 };

@@ -1,8 +1,8 @@
 import express from 'express';
 import { addTag, deleteRecipe, deleteTag, insertRecipe, selectAllRecipes, selectRecipeByID, selectTags, updateRecipe } from '../database/recipes.js';
-import { createIngredients, createSteps, importRecipe } from '../scrapers/RecipeImporter.js';
+import { breakdownIngredient, createIngredients, createSteps, importRecipe } from '../scrapers/RecipeImporter.js';
 import { deleteStepsByRecipeID, selectStepsByRecipeID } from '../database/step.js';
-import { deleteIngredientsByRecipeID, selectIngredientsByRecipeID } from '../database/ingredient.js';
+import { deleteIngredientsByRecipeID, selectIngredientsByRecipeID, updateIngredient } from '../database/ingredient.js';
 
 import Tesseract, { createWorker } from 'tesseract.js';
 import multer from 'multer';
@@ -11,6 +11,7 @@ import { insertTag, selectTagByName } from '../database/tags.js';
 
 import fs from 'fs';
 import { checkAdminMiddleware } from './auth.js';
+import { insertIngredientTag, selectIngredientTagByName } from '../database/ingredientTags.js';
 
 const thumbnailStorageEngine = multer.diskStorage({
 	destination: (req, file, callback) => {
@@ -79,20 +80,31 @@ const getRecipe = async (req, res) => {
 
 		console.log(recipe.attachments);
 
-		const ingredients = await selectIngredientsByRecipeID(req.params.recipeID);
-
-		recipe.ingredients = [];
-		for (const ingredient of ingredients) {
-			recipe.ingredients.push({
-				amount: ingredient.amount,
-				rawname: ingredient.rawname,
-			});
-		}
+		await addIngredientsToRecipe(recipe);
 
 		res.status(200).json(recipe);
 	}
 };
 
+export const addIngredientsToRecipe = async (recipe) => {
+	const ingredients = await selectIngredientsByRecipeID(recipe.RecipeID);
+
+	recipe.ingredients = [];
+	for (const ingredient of ingredients) {
+		const { extractedAmount, extractedName } = breakdownIngredient(ingredient?.Name);
+
+		recipe.ingredients.push({
+			ingredientID: ingredient.IngredientID,
+			name: ingredient.Name,
+			tagName: ingredient.TagName,
+			tagID: ingredient.IngredientTagID,
+			calculatedAmount: extractedAmount,
+			calculatedValue: extractedName,
+			ingredientDepartment: ingredient.IngredientDepartment,
+			ingredientDepartmentPosition: ingredient.IngredientDepartmentPosition,
+		});
+	}
+};
 const getAllRecipes = (req, res) => {
 	const selectPromise = selectAllRecipes();
 
@@ -108,7 +120,8 @@ const getAllRecipes = (req, res) => {
 
 const importRecipeProcessor = async (req, res) => {
 	let url = req.body.url;
-	const importResponse = await importRecipe(url);
+	let currentRecipeID = req.body.currentRecipeID;
+	const importResponse = await importRecipe(url, currentRecipeID);
 	res.status(200).json(importResponse);
 };
 
@@ -295,23 +308,57 @@ const updateRecipeProcessor = async (req, res) => {
 	res.status(200).json({ success: true, recipe });
 };
 
+const updateIngredientProcessor = async (req, res) => {
+	const ingredientID = req.params.ingredientID;
+	console.log(`Incoming Update Ingredient for ${ingredientID}`, req.body);
+
+	const ingredientValue = req.body.value;
+	const tagName = req.body?.tagName;
+
+	const updatedIngredient = {};
+
+	if (ingredientValue) {
+		updatedIngredient.Name = ingredientValue;
+	}
+
+	if (tagName) {
+		let tagID = null;
+
+		const foundTagResults = await selectIngredientTagByName(tagName);
+
+		if (foundTagResults.length === 0) {
+			const createdTag = await insertIngredientTag({ Name: tagName.trim() });
+			tagID = createdTag.id;
+		} else {
+			tagID = foundTagResults[0].IngredientTagID;
+		}
+		updatedIngredient.IngredientTagID = tagID;
+	} else if (tagName !== undefined) {
+		// Remove the tag if its falsy but it was still included in the body
+		updatedIngredient.IngredientTagID = null;
+	}
+
+	// Update the ingredient with the tag
+	console.log(` Update Ingredient for ${ingredientID}`, updatedIngredient);
+	const recipe = await updateIngredient(updatedIngredient, ingredientID);
+	res.status(200).json({ success: true, updatedIngredient });
+};
+
 const updateStepsAndIngredients = async (body, recipeID) => {
 	const updatedRecipe = {};
 
 	// Now that we updated the recipe we can add in the data that is joined with the RECIPE table
 	if (body.ingredients) {
 		updatedRecipe.ingredients = body.ingredients;
+		await deleteIngredientsByRecipeID(recipeID);
+		await createIngredients(recipeID, updatedRecipe);
 	}
 
 	if (body.steps) {
 		updatedRecipe.steps = body.steps;
+		await deleteStepsByRecipeID(recipeID);
+		await createSteps(recipeID, updatedRecipe);
 	}
-
-	await deleteIngredientsByRecipeID(recipeID);
-	await deleteStepsByRecipeID(recipeID);
-
-	await createIngredients(recipeID, updatedRecipe);
-	await createSteps(recipeID, updatedRecipe);
 };
 
 const referenceStorageEngine = multer.diskStorage({
@@ -375,6 +422,7 @@ const deleteRecipeProcessor = async (req, res) => {
 let progress = 0;
 const router = express.Router();
 
+router.get('/api/recipes/parseTextProgress', getParseTextProgress);
 router.get('/api/recipes/:recipeID/tags', getTagsForRecipe);
 router.get('/api/recipes/:recipeID', getRecipe);
 router.get('/api/recipes', getAllRecipes);
@@ -385,8 +433,8 @@ router.put('/api/recipes', [checkAdminMiddleware], addRecipe);
 router.post('/api/recipes/:recipeID/addTag', [checkAdminMiddleware], addTagToRecipe);
 router.post('/api/recipes/:recipeID/removeTag', [checkAdminMiddleware], removeTagFromRecipe);
 router.patch('/api/recipes/:recipeID', [checkAdminMiddleware], updateRecipeProcessor);
+router.patch('/api/recipes/:recipeID/ingredient/:ingredientID', [checkAdminMiddleware], updateIngredientProcessor);
 router.post('/api/recipeOCR', [checkAdminMiddleware], uploadImportFile.single('importFile'), uploadOCR);
-router.get('/api/recipes/parseTextProgress', [checkAdminMiddleware], getParseTextProgress);
 router.post('/api/recipes/:recipeID/parseText', [checkAdminMiddleware], parseText);
 router.delete('/api/recipes/:recipeID', [checkAdminMiddleware], deleteRecipeProcessor);
 

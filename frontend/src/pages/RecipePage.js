@@ -47,9 +47,9 @@ const RecipePage = () => {
 		</div>;
 	} else {
 		return (
-			<section class="hero">
-				<div class="container">
-					<div class="section-title">
+			<section className="hero">
+				<div className="container">
+					<div className="section-title">
 						<h2>{recipe.Name}</h2>
 					</div>
 
@@ -101,10 +101,10 @@ const Statistics = ({ recipe, book }) => {
 	return (
 		<div className="statistics">
 			{recipeTags.length > 0 && (
-				<div class="tag-section">
-					{recipeTags.map((tag) => {
+				<div className="tag-container">
+					{recipeTags.map((tag, index) => {
 						return (
-							<span className="tag">
+							<span key={index} className="tag">
 								<span className="tag-name">{tag.Name}</span>
 							</span>
 						);
@@ -204,11 +204,7 @@ const Ingredients = ({ ingredients }) => {
 			<ul>
 				{ingredients &&
 					ingredients.map((ingredient, index) => {
-						return (
-							<li key={index}>
-								{ingredient.amount} {ingredient.rawname}
-							</li>
-						);
+						return <li key={index}>{ingredient.name}</li>;
 					})}
 			</ul>
 		</div>
@@ -225,7 +221,7 @@ const Steps = ({ steps }) => {
 			<h4>Steps</h4>
 			{steps.map((step) => {
 				return (
-					<div className="step" key={step.stepNumber}>
+					<div key={step.stepNumber} className="step">
 						<div className="number">
 							<div>{step.stepNumber}</div>
 						</div>
@@ -248,8 +244,8 @@ const Notes = ({ title, notes }) => {
 		<div className="notes">
 			<h4>{title}</h4>
 			<ul>
-				{notesSplit.map((note) => {
-					return <li>{note}</li>;
+				{notesSplit.map((note, index) => {
+					return <li key={index}>{note}</li>;
 				})}
 			</ul>
 		</div>

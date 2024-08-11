@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import FilteredRecipesControl from '../components/Recipes/FilteredRecipesControl';
+import FilteredRecipesControl, { HIDDEN_CATEGORY_FILTER } from '../components/Recipes/FilteredRecipesControl';
 import RecipeCard from '../components/Recipes/RecipeCard';
 
 const HomePage = () => {
@@ -7,13 +7,13 @@ const HomePage = () => {
 	return (
 		<>
 			<section>
-				<div class="container">
-					<div class="row">
-						<div class="col-lg-12">
-							<div class="section-title">
+				<div className="container">
+					<div className="row">
+						<div className="col-lg-12">
+							<div className="section-title">
 								<h2>Recipe Book</h2>
 							</div>
-							<div class="featured__controls">
+							<div className="featured__controls">
 								<ul>
 									<li class={categoryFilter === null ? 'active' : ''} onClick={() => setCategoryFilter(null)}>
 										All
@@ -29,6 +29,13 @@ const HomePage = () => {
 									</li>
 									<li class={categoryFilter === 'Dessert' ? 'active' : ''} data-filter=".fastfood" onClick={() => setCategoryFilter('Dessert')}>
 										Dessert
+									</li>
+									<li
+										class={categoryFilter === HIDDEN_CATEGORY_FILTER ? 'active' : ''}
+										data-filter=".fastfood"
+										onClick={() => setCategoryFilter(HIDDEN_CATEGORY_FILTER)}
+									>
+										Hidden
 									</li>
 								</ul>
 							</div>

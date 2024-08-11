@@ -3,6 +3,7 @@ import { Menu, Users } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../authentication/auth-context';
 import LoginDisplay from '../authentication/LoginDisplay';
+import AddRecipeModal from './Settings/AddRecipeModal';
 import ImportRecipeModal from './Settings/ImportRecipeModal';
 
 const Header = () => {
@@ -10,6 +11,7 @@ const Header = () => {
 	const navigate = useNavigate();
 
 	const [showImportModal, setShowImportModal] = useState(false);
+	const [showAddRecipeModal, setShowAddRecipeModal] = useState(false);
 	const [showSidebar, setShowSidebar] = useState(false);
 
 	const overlayClasses = ['humberger__menu__overlay'];
@@ -30,6 +32,11 @@ const Header = () => {
 		setShowSidebar(false);
 	};
 
+	const addRecipe = () => {
+		setShowAddRecipeModal(true);
+		setShowSidebar(false);
+	};
+
 	const links = (
 		<ul>
 			<li>
@@ -45,13 +52,23 @@ const Header = () => {
 			{authContext.isAdmin && (
 				<>
 					<li>
-						<div className="nav-link" onClick={() => navigateTo('recipe')}>
+						<div className="nav-link" onClick={addRecipe}>
 							<span>Add Recipe</span>
 						</div>
 					</li>
 					<li>
 						<div className="nav-link" onClick={importRecipe}>
 							<span>Import Recipe</span>
+						</div>
+					</li>
+					<li>
+						<div className="nav-link" onClick={() => navigateTo('shoppingList')}>
+							<span>Shopping List</span>
+						</div>
+					</li>
+					<li>
+						<div className="nav-link" onClick={() => navigateTo('configuration')}>
+							<span>Config</span>
 						</div>
 					</li>
 				</>
@@ -62,55 +79,49 @@ const Header = () => {
 	return (
 		<>
 			{showImportModal && <ImportRecipeModal closeModalHandler={() => setShowImportModal(true)} />}
+			{showAddRecipeModal && <AddRecipeModal closeModalHandler={() => setShowAddRecipeModal(false)} />}
 			<div className={overlayClasses.join(' ')} onClick={() => setShowSidebar(false)}></div>
 			<div className={sidebarClasses.join(' ')}>
-				<div class="humberger__menu__logo">MANGIA!</div>
-				<div class="humberger__menu__widget">
-					<div class="header__top__right__auth">
-						<a href="#">
+				<div className="humberger__menu__logo">MANGIA!</div>
+				<div className="humberger__menu__widget">
+					<div className="header__top__right__auth">
+						<span>
 							<Users size={15} /> <LoginDisplay />
-						</a>
+						</span>
 					</div>
 				</div>
-				<nav class="humberger__menu__nav mobile-menu slicknav_nav">{links}</nav>
+				<nav className="humberger__menu__nav mobile-menu slicknav_nav">{links}</nav>
 				<div id="mobile-menu-wrap"></div>
 			</div>
 
-			<header class="header">
-				<div class="header__top">
-					<div class="container">
-						<div class="row">
-							<div class="col-lg-6 col-md-6">
-								<div class="header__top__left">
+			<header className="header">
+				<div className="header__top">
+					<div className="container">
+						<div className="row">
+							<div className="col-lg-8 col-md-8">
+								<div className="header__top__left">
 									<ul>MANGIA!</ul>
 								</div>
 							</div>
-							<div class="col-lg-6 col-md-6">
-								<div class="header__top__right">
-									<div class="header__top__right__auth">
-										<a href="#">
+							<div className="col-lg-8 col-md-8">
+								<div className="header__top__right">
+									<div className="header__top__right__auth">
+										<span>
 											<Users size={15} /> <LoginDisplay />
-										</a>
+										</span>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div class="container">
-					<div class="row">
-						<div class="col-lg-3">
-							<div class="header__logo">
-								<a href="./index.html">
-									<img src="img/logo.png" alt="" />
-								</a>
-							</div>
-						</div>
-						<div class="col-lg-6">
-							<nav class="header__menu">{links}</nav>
+				<div className="container">
+					<div className="row">
+						<div className="col-lg-12">
+							<nav className="header__menu">{links}</nav>
 						</div>
 					</div>
-					<div class="humberger__open" onClick={() => setShowSidebar(true)}>
+					<div className="humberger__open" onClick={() => setShowSidebar(true)}>
 						<Menu />
 					</div>
 				</div>

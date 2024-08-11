@@ -3,7 +3,6 @@ export const checkAdminMiddleware = async (req, res, next) => {
 		return next();
 	}
 
-	console.log('Authentication coming in');
 	// Make a call to the auth server to get the details of this user
 	const response = await fetch(`http://authentication:${process.env.AUTH_BACKEND_PORT}/auth/checkuser`, {
 		method: 'POST',

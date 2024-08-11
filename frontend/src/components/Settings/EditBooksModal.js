@@ -45,7 +45,7 @@ const EditBooksModal = ({ books, fetchBooks, closeModalHandler }) => {
 					</ul>
 					<Row>
 						<Col lg={4}>
-							<div class="form-floating">
+							<div className="form-floating">
 								<Input id="book-name" type="text" placeholder="Book Name" innerRef={addBookInputRef}></Input>
 								<label for="book-name">Book Name</label>
 							</div>

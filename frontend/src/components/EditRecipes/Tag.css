@@ -1,8 +1,12 @@
-.tag-section {
-	margin: 20px 0px;
+.tag-container {
+	display: flex;
+	align-content: center;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
 }
 
-.tag-section .tag {
+.tag-container .tag {
 	margin-right: 10px;
 	color: white;
 }
@@ -14,12 +18,26 @@
 
 .tag .tag-name {
 	padding: 2px 15px;
+}
+
+.tag.recipe .tag-name {
 	background-color: rgb(148, 150, 24);
+}
+
+.tag.ingredient .tag-name {
+	background-color: rgb(24, 93, 150);
 }
 
 .tag .remove-tag {
 	padding: 2px 10px;
+}
+
+.tag.recipe .remove-tag {
 	background-color: rgb(118, 119, 27);
+}
+
+.tag.ingredient .remove-tag {
+	background-color: rgb(20, 61, 95);
 }
 
 .tag .remove-tag:hover {
@@ -27,7 +45,7 @@
 	color: rgb(255, 87, 87);
 }
 
-.tag-suggestions {
+.suggestions {
 	position: absolute;
 	border: 1px solid #999;
 	border-top-width: 0;
@@ -35,20 +53,22 @@
 	margin-top: 0;
 	padding-left: 0;
 	width: calc(300px + 1rem);
+	z-index: 150000;
 }
 
-.tag-suggestions li {
+.suggestions li {
 	padding: 0.5rem;
+	background-color: white;
 }
 
 .suggestion-active,
-.tag-suggestions li:hover {
-	background-color: #008f68;
+.suggestions li:hover {
+	background-color: #008f68 !important;
 	color: #fae042;
 	cursor: pointer;
 	font-weight: 700;
 }
 
-.tag-suggestions li:not(:last-of-type) {
+.suggestions li:not(:last-of-type) {
 	border-bottom: 1px solid #999;
 }

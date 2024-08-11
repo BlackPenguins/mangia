@@ -1,4 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
+import { debounce } from 'lodash';
+
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, FormGroup, FormText, Input, Label, Row } from 'reactstrap';
 
@@ -6,21 +8,23 @@ import './RecipeEditPage.css';
 import EditBooksModal from '../components/Settings/EditBooksModal';
 import Rating from '../components/Settings/Rating';
 import Category from '../components/Recipes/Category';
-import Tag from '../components/EditRecipes/Tag';
-import { Book, Eye, PlusCircle, Printer, Save } from 'react-feather';
+import Tag, { TagBox } from '../components/EditRecipes/Tag';
+import { ArrowDown, ArrowUpCircle, Book, Eye, PlusCircle, Printer, Save } from 'react-feather';
 import ScanModal from '../components/Settings/ScanModal';
 import AuthContext from '../authentication/auth-context';
+import InputWithAutocomplete from '../components/EditRecipes/InputWithAutocomplete';
+import ImportRecipeModal from '../components/Settings/ImportRecipeModal';
 
 const RecipeDetailsPage = () => {
 	const navigate = useNavigate();
 	const authContext = useContext(AuthContext);
 	const tokenFromStorage = authContext.token;
 
-	if (!authContext.isAdmin) {
+	if (authContext.isNotAdmin()) {
+		console.log('Kicking the non-admin out of the edit page!');
 		navigate('/home');
 	}
-	// TODO: Edit anything it autosaves, without needing a button click
-	// TODO: Create action js tom handle all the handlers
+
 	// TODO: Test the algorithm, show last mades on the page, something is off
 	//
 
@@ -58,7 +62,9 @@ const RecipeDetailsPage = () => {
 	const [defrost, setDefrost] = useState('');
 	const [description, setDescription] = useState('');
 	const [steps, setSteps] = useState('');
-	const [ingredients, setIngredients] = useState('');
+	const [ingredients, setIngredients] = useState([]);
+	const [ingredientsBulk, setIngredientsBulk] = useState('');
+	const [ingredientsDebug, setIngredientsDebug] = useState('');
 	const [bookID, setBookID] = useState(0);
 	const [isActive, setIsActive] = useState(true);
 	const [page, setPage] = useState('');
@@ -92,16 +98,10 @@ const RecipeDetailsPage = () => {
 			const finalSteps = recipe.steps.map((step) => step.instruction).join('\n\n');
 			setSteps(finalSteps);
 
-			const finalIngredients = recipe.ingredients
-				.map((ingredient) => {
-					if (ingredient.amount === 0) {
-						return ingredient.rawname;
-					} else {
-						return `${ingredient.amount} ${ingredient.rawname}`;
-					}
-				})
-				.join('\n');
-			setIngredients(finalIngredients);
+			const ingredientsBulk = recipe.ingredients.map((ingredient) => ingredient.Name).join('\n');
+			setIngredients(recipe.ingredients);
+			setIngredientsBulk(ingredientsBulk);
+			setIngredientsDebug(recipe.ingredients);
 		}
 	}, [recipeID]);
 
@@ -109,28 +109,9 @@ const RecipeDetailsPage = () => {
 		fetchRecipe();
 	}, [fetchRecipe]);
 
-	const addRecipe = async (recipe) => {
-		console.log('Adding new recipe', recipe);
-		const response = await fetch('/api/recipes', {
-			method: 'PUT',
-			body: JSON.stringify(recipe),
-			headers: {
-				// This is required. NodeJS server won't know how to read it without it.
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${tokenFromStorage}`,
-			},
-		});
-		const data = await response.json();
-
-		if (response.status === 200) {
-			console.log('Recipe added successfully.', data);
-			navigate(`/recipe/${data.recipeID}`);
-		} else {
-			console.error('ERROR: ' + data.message);
-		}
-	};
-
 	const previewAction = () => navigate(`/recipe/${recipeID}`);
+
+	const [showImportModal, setShowImportModal] = useState(false);
 
 	const updateRecipe = async (recipe) => {
 		console.log('Updating recipe', recipe);
@@ -165,95 +146,138 @@ const RecipeDetailsPage = () => {
 		}
 	};
 
-	const onSaveHandler = (event) => {
-		event.preventDefault();
+	const debounceEditFunction = useCallback(debounce(updateRecipe, 1500), [tokenFromStorage]);
 
-		const recipeJSON = {
-			name,
-			description,
-			category,
-			protein,
-			defrost,
-			bookID,
-			page,
-			notes,
-			dayPrep,
-			rating,
-			url,
-			isActive,
-		};
+	const isActiveHandler = (value) => {
+		setIsActive(value);
+		debounceEditFunction({ isActive: value });
+	};
 
-		recipeJSON.steps = steps.split('\n');
-		recipeJSON.ingredients = ingredients.split('\n');
+	const nameHandler = (value) => {
+		setName(value);
+		debounceEditFunction({ name: value });
+	};
 
-		if (recipeID) {
-			updateRecipe(recipeJSON);
-		} else {
-			addRecipe(recipeJSON);
-		}
+	const descriptionHandler = (value) => {
+		setDescription(value);
+		debounceEditFunction({ description: value });
+	};
+
+	const categoryHandler = (value) => {
+		setCategory(value);
+		debounceEditFunction({ category: value });
+	};
+
+	const proteinHandler = (value) => {
+		setProtein(value);
+		debounceEditFunction({ protein: value });
+	};
+
+	const stepsHandler = (value) => {
+		setSteps(value);
+		debounceEditFunction({ steps: value.split('\n') });
+	};
+
+	const ingredientsHandler = (value) => {
+		setIngredientsBulk(value);
+		debounceEditFunction({ ingredients: value.split('\n') });
+	};
+
+	const notesHandler = (value) => {
+		setNotes(value);
+		debounceEditFunction({ notes: value });
+	};
+
+	const dayPrepHandler = (value) => {
+		setDayPrep(value);
+		debounceEditFunction({ dayPrep: value });
+	};
+
+	const urlHandler = (value) => {
+		setURL(value);
+		debounceEditFunction({ url: value });
+	};
+
+	const ratingHandler = (value) => {
+		setRating(value);
+		debounceEditFunction({ rating: value });
+	};
+
+	const defrostHandler = (value) => {
+		setDefrost(value);
+		debounceEditFunction({ defrost: value });
+	};
+
+	const pageHandler = (value) => {
+		setPage(value);
+		debounceEditFunction({ page: value });
+	};
+
+	const bookIDHandler = (value) => {
+		setBookID(value);
+		debounceEditFunction({ bookID: value });
 	};
 
 	return (
 		<>
-			<div class="section-title">
-				<h2>{recipeID ? 'Edit' : 'Add'} Recipe</h2>
+			{showImportModal && <ImportRecipeModal closeModalHandler={() => setShowImportModal(true)} currentRecipeID={recipeID} />}
+
+			<div className="section-title">
+				<h2>Edit Recipe</h2>
 			</div>
 
-			<section class="hero edit-recipe-section">
-				<div class="container">
+			<section className="hero edit-recipe-section">
+				<div className="container">
 					<div>
 						<Row>
 							<Col lg={12}>
-								<ActiveCheckbox value={isActive} setValue={setIsActive} />
+								<ActiveCheckbox value={isActive} setValue={isActiveHandler} />
 							</Col>
 						</Row>
 						<Row>
 							<Col lg={9}>
-								<NameInput value={name} setValue={setName} filteredRecipes={filteredRecipes} filterRecipesHandler={filterRecipesHandler} />
-								<DescriptionInput value={description} setValue={setDescription} />
+								<NameInput value={name} setValue={nameHandler} filteredRecipes={filteredRecipes} filterRecipesHandler={filterRecipesHandler} />
+								<DescriptionInput value={description} setValue={descriptionHandler} />
 								<Row>
 									<Col lg={4}>
-										<Category category={category} setCategory={setCategory} />
+										<Category category={category} setCategory={categoryHandler} />
 									</Col>
 									<Col lg={8}>
-										<ProteinDropdown value={protein} setValue={setProtein} />
+										<ProteinDropdown value={protein} setValue={proteinHandler} />
 									</Col>
 								</Row>
 								<Row>
-									<Col lg={4}>
-										<IngredientsTextarea value={ingredients} setValue={setIngredients} />
-									</Col>
-									<Col lg={8}>
-										<StepsTextarea value={steps} setValue={setSteps} />
+									<Col lg={12}>
+										<StepsTextarea value={steps} setValue={stepsHandler} />
 									</Col>
 								</Row>
 							</Col>
 							<Col lg={3}>
-								<NotesTextarea value={notes} setValue={setNotes} />
-								<DayPrepTextarea value={dayPrep} setValue={setDayPrep} />
-								<DefrostInput value={defrost} setValue={setDefrost} />
+								<NotesTextarea value={notes} setValue={notesHandler} />
+								<DayPrepTextarea value={dayPrep} setValue={dayPrepHandler} />
+								<DefrostInput value={defrost} setValue={defrostHandler} />
 							</Col>
 						</Row>
 						<Row>
 							<Col lg={9}>
 								<BooksSection
 									bookID={bookID}
-									setBookID={setBookID}
+									setBookID={bookIDHandler}
 									page={page}
-									setPage={setPage}
+									setPage={pageHandler}
 									attachments={attachments}
 									fetchRecipe={fetchRecipe}
 									recipeID={recipeID}
 								/>
 							</Col>
 							<Col lg={3} className="rating-row">
-								<Rating rating={rating} setRating={setRating} size="48" />
+								<Rating rating={rating} setRating={ratingHandler} size="48" />
 							</Col>
 						</Row>
 
 						<Row>
 							<Col>
-								<URLInput value={url} setValue={setURL} />
+								<URLInput value={url} setValue={urlHandler} />
 							</Col>
 						</Row>
 						<Row>
@@ -264,21 +288,22 @@ const RecipeDetailsPage = () => {
 
 						<Tag recipeID={recipeID} />
 
+						<Row>
+							<Col lg={12}>
+								<IngredientsLines ingredients={ingredients} />
+							</Col>
+						</Row>
+
+						<IngredientsTextarea value={ingredientsBulk} setValue={ingredientsHandler} />
+
+						<div>{JSON.stringify(ingredientsDebug)}</div>
+
 						<div className="bottom-buttons">
 							<Button className="site-btn muted" onClick={previewAction}>
 								<Eye /> Preview
 							</Button>
-							<Button className="site-btn" onClick={onSaveHandler}>
-								{!recipeID && (
-									<span>
-										<PlusCircle /> Add Recipe
-									</span>
-								)}
-								{recipeID && (
-									<span>
-										<Save /> Save Changes
-									</span>
-								)}
+							<Button className="site-btn muted" onClick={() => setShowImportModal(true)}>
+								<ArrowUpCircle /> Import
 							</Button>
 						</div>
 					</div>
@@ -321,7 +346,7 @@ const ActiveCheckbox = ({ value, setValue }) => {
 
 const NameInput = ({ value, setValue, filteredRecipes, filterRecipesHandler }) => {
 	return (
-		<div class="form-floating">
+		<div className="form-floating">
 			<Input
 				className="editInput"
 				id="recipe-name"
@@ -337,8 +362,12 @@ const NameInput = ({ value, setValue, filteredRecipes, filterRecipesHandler }) =
 			<label for="recipe-name">Name</label>
 			{filteredRecipes.length > 0 && (
 				<div className="recipe-name-results">
-					{filteredRecipes.map((recipe) => {
-						return <div className="recipe-name-option">{recipe}</div>;
+					{filteredRecipes.map((recipe, index) => {
+						return (
+							<div key={index} className="recipe-name-option">
+								{recipe}
+							</div>
+						);
 					})}
 				</div>
 			)}
@@ -348,7 +377,7 @@ const NameInput = ({ value, setValue, filteredRecipes, filterRecipesHandler }) =
 
 const DescriptionInput = ({ value, setValue }) => {
 	return (
-		<div class="form-floating">
+		<div className="form-floating">
 			<Input
 				className="editInput"
 				id="recipe-description"
@@ -366,7 +395,7 @@ const DescriptionInput = ({ value, setValue }) => {
 
 const ProteinDropdown = ({ value, setValue }) => {
 	return (
-		<div class="form-floating">
+		<div className="form-floating">
 			<Input
 				id="protein-dropdown"
 				className="edit-protein-dropdown"
@@ -385,9 +414,122 @@ const ProteinDropdown = ({ value, setValue }) => {
 	);
 };
 
+const IngredientsLines = ({ ingredients }) => {
+	const authContext = useContext(AuthContext);
+	const tokenFromStorage = authContext.token;
+
+	const updateIngredientHandler = async (ingredientID, value) => {
+		console.log('Set Tag', value);
+		const response = await fetch(`/api/recipes/123/ingredient/${ingredientID}`, {
+			method: 'PATCH',
+			body: JSON.stringify(value),
+			headers: {
+				// This is required. NodeJS server won't know how to read it without it.
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
+			},
+		});
+		const data = await response.json();
+
+		if (data.success) {
+			console.log('Ingredient updated successfully.', data);
+		}
+	};
+
+	const debounceEditFunction = useCallback(debounce(updateIngredientHandler, 1500), [tokenFromStorage]);
+
+	console.log('INGREDIDENT ON EDIT PAGE', ingredients);
+	return (
+		<div>
+			{ingredients &&
+				ingredients.map((singleIngredient, index) => {
+					return (
+						<IngredientLine
+							index={index}
+							singleIngredient={singleIngredient}
+							debounceEditFunction={debounceEditFunction}
+							updateIngredientHandler={updateIngredientHandler}
+						/>
+					);
+				})}
+		</div>
+	);
+};
+
+const IngredientLine = ({ index, singleIngredient, debounceEditFunction, updateIngredientHandler }) => {
+	const [value, setValue] = useState(singleIngredient.name);
+	const [tagName, setTagName] = useState(singleIngredient?.tagName);
+
+	const updateIngredientByID = (value) => {
+		setValue(value);
+		debounceEditFunction(singleIngredient.ingredientID, { value });
+	};
+
+	const removeTagHandler = () => {
+		setTagName(null);
+		updateIngredientHandler(singleIngredient.ingredientID, { tagName: null });
+	};
+
+	return (
+		<Row>
+			<Col lg={7}>
+				<div className="form-floating ingredients">
+					<Input
+						className="editInput form-control"
+						id="recipe-ingredients"
+						type="text"
+						placeholder="Ingredients"
+						onChange={(e) => {
+							updateIngredientByID(e.target.value);
+						}}
+						value={value}
+					/>
+					<label for="recipe-ingredients">{`Ingredient ${index + 1}`}</label>
+				</div>
+			</Col>
+			<Col lg={3} className="tag-container">
+				<TagBox type="ingredient" tag={{ Name: tagName, TagID: singleIngredient?.tagID }} removeTagHandler={removeTagHandler} />
+			</Col>
+			<Col lg={2}>
+				<IngredientTagDropdown ingredientID={singleIngredient.ingredientID} updateIngredientHandler={updateIngredientHandler} setTagName={setTagName} />
+			</Col>
+		</Row>
+	);
+};
+const IngredientTagDropdown = ({ ingredientID, updateIngredientHandler, setTagName }) => {
+	const [selectedValue, setSelectedValue] = useState('');
+
+	const setTagHandler = (value) => {
+		setTagName(value);
+		updateIngredientHandler(ingredientID, { tagName: value });
+		setSelectedValue('');
+	};
+
+	const fetchAllTags = async () => {
+		const response = await fetch('/api/ingredientTags', {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		const data = await response.json();
+		return data.map((d) => d.Name);
+	};
+
+	return (
+		<InputWithAutocomplete
+			id="ingredient-tag"
+			label="Search Tag"
+			fetchAvailableResults={fetchAllTags}
+			selectedValue={selectedValue}
+			setSelectedValue={setSelectedValue}
+			onkeyDownHandler={(value) => setTagHandler(value)}
+		/>
+	);
+};
 const IngredientsTextarea = ({ value, setValue }) => {
 	return (
-		<div class="form-floating ingredients">
+		<div className="form-floating ingredients">
 			<Input
 				className="editInput form-control"
 				id="recipe-ingredients"
@@ -399,14 +541,14 @@ const IngredientsTextarea = ({ value, setValue }) => {
 				value={value}
 				rows={15}
 			/>
-			<label for="recipe-ingredients">Ingredients</label>
+			<label for="recipe-ingredients">Bulk Ingredients</label>
 		</div>
 	);
 };
 
 const StepsTextarea = ({ value, setValue }) => {
 	return (
-		<div class="form-floating steps">
+		<div className="form-floating steps">
 			<Input
 				className="editInput"
 				id="recipe-steps"
@@ -425,7 +567,7 @@ const StepsTextarea = ({ value, setValue }) => {
 
 const NotesTextarea = ({ value, setValue }) => {
 	return (
-		<div class="form-floating notes">
+		<div className="form-floating notes">
 			<Input
 				className="editInput"
 				id="recipe-notes"
@@ -444,7 +586,7 @@ const NotesTextarea = ({ value, setValue }) => {
 
 const DayPrepTextarea = ({ value, setValue }) => {
 	return (
-		<div class="form-floating notes">
+		<div className="form-floating notes">
 			<Input
 				className="editInput"
 				id="recipe-day-prep"
@@ -463,7 +605,7 @@ const DayPrepTextarea = ({ value, setValue }) => {
 
 const DefrostInput = ({ value, setValue }) => {
 	return (
-		<div class="form-floating">
+		<div className="form-floating">
 			<Input
 				id="defrost"
 				className="mb-3"
@@ -482,7 +624,7 @@ const DefrostInput = ({ value, setValue }) => {
 
 const URLInput = ({ value, setValue }) => {
 	return (
-		<div class="form-floating">
+		<div className="form-floating">
 			<Input
 				id="recipe-url"
 				className="mb-3"
@@ -524,7 +666,6 @@ const BooksSection = ({ bookID, setBookID, page, setPage, fetchRecipe, attachmen
 		fetchBooks();
 	}, [fetchBooks]);
 
-	console.log('BOK', books);
 	const bookOptions = books.map((book) => {
 		return (
 			<option key={book.BookID} value={book.BookID}>
@@ -538,7 +679,7 @@ const BooksSection = ({ bookID, setBookID, page, setPage, fetchRecipe, attachmen
 			{showEditBookModal && <EditBooksModal books={books} fetchBooks={fetchBooks} closeModalHandler={hideEditBookModalHandler} />}
 			{showScanModal && <ScanModal fetchRecipe={fetchRecipe} attachments={attachments} closeModalHandler={hideScanModalHandler} recipeID={recipeID} />}
 			<Col lg={4}>
-				<div class="form-floating">
+				<div className="form-floating">
 					<Input
 						className="edit-book-dropdown"
 						type="select"
@@ -554,7 +695,7 @@ const BooksSection = ({ bookID, setBookID, page, setPage, fetchRecipe, attachmen
 				</div>
 			</Col>
 			<Col lg={2}>
-				<div class="form-floating">
+				<div className="form-floating">
 					<Input
 						id="page"
 						type="text"
@@ -567,12 +708,7 @@ const BooksSection = ({ bookID, setBookID, page, setPage, fetchRecipe, attachmen
 					<label for="page">Page</label>
 				</div>
 			</Col>
-			<Col lg={3} className="recipe-edit-btn">
-				<Button className="site-btn muted" onClick={showEditBookModalHandler}>
-					<Book /> Edit Books
-				</Button>
-			</Col>
-			<Col lg={3} className="recipe-edit-btn">
+			<Col lg={6} className="recipe-edit-btn">
 				<Button className="site-btn muted" onClick={showScanModalHandler}>
 					<Printer /> Scan
 				</Button>

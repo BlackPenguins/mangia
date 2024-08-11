@@ -1,0 +1,72 @@
+.ingredient-debug ul {
+	margin-left: 40px;
+}
+
+.shopping-list {
+	margin-bottom: 80px;
+}
+
+.shopping-list table {
+	min-width: 1000px !important;
+	width: 100%;
+}
+
+.shopping-list table th {
+	background: #82ae46;
+	padding: 15px 20px;
+	color: #fff !important;
+	border: 1px solid transparent !important;
+	font-weight: normal;
+}
+
+.shopping-list td {
+	vertical-align: middle;
+	padding: 15px 20px;
+	border: 1px solid transparent !important;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+	background-color: #ffffff;
+}
+
+.shopping-list .name {
+	font-size: 16px;
+}
+
+.shopping-list th:nth-child(1),
+.shopping-list td:nth-child(1) {
+	width: 5%;
+}
+
+.shopping-list td:nth-child(1) .check-container {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	flex-wrap: nowrap;
+	align-content: center;
+}
+
+.shopping-list td:nth-child(1) .check-container input {
+	font-size: 1.8em;
+}
+
+.shopping-list th:nth-child(2),
+.shopping-list td:nth-child(2) {
+	width: 80%;
+}
+
+.shopping-list th:nth-child(3),
+.shopping-list td:nth-child(3) {
+	width: 15%;
+}
+
+.shopping-list tr.checked .name {
+	text-decoration: line-through;
+}
+
+.shopping-list tr.checked .name,
+.shopping-list tr.checked .recipe-count {
+	color: grey;
+}
+
+.shopping-list tr.checked td {
+	background-color: #e0fdb7;
+}

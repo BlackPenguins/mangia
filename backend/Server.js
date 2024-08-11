@@ -7,6 +7,9 @@ import recipesRoutes from './routes/recipes.js';
 import menuRoutes from './routes/menu.js';
 import setupRoutes from './routes/setup.js';
 import tagRoutes from './routes/tags.js';
+import ingredientTagRoutes from './routes/ingredientTags.js';
+import ingredientDepartmentRoutes from './routes/ingredientDepartment.js';
+import shoppingListItemRoutes from './routes/shoppingListItem.js';
 
 // We start the client-side by running: npm run start
 // We start the server-side by running: nodemon (something that runs an auto-updating nodejs)
@@ -50,6 +53,9 @@ app.use(recipesRoutes);
 app.use(menuRoutes);
 app.use(setupRoutes);
 app.use(tagRoutes);
+app.use(ingredientTagRoutes);
+app.use(ingredientDepartmentRoutes);
+app.use(shoppingListItemRoutes);
 
 app.listen(port, () => {
 	console.log(`Mangia-Server is now running on ${port}`);

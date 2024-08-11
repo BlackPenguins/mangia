@@ -64,12 +64,6 @@
 	display: inline-block;
 }
 
-#recipe-tag .input {
-	width: auto;
-	display: inline-block;
-	margin-left: 10px;
-}
-
 .form-control:focus {
 	border-color: #7fad39;
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(30, 255, 0, 0.6);

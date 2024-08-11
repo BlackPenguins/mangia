@@ -11,6 +11,10 @@ router.post('/api/setup/createTable/recipe', (req, res) => {
 	);
 });
 
+router.post('/api/setup/createTable/recipe', (req, res) => {
+	simpleDBQuery('Create Recipe', 'CREATE TABLE Week (WeekID INT AUTO_INCREMENT PRIMARY KEY)', res);
+});
+
 router.post('/api/setup/createTable/book', (req, res) => {
 	simpleDBQuery('Create Book', 'CREATE TABLE Book (BookID INT AUTO_INCREMENT PRIMARY KEY, Name VarChar(50) NOT NULL, Description VarChar(100) DEFAULT NOT NULL)', res);
 });
@@ -45,6 +49,42 @@ router.post('/api/setup/createTable/step', (req, res) => {
 
 router.post('/api/setup/createTable/tag', (req, res) => {
 	simpleDBQuery('Create Tag', 'CREATE TABLE TAG (TagID INT AUTO_INCREMENT PRIMARY KEY, Name VARCHAR(50) NOT NULL )', res);
+});
+
+router.post('/api/setup/createTable/ingredienttag', (req, res) => {
+	simpleDBQuery('Create Tag', 'CREATE TABLE INGREDIENT_TAG (IngredientTagID INT AUTO_INCREMENT PRIMARY KEY, Name VARCHAR(200) NOT NULL )', res);
+});
+
+router.post('/api/setup/createTable/ingredienttag', (req, res) => {
+	simpleDBQuery(
+		'Create Tag',
+		'CREATE TABLE SHOPPING_LIST_ITEM (ShoppingListItemID INT AUTO_INCREMENT PRIMARY KEY, WeekID INT NOT NULL, Amount VARCHAR(200), Name VARCHAR(500), IsChecked TINYINT, FOREIGN KEY (WeekID) REFERENCES WEEK(WeekID));',
+		res
+	);
+});
+
+router.post('/api/setup/createTable/ingredientdept', (req, res) => {
+	simpleDBQuery('Create Tag', 'CREATE TABLE INGREDIENT_DEPARTMENT (IngredientDepartmentID INT AUTO_INCREMENT PRIMARY KEY, Name VARCHAR(200) NOT NULL )', res);
+});
+
+router.post('/api/setup/createTable/ingredienttag_foreign', (req, res) => {
+	simpleDBQuery(
+		'Create Tag',
+		'ALTER TABLE INGREDIENT ADD COLUMN IngredientTagID INT, ADD FOREIGN KEY INGREDIENT(IngredientTagID) REFERENCES INGREDIENT_TAG(IngredientTagID) )',
+		res
+	);
+});
+
+router.post('/api/setup/createTable/ingredientdept_foreign', (req, res) => {
+	simpleDBQuery(
+		'Create Tag',
+		'ALTER TABLE INGREDIENT_TAG ADD COLUMN IngredientDepartmentID INT, ADD FOREIGN KEY INGREDIENT(IngredientDepartmentID) REFERENCES INGREDIENT_DEPARTMENT(IngredientDepartmentID) )',
+		res
+	);
+});
+
+router.post('/api/setup/createTable/ingredientdept_foreign', (req, res) => {
+	simpleDBQuery('Create Tag', 'ALTER TABLE INGREDIENT_DEPARTMENT ADD COLUMN Position INT', res);
 });
 
 router.post('/api/setup/createTable/recipeTag', (req, res) => {

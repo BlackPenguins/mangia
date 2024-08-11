@@ -4,12 +4,13 @@ import { Tag as TagIcon } from 'react-feather';
 
 import './Tag.css';
 import AuthContext from '../../authentication/auth-context';
+import InputWithAutocomplete from './InputWithAutocomplete';
 
 const Tag = ({ recipeID }) => {
 	const authContext = useContext(AuthContext);
 	const tokenFromStorage = authContext.token;
 
-	const fetchTags = useCallback(async () => {
+	const fetchAllTags = async () => {
 		const response = await fetch('/api/tags', {
 			method: 'GET',
 			headers: {
@@ -17,10 +18,8 @@ const Tag = ({ recipeID }) => {
 			},
 		});
 		const data = await response.json();
-		console.log('Retrieved Tags from Server', data);
-		setAllTags(data);
-		setFilteredTags([]);
-	}, []);
+		return data.map((d) => d.Name);
+	};
 
 	const fetchRecipeTags = useCallback(async () => {
 		const response = await fetch(`/api/recipes/${recipeID}/tags`);
@@ -30,26 +29,11 @@ const Tag = ({ recipeID }) => {
 	}, [recipeID]);
 
 	useEffect(() => {
-		fetchTags();
 		fetchRecipeTags();
-	}, [fetchTags, fetchRecipeTags]);
+	}, [fetchRecipeTags]);
 
-	const [allTags, setAllTags] = useState([]);
-	const [filteredTags, setFilteredTags] = useState([]);
 	const [recipeTags, setRecipeTags] = useState([]);
-	const [newTag, setNewTag] = useState('');
-	const [tagSuggestion, setTagSuggestion] = useState(0);
-	const [showSuggestions, setShowSuggestions] = useState(false);
-
-	const filterTagsHandler = (searchString) => {
-		if (!searchString.trim()) {
-			setFilteredTags([]);
-		} else {
-			const lowercaseSearchString = searchString.toLowerCase();
-			console.log('all', allTags);
-			setFilteredTags(allTags.filter((tag) => tag?.Name.toLowerCase().indexOf(lowercaseSearchString) !== -1));
-		}
-	};
+	const [selectedValue, setSelectedValue] = useState('');
 
 	const addTagHandler = async (tagName) => {
 		await fetch(`/api/recipes/${recipeID}/addTag`, {
@@ -61,8 +45,6 @@ const Tag = ({ recipeID }) => {
 				Authorization: `Bearer ${tokenFromStorage}`,
 			},
 		});
-
-		setNewTag('');
 		fetchRecipeTags();
 	};
 
@@ -77,98 +59,53 @@ const Tag = ({ recipeID }) => {
 			},
 		});
 
-		console.log('REMOVE TAG', newTag);
+		console.log('REMOVE TAG', selectedValue);
 		fetchRecipeTags();
 	};
 
-	const inputKeyDownHandler = (e) => {
-		console.log('KEY', { code: e.keyCode, tagSuggestion, filteredTags, oh: filteredTags[tagSuggestion] });
-		if (e.keyCode === 13) {
-			if (showSuggestions && filteredTags.length) {
-				// use the suggestions
-				addTagHandler(filteredTags[tagSuggestion].Name);
-			} else {
-				addTagHandler(newTag);
-			}
+	const addTag = () => addTagHandler(selectedValue);
 
-			setTagSuggestion(0);
-			setShowSuggestions(false);
-		} else if (e.keyCode === 38) {
-			if (tagSuggestion === 0) {
-				return;
-			}
-			setTagSuggestion((prev) => prev - 1);
-		} else if (e.keyCode === 40) {
-			if (tagSuggestion - 1 === filteredTags.length) {
-				return;
-			}
-			setTagSuggestion((prev) => prev + 1);
-		}
-	};
-
-	const addTag = () => addTagHandler(newTag);
 	return (
 		<Row>
 			<Col lg={2}>
-				<div class="form-floating">
-					<Input
-						className="editInput"
-						id="recipe-tag"
-						type="text"
-						maxLength={50}
-						placeholder="Name"
-						onChange={(e) => {
-							setNewTag(e.target.value);
-							filterTagsHandler(e.target.value);
-							setTagSuggestion(0);
-							setShowSuggestions(true);
-						}}
-						onKeyDown={inputKeyDownHandler}
-						value={newTag}
-					></Input>
-					<label for="recipe-tag">Tag</label>
-					{filteredTags.length > 0 && showSuggestions && (
-						<ul className="tag-suggestions">
-							{filteredTags.map((tag, index) => {
-								let className;
-
-								if (index === tagSuggestion) {
-									className = 'suggestion-active';
-								}
-
-								return (
-									<li className={className} key={index}>
-										{tag.Name}
-									</li>
-								);
-							})}
-						</ul>
-					)}
-				</div>
+				<InputWithAutocomplete
+					id="recipe-tag"
+					label="Tag"
+					fetchAvailableResults={fetchAllTags}
+					selectedValue={selectedValue}
+					setSelectedValue={setSelectedValue}
+					onkeyDownHandler={(value) => addTagHandler(value)}
+				/>
 			</Col>
 			<Col lg={2} className="recipe-edit-btn">
 				<Button size="sm" color="success" onClick={addTag} className="site-btn muted">
 					<TagIcon /> Add Tag
 				</Button>
 			</Col>
-			<Col lg={8} className="tag-section">
+			<Col lg={8} className="tag-container">
 				{recipeTags.length > 0 && (
 					<>
 						{recipeTags.map((tag) => {
-							const removeTag = () => removeTagHandler(tag.TagID);
-							return (
-								<span className="tag">
-									<span onClick={removeTag} className="remove-tag">
-										X
-									</span>
-									<span className="tag-name">{tag.Name}</span>
-								</span>
-							);
+							return <TagBox type="recipe" tag={tag} removeTagHandler={removeTagHandler} />;
 						})}
 					</>
 				)}
 			</Col>
 		</Row>
+	);
+};
+export const TagBox = ({ type, tag, removeTagHandler }) => {
+	if (!tag?.Name) {
+		return null;
+	}
+	const removeTag = () => removeTagHandler(tag.TagID);
+	return (
+		<span key={tag.TagID} className={`tag ${type}`}>
+			<span onClick={removeTag} className="remove-tag">
+				X
+			</span>
+			<span className="tag-name">{tag.Name}</span>
+		</span>
 	);
 };
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Input, Row, Spinner } from 'reactstrap';
 import './FilteredRecipesControl.css';
 
+export const HIDDEN_CATEGORY_FILTER = 'Hidden';
 const FilteredRecipesControl = ({ CardType, layoutClass, onClickHandler, categoryFilter }) => {
 	const fetchRecipes = async () => {
 		const response = await fetch('/api/recipes');
@@ -26,33 +27,37 @@ const FilteredRecipesControl = ({ CardType, layoutClass, onClickHandler, categor
 
 	const [filteredRecipes, setFilteredRecipes] = useState(null);
 
+	const isFilteredByCategory = (recipe) => {
+		const matchesAll = !categoryFilter && recipe.IsActive;
+		const matchesCategory = categoryFilter && recipe.Category === categoryFilter && recipe.IsActive;
+		const matchesHidden = categoryFilter === HIDDEN_CATEGORY_FILTER && !recipe?.IsActive;
+		return matchesAll || matchesHidden || matchesCategory;
+	};
 	const filterRecipesHandler = (searchString) => {
 		const lowercaseSearchString = searchString.toLowerCase();
 		setFilteredRecipes(
-			allRecipes.filter((recipe) => {
-				if (lowercaseSearchString === 'hidden') {
-					return !recipe.IsActive;
-				} else {
-					const matchesCategory = !categoryFilter || (categoryFilter && recipe.Category === categoryFilter);
+			allRecipes &&
+				allRecipes.filter((recipe) => {
 					const matchesName = recipe && recipe.Name.toLowerCase().indexOf(lowercaseSearchString) !== -1;
-					return matchesCategory && matchesName && recipe.IsActive;
-				}
-			})
+					console.log('MATCH', { matchesName, recipe });
+					return isFilteredByCategory(recipe) && matchesName;
+				})
 		);
 	};
 
 	useEffect(() => {
-		if (categoryFilter) {
-			setFilteredRecipes(allRecipes.filter((recipe) => recipe && recipe.Category === categoryFilter));
-		} else {
-			setFilteredRecipes(allRecipes);
-		}
+		setFilteredRecipes(
+			allRecipes &&
+				allRecipes.filter((recipe) => {
+					return isFilteredByCategory(recipe);
+				})
+		);
 		setSearch('');
 	}, [categoryFilter, allRecipes]);
 
 	return (
-		<section class="hero">
-			<div class="container">
+		<section className="hero">
+			<div className="container">
 				<SearchBox search={search} setSearch={setSearch} filteredRecipes={filteredRecipes} filterRecipesHandler={filterRecipesHandler} />
 
 				{filteredRecipes === null && <LoadingText />}
@@ -88,10 +93,10 @@ const LoadingText = () => {
 
 const SearchBox = ({ search, setSearch, filteredRecipes, filterRecipesHandler }) => {
 	return (
-		<div class="row">
-			<div class="col-lg-9">
-				<div class="hero__search">
-					<div class="hero__search__form">
+		<div className="row">
+			<div className="col-lg-9">
+				<div className="hero__search">
+					<div className="hero__search__form">
 						<form action="#">
 							<Input
 								id="recipe-category"
@@ -103,7 +108,7 @@ const SearchBox = ({ search, setSearch, filteredRecipes, filterRecipesHandler })
 								}}
 								value={search}
 							/>
-							<button type="submit" class="site-btn">
+							<button type="submit" className="site-btn">
 								SEARCH
 							</button>
 						</form>
