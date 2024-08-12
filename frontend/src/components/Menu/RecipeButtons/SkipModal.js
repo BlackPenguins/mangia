@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import { Button, Input } from 'reactstrap';
-import AuthContext from '../../../authentication/auth-context';
-import Modal from '../../Modal';
+import AuthContext from 'authentication/auth-context';
+import Modal from 'components/Common/Modal';
 
 const SkipModal = ({ page, menu, fetchMenu, closeModalHandler }) => {
 	const authContext = useContext(AuthContext);
@@ -25,7 +25,7 @@ const SkipModal = ({ page, menu, fetchMenu, closeModalHandler }) => {
 
 	return (
 		<>
-			<Modal closeHandler={closeModalHandler}>
+			<Modal title="Skip Day" closeHandler={closeModalHandler} buttons={<Button onClick={skipHandler}>Skip Day</Button>}>
 				<Input
 					name="text"
 					placeholder="Skip Reason"
@@ -34,7 +34,6 @@ const SkipModal = ({ page, menu, fetchMenu, closeModalHandler }) => {
 					}}
 					value={skipReason}
 				/>
-				<Button onClick={skipHandler}>Skip Day</Button>
 			</Modal>
 		</>
 	);

@@ -11,7 +11,9 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 		recipeName = recipe.Name;
 	}
 
-	const thumbnailImage = (recipe?.Image && !isLeftovers && `http://${process.env.REACT_APP_HOST_NAME}:6200/thumbs/${recipe?.Image}`) || 'images/no-thumb.png';
+	const hideInformation = isSkipped || isLeftovers;
+
+	const thumbnailImage = (recipe?.Image && !hideInformation && `http://${process.env.REACT_APP_HOST_NAME}:6200/thumbs/${recipe?.Image}`) || 'images/no-thumb.png';
 
 	const thumbnailStyle = {
 		backgroundImage: `url(${thumbnailImage})`,
@@ -22,12 +24,12 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 	let thumbnail = (
 		<>
 			<div style={thumbnailStyle} className="thumbnail-container">
-				{!isLeftovers && <Rating size="20" rating={recipe?.Rating} />}
+				{!hideInformation && <Rating size="20" rating={recipe?.Rating} />}
 			</div>
 		</>
 	);
 
-	if (recipe?.RecipeID && !isLeftovers) {
+	if (recipe?.RecipeID && !hideInformation) {
 		thumbnail = <Link to={`/recipe/${recipe?.RecipeID}`}>{thumbnail}</Link>;
 	}
 
@@ -45,17 +47,22 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 				{thumbnail}
 			</a>
 			<div className="text py-3 pb-4 px-3 text-center">
-				<h3 className={`card-title ${categoryClass}`}>
-					<span>{recipeName}</span>
-				</h3>
-				<DaysAgo lastMade={recipe?.lastmade} />
-				<div className="d-flex">
-					<div className="pricing">
-						<p className="price">
-							<span className="mr-2 price-dc">{recipe?.Description}</span>
-						</p>
-					</div>
-				</div>
+				{!hideInformation && (
+					<>
+						<h3 className={`card-title ${categoryClass}`}>
+							<span>{recipeName}</span>
+						</h3>
+						<DaysAgo lastMade={recipe?.lastmade} />
+						<div className="d-flex">
+							<div className="pricing">
+								<p className="price">
+									<span className="mr-2 price-dc">{recipe?.Description}</span>
+								</p>
+							</div>
+						</div>
+					</>
+				)}
+
 				<div className="bottom-area d-flex px-3">
 					<div className="m-auto d-flex">{bottomButtons}</div>
 				</div>

@@ -1,9 +1,9 @@
 import { useContext, useState } from 'react';
 import { Button, Input } from 'reactstrap';
-import AuthContext from '../../../authentication/auth-context';
-import Modal from '../../Modal';
-import FilteredRecipesControl from '../../Recipes/FilteredRecipesControl';
-import RecipeRow from '../../Recipes/RecipeRow';
+import AuthContext from 'authentication/auth-context';
+import Modal from 'components/Common/Modal';
+import FilteredRecipesControl from 'components/Recipes/FilteredRecipesControl';
+import RecipeRow from 'components//Recipes/RecipeRow';
 import './ChangeModal.css';
 
 const ChangeModal = ({ menu, fetchMenu, page, availableSwapDays, closeModalHandler }) => {
@@ -48,7 +48,7 @@ const ChangeModal = ({ menu, fetchMenu, page, availableSwapDays, closeModalHandl
 
 	return (
 		<>
-			<Modal closeHandler={closeModalHandler}>
+			<Modal title="Edit Menu" closeHandler={closeModalHandler}>
 				<h3>Swap Days</h3>
 				<div className="swap-days-container">
 					<Input

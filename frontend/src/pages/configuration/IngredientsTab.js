@@ -37,14 +37,18 @@ const DepartmentDropdown = ({ element }) => {
 				Authorization: `Bearer ${tokenFromStorage}`,
 			},
 		});
-
-		console.log('OPTION', { option, element });
 	};
+
+	const classes = ['edit-book-dropdown'];
+
+	if (element.IngredientDepartmentID == null) {
+		classes.push('unused');
+	}
 
 	return (
 		<span className="form-floating">
 			<Input
-				className="edit-book-dropdown"
+				className={classes.join(' ')}
 				type="select"
 				onChange={(e) => {
 					changeDepartment(e.target.value);

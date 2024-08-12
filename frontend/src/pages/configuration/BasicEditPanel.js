@@ -1,6 +1,7 @@
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Button, Col, Input, Row } from 'reactstrap';
 import AuthContext from '../../authentication/auth-context';
+import LoadingText from '../../components/Common/LoadingText';
 
 const BasicEditPanel = ({ label, apiFetch, apiUpdate, AdditionalOption }) => {
 	const [elements, setElements] = useState(null);
@@ -42,7 +43,6 @@ const BasicEditPanel = ({ label, apiFetch, apiUpdate, AdditionalOption }) => {
 		const data = await response.json();
 
 		if (data.success) {
-			console.log('FETCH');
 			fetchElements();
 		}
 		addElementInputRef.current.value = '';
@@ -52,10 +52,10 @@ const BasicEditPanel = ({ label, apiFetch, apiUpdate, AdditionalOption }) => {
 		<div className="container book-list">
 			<h3>{label} List</h3>
 			<div class="shoping__cart__table">
+				{elements == null && <LoadingText text={`Loading ${label}s`} />}
+				{elements && elements?.length === 0 && <div>No {label.toLowerCase()}s found</div>}
 				<table>
 					<tbody>
-						{elements == null && <div>Loading...</div>}
-						{elements && elements?.length === 0 && <div>No {label.toLowerCase()}s found</div>}
 						{elements &&
 							elements.map((book) => (
 								<tr key={book.BookID}>

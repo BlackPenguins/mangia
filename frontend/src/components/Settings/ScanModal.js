@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import { Button, Col, FormText, Input, Row } from 'reactstrap';
-import AuthContext from '../../authentication/auth-context';
-import Modal from '../Modal';
+import AuthContext from 'authentication/auth-context';
+import Modal from 'components/Common/Modal';
 import './EditBooksModal.css';
 
 const ScanModal = ({ attachments, fetchRecipe, closeModalHandler, recipeID }) => {
@@ -68,7 +68,16 @@ const ScanModal = ({ attachments, fetchRecipe, closeModalHandler, recipeID }) =>
 
 	return (
 		<>
-			<Modal closeHandler={closeModalHandler} className="large">
+			<Modal
+				title="Scan Reference Images"
+				closeHandler={closeModalHandler}
+				className="large"
+				buttons={
+					<Button size="sm" color="success" className="site-btn" onClick={importFile}>
+						Add Attachment
+					</Button>
+				}
+			>
 				<div className="container book-list">
 					<h3>Scanned Files</h3>
 					<ul>
@@ -87,14 +96,6 @@ const ScanModal = ({ attachments, fetchRecipe, closeModalHandler, recipeID }) =>
 							<Input id="recipe-image" name="file" type="file" onChange={fileChangeHandler} />
 							<FormText>The attachment image for the recipe.</FormText>
 						</Col>
-					</Row>
-					<Row>
-						<Col className="recipe-edit-btn">
-							<Button size="sm" color="success" className="site-btn" onClick={importFile}>
-								Add Attachment
-							</Button>
-						</Col>
-						<Col lg={4}></Col>
 					</Row>
 					<div className="parsed-text">
 						{lines &&

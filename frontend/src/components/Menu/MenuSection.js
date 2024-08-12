@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { Row, Spinner } from 'reactstrap';
+import { Row } from 'reactstrap';
 import './MenuSection.css';
 import RecipeCard from '../Recipes/RecipeCard';
 import MenuNav from './MenuNav';
@@ -10,6 +10,7 @@ import { AcUnit } from '@mui/icons-material';
 import LeftoversButton from './RecipeButtons/LeftoversButton';
 import ChangeButton from './RecipeButtons/ChangeButton';
 import AuthContext from '../../authentication/auth-context';
+import LoadingText from 'components/Common/LoadingText';
 
 const MenuSection = () => {
 	const [page, setPage] = useState(0);
@@ -36,14 +37,7 @@ const MenuSection = () => {
 		return (
 			<section className="hero">
 				<div className="container">
-					<Spinner
-						color="success"
-						style={{
-							height: '2em',
-							width: '2em',
-						}}
-					></Spinner>
-					<span className="loading-text">Loading menu</span>
+					<LoadingText text="Loading menu" />
 				</div>
 			</section>
 		);

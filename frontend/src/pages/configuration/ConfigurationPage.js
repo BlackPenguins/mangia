@@ -36,6 +36,11 @@ const ConfigurationPage = () => {
 										Department
 									</a>
 								</li>
+								<li>
+									<a href="#" onClick={() => navigate('migration')}>
+										Migration
+									</a>
+								</li>
 							</ul>
 						</div>
 					</div>

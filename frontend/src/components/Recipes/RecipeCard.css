@@ -91,6 +91,11 @@
 	color: rgb(240, 245, 255);
 }
 
+.history .made {
+	color: #7346ae;
+	font-weight: bold;
+}
+
 .layer {
 	position: absolute;
 	top: 0;

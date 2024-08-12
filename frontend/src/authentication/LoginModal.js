@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react';
 import { Button, Input, InputGroup, InputGroupText } from 'reactstrap';
-import Modal from '../components/Modal';
+import Modal from '../components/Common/Modal';
 import AuthContext from './auth-context';
 
 import './LoginModal.css';
@@ -20,8 +20,7 @@ const LoginModal = ({ closeModalHandler, showSignUpModal }) => {
 
 	return (
 		<>
-			<Modal closeHandler={closeModalHandler}>
-				<div className="modal-title">Welcome back!</div>
+			<Modal title="Login" closeHandler={closeModalHandler}>
 				<InputGroup>
 					<InputGroupText>Username</InputGroupText>
 					<Input
@@ -46,12 +45,12 @@ const LoginModal = ({ closeModalHandler, showSignUpModal }) => {
 				</InputGroup>
 				<div>{errorMessage}</div>
 				<div className="login-button">
-					<Button onClick={loginHandler}>Sign In</Button>
+					<Button onClick={loginHandler}>Login</Button>
 				</div>
 				<div className="register">
 					Not a user?
 					<a className="link" onClick={signUpHandler}>
-						Sign up now!
+						Register now!
 					</a>
 				</div>
 			</Modal>

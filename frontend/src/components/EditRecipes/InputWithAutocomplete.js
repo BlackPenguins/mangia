@@ -32,6 +32,7 @@ const InputWithAutocomplete = ({ fetchAvailableResults, selectedValue, setSelect
 			// Once we select something from dropodown, hide the suggestions until we type again
 			setResultSuggestionIndex(0);
 			setShowSuggestions(false);
+			fetchData();
 		} else if (e.keyCode === 38) {
 			// UP ARROW KEY
 			if (resultSuggestionIndex === 0) {
@@ -49,13 +50,13 @@ const InputWithAutocomplete = ({ fetchAvailableResults, selectedValue, setSelect
 		}
 	};
 
-	useEffect(() => {
-		const fetchData = async () => {
-			// Call the supplier function passed from the parent component to get all possible suuggestions
-			const newData = await fetchAvailableResults();
-			setAllResults(newData);
-		};
+	const fetchData = async () => {
+		// Call the supplier function passed from the parent component to get all possible suggestions
+		const newData = await fetchAvailableResults();
+		setAllResults(newData);
+	};
 
+	useEffect(() => {
 		fetchData();
 		setFilteredResults([]);
 	}, []);

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button, Input, InputGroup, InputGroupText } from 'reactstrap';
-import Modal from '../components/Modal';
+import Modal from '../components/Common/Modal';
 
 const SignUpModal = ({ closeModalHandler }) => {
 	const [username, setUsername] = useState('');
@@ -37,8 +37,7 @@ const SignUpModal = ({ closeModalHandler }) => {
 
 	return (
 		<>
-			<Modal closeHandler={closeModalHandler}>
-				<div className="modal-title">Join Penguinore!</div>
+			<Modal title="Join Penguinore!" closeHandler={closeModalHandler} buttons={<Button onClick={signUpHandler}>Register!</Button>}>
 				<InputGroup>
 					<InputGroupText>Username</InputGroupText>
 					<Input
@@ -84,9 +83,6 @@ const SignUpModal = ({ closeModalHandler }) => {
 					/>
 				</InputGroup>
 				<div>{errorMessage}</div>
-				<div className="login-button">
-					<Button onClick={signUpHandler}>Register!</Button>
-				</div>
 			</Modal>
 		</>
 	);

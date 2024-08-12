@@ -5,7 +5,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, FormGroup, FormText, Input, Label, Row } from 'reactstrap';
 
 import './RecipeEditPage.css';
-import EditBooksModal from '../components/Settings/EditBooksModal';
 import Rating from '../components/Settings/Rating';
 import Category from '../components/Recipes/Category';
 import Tag, { TagBox } from '../components/EditRecipes/Tag';
@@ -24,9 +23,6 @@ const RecipeDetailsPage = () => {
 		console.log('Kicking the non-admin out of the edit page!');
 		navigate('/home');
 	}
-
-	// TODO: Test the algorithm, show last mades on the page, something is off
-	//
 
 	const fetchRecipes = useCallback(async () => {
 		const response = await fetch('/api/recipes');
@@ -98,7 +94,8 @@ const RecipeDetailsPage = () => {
 			const finalSteps = recipe.steps.map((step) => step.instruction).join('\n\n');
 			setSteps(finalSteps);
 
-			const ingredientsBulk = recipe.ingredients.map((ingredient) => ingredient.Name).join('\n');
+			const ingredientsBulk = recipe.ingredients.map((ingredient) => ingredient.name).join('\n');
+			console.log('SET IT', ingredientsBulk);
 			setIngredients(recipe.ingredients);
 			setIngredientsBulk(ingredientsBulk);
 			setIngredientsDebug(recipe.ingredients);
@@ -124,25 +121,23 @@ const RecipeDetailsPage = () => {
 				Authorization: `Bearer ${tokenFromStorage}`,
 			},
 		});
-		const data = await response.json();
+	};
 
-		if (data.success) {
-			console.log('Recipe updated successfully.', data);
+	const updateImage = async (imageFile) => {
+		console.log('Image updated successfully.', imageFile);
 
-			if (imageFile) {
-				const imageData = new FormData();
-				imageData.append('imageFile', imageFile);
+		if (imageFile) {
+			const imageData = new FormData();
+			imageData.append('imageFile', imageFile);
 
-				console.log('posting', imageFile);
-				await fetch(`/api/recipes/image/${recipeID}`, {
-					method: 'POST',
-					body: imageData,
-					headers: {
-						Authorization: `Bearer ${tokenFromStorage}`,
-					},
-				});
-				// const data = await response.json();
-			}
+			console.log('posting', imageFile);
+			await fetch(`/api/recipes/image/${recipeID}`, {
+				method: 'POST',
+				body: imageData,
+				headers: {
+					Authorization: `Bearer ${tokenFromStorage}`,
+				},
+			});
 		}
 	};
 
@@ -198,6 +193,11 @@ const RecipeDetailsPage = () => {
 		debounceEditFunction({ url: value });
 	};
 
+	const thumbnailHandler = (value) => {
+		setImageFile(value);
+		updateImage(value);
+	};
+
 	const ratingHandler = (value) => {
 		setRating(value);
 		debounceEditFunction({ rating: value });
@@ -218,11 +218,17 @@ const RecipeDetailsPage = () => {
 		debounceEditFunction({ bookID: value });
 	};
 
+	const nameClasses = ['section-title'];
+
+	if (!isActive) {
+		nameClasses.push('hidden');
+	}
+
 	return (
 		<>
 			{showImportModal && <ImportRecipeModal closeModalHandler={() => setShowImportModal(true)} currentRecipeID={recipeID} />}
 
-			<div className="section-title">
+			<div className={nameClasses.join(' ')}>
 				<h2>Edit Recipe</h2>
 			</div>
 
@@ -282,7 +288,7 @@ const RecipeDetailsPage = () => {
 						</Row>
 						<Row>
 							<Col>
-								<ThumbnailSection setValue={setImageFile} />
+								<ThumbnailSection setValue={thumbnailHandler} />
 							</Col>
 						</Row>
 
@@ -295,8 +301,6 @@ const RecipeDetailsPage = () => {
 						</Row>
 
 						<IngredientsTextarea value={ingredientsBulk} setValue={ingredientsHandler} />
-
-						<div>{JSON.stringify(ingredientsDebug)}</div>
 
 						<div className="bottom-buttons">
 							<Button className="site-btn muted" onClick={previewAction}>
@@ -338,7 +342,7 @@ const ActiveCheckbox = ({ value, setValue }) => {
 					}}
 					type="checkbox"
 				/>
-				<Label check>Active</Label>
+				<Label check>Show Recipe in Book</Label>
 			</FormGroup>
 		</div>
 	);
@@ -641,11 +645,7 @@ const URLInput = ({ value, setValue }) => {
 };
 const BooksSection = ({ bookID, setBookID, page, setPage, fetchRecipe, attachments, recipeID }) => {
 	const [books, setBooks] = useState([]);
-	const [showEditBookModal, setShowEditBookModal] = useState(false);
 	const [showScanModal, setShowScanModal] = useState(false);
-
-	const showEditBookModalHandler = () => setShowEditBookModal(true);
-	const hideEditBookModalHandler = () => setShowEditBookModal(false);
 
 	const showScanModalHandler = () => setShowScanModal(true);
 	const hideScanModalHandler = () => setShowScanModal(false);
@@ -676,7 +676,6 @@ const BooksSection = ({ bookID, setBookID, page, setPage, fetchRecipe, attachmen
 
 	return (
 		<Row>
-			{showEditBookModal && <EditBooksModal books={books} fetchBooks={fetchBooks} closeModalHandler={hideEditBookModalHandler} />}
 			{showScanModal && <ScanModal fetchRecipe={fetchRecipe} attachments={attachments} closeModalHandler={hideScanModalHandler} recipeID={recipeID} />}
 			<Col lg={4}>
 				<div className="form-floating">

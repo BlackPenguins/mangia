@@ -1,9 +1,9 @@
 import { useContext, useRef, useState } from 'react';
 import { Button, Input } from 'reactstrap';
-import Modal from '../Modal';
+import Modal from 'components/Common/Modal';
 import { useNavigate } from 'react-router-dom';
 import './ImportRecipeModal.css';
-import AuthContext from '../../authentication/auth-context';
+import AuthContext from 'authentication/auth-context';
 
 const ImportRecipeModal = ({ closeModalHandler, currentRecipeID }) => {
 	const authContext = useContext(AuthContext);
@@ -63,7 +63,21 @@ const ImportRecipeModal = ({ closeModalHandler, currentRecipeID }) => {
 
 	return (
 		<>
-			<Modal closeHandler={closeModalHandler}>
+			<Modal
+				title="Import Recipe"
+				closeHandler={closeModalHandler}
+				buttons={
+					<>
+						{!newRecipeID && <Button onClick={importHandler}>Import Recipe</Button>}
+						{!newRecipeID && <Button onClick={importRecipeFile}>Import File</Button>}
+						{newRecipeID && (
+							<Button color="success" onClick={viewRecipeHandler}>
+								View Recipe
+							</Button>
+						)}
+					</>
+				}
+			>
 				<div>Provide a URL to import a recipe. Not all websites can be imported.</div>
 				<div>
 					<Input
@@ -77,15 +91,6 @@ const ImportRecipeModal = ({ closeModalHandler, currentRecipeID }) => {
 					<input id="recipe-image" name="file" type="file" onChange={fileChangeHandler} />
 				</div>
 				<div className={statusClasses}>{status}</div>
-				<div className="buttons">
-					{!newRecipeID && <Button onClick={importHandler}>Import Recipe</Button>}
-					{!newRecipeID && <Button onClick={importRecipeFile}>Import File</Button>}
-					{newRecipeID && (
-						<Button color="success" onClick={viewRecipeHandler}>
-							View Recipe
-						</Button>
-					)}
-				</div>
 			</Modal>
 		</>
 	);

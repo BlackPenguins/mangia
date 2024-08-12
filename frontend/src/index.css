@@ -10,8 +10,19 @@ code {
 	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+.loading {
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
 .loading-text {
 	font-size: 2em;
 	font-weight: bold;
 	margin-left: 10px;
+}
+
+@media only screen and (max-width: 767px) {
+	.loading-text {
+		font-size: 1em;
+	}
 }

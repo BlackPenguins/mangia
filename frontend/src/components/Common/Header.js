@@ -1,10 +1,10 @@
 import { useContext, useState } from 'react';
 import { Menu, Users } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
-import AuthContext from '../authentication/auth-context';
-import LoginDisplay from '../authentication/LoginDisplay';
-import AddRecipeModal from './Settings/AddRecipeModal';
-import ImportRecipeModal from './Settings/ImportRecipeModal';
+import AuthContext from 'authentication/auth-context';
+import LoginDisplay from 'authentication/LoginDisplay';
+import AddRecipeModal from 'components/Settings/AddRecipeModal';
+import ImportRecipeModal from 'components/Settings/ImportRecipeModal';
 
 const Header = () => {
 	const authContext = useContext(AuthContext);
@@ -78,7 +78,7 @@ const Header = () => {
 
 	return (
 		<>
-			{showImportModal && <ImportRecipeModal closeModalHandler={() => setShowImportModal(true)} />}
+			{showImportModal && <ImportRecipeModal closeModalHandler={() => setShowImportModal(false)} />}
 			{showAddRecipeModal && <AddRecipeModal closeModalHandler={() => setShowAddRecipeModal(false)} />}
 			<div className={overlayClasses.join(' ')} onClick={() => setShowSidebar(false)}></div>
 			<div className={sidebarClasses.join(' ')}>
@@ -98,19 +98,11 @@ const Header = () => {
 				<div className="header__top">
 					<div className="container">
 						<div className="row">
-							<div className="col-lg-8 col-md-8">
-								<div className="header__top__left">
-									<ul>MANGIA!</ul>
-								</div>
-							</div>
-							<div className="col-lg-8 col-md-8">
-								<div className="header__top__right">
-									<div className="header__top__right__auth">
-										<span>
-											<Users size={15} /> <LoginDisplay />
-										</span>
-									</div>
-								</div>
+							<div className="col-lg-12 col-md-12">
+								<span className="header__top__left">MANGIA!</span>
+								<span className="header__top__right">
+									<Users size={15} /> <LoginDisplay />
+								</span>
 							</div>
 						</div>
 					</div>
@@ -121,7 +113,13 @@ const Header = () => {
 							<nav className="header__menu">{links}</nav>
 						</div>
 					</div>
-					<div className="humberger__open" onClick={() => setShowSidebar(true)}>
+					<div
+						className="humberger__open"
+						onClick={() => {
+							console.log('OPE');
+							setShowSidebar(true);
+						}}
+					>
 						<Menu />
 					</div>
 				</div>

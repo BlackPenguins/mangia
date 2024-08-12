@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Input, Row, Spinner } from 'reactstrap';
+import { Input, Row } from 'reactstrap';
+import LoadingText from '../Common/LoadingText';
 import './FilteredRecipesControl.css';
 
 export const HIDDEN_CATEGORY_FILTER = 'Hidden';
@@ -60,7 +61,7 @@ const FilteredRecipesControl = ({ CardType, layoutClass, onClickHandler, categor
 			<div className="container">
 				<SearchBox search={search} setSearch={setSearch} filteredRecipes={filteredRecipes} filterRecipesHandler={filterRecipesHandler} />
 
-				{filteredRecipes === null && <LoadingText />}
+				{filteredRecipes === null && <LoadingText text="Loading recipes" />}
 				{filteredRecipes?.length === 0 && <span>No recipes found</span>}
 				{filteredRecipes?.length > 0 && (
 					<Row className="recipes">
@@ -73,21 +74,6 @@ const FilteredRecipesControl = ({ CardType, layoutClass, onClickHandler, categor
 				)}
 			</div>
 		</section>
-	);
-};
-
-const LoadingText = () => {
-	return (
-		<>
-			<Spinner
-				color="success"
-				style={{
-					height: '2em',
-					width: '2em',
-				}}
-			></Spinner>
-			<span className="loading-text">Loading recipes</span>
-		</>
 	);
 };
 

@@ -31,6 +31,10 @@
 	display: inline-block;
 }
 
+.edit-book-dropdown.unused {
+	background-color: rgb(255, 209, 209);
+}
+
 .edit-book-button {
 	display: inline-block;
 }
@@ -99,6 +103,11 @@ body {
 
 .bottom-buttons button {
 	margin: 0px 10px;
+}
+
+.book-list {
+	background-color: #f9f9f9;
+	padding: 20px;
 }
 
 .book-list ul {

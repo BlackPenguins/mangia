@@ -6,7 +6,7 @@ import { addIngredientsToRecipe } from './recipes.js';
 import { insertWeek } from '../database/week.js';
 
 const DAYS_OF_WEEK = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
-const MONTHS_OF_YEAR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTHS_OF_YEAR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 const getMenuForWeek = async (req, res) => {
 	let weekOffset = req.params.weekOffset;
@@ -26,13 +26,7 @@ export const getMenuForWeekOffset = async (weekOffset) => {
 	const dayOfYear = Math.floor((firstDayOfWeek - firstDayOfTheYear) / (24 * 60 * 60 * 1000));
 	const weekOfYear = Math.floor(dayOfYear / 7);
 
-	const todaysDate = new Date();
-
 	for (const day of daysArray) {
-		const isToday = todaysDate.getDate() === day.getDate() && todaysDate.getMonth() === day.getMonth() && todaysDate.getFullYear() === day.getFullYear();
-		const dayOfWeek = DAYS_OF_WEEK[day.getDay()];
-		const monthOfYear = MONTHS_OF_YEAR[day.getMonth()];
-
 		const formattedDateForDB = day.toISOString().slice(0, 10);
 
 		const doesExistPromise = await selectMenuByDay(formattedDateForDB);
@@ -56,19 +50,28 @@ export const getMenuForWeekOffset = async (weekOffset) => {
 			}
 		}
 
-		formattedDaysArray.push({
-			week: dayOfWeek,
-			date: monthOfYear + ' ' + day.getDate() + ', ' + day.getFullYear(),
-			year: day.getFullYear(),
-			isToday,
-			fullDate: day,
-			...menuExistsDetails,
-		});
+		formattedDaysArray.push(withDateDetails(day, menuExistsDetails));
 	}
 
 	return {
 		weekOfYear,
 		days: formattedDaysArray,
+	};
+};
+
+export const withDateDetails = (day, data) => {
+	const todaysDate = new Date();
+	const isToday = todaysDate.getDate() === day.getDate() && todaysDate.getMonth() === day.getMonth() && todaysDate.getFullYear() === day.getFullYear();
+	const dayOfWeek = DAYS_OF_WEEK[day.getDay()];
+	const monthOfYear = MONTHS_OF_YEAR[day.getMonth()];
+
+	return {
+		week: dayOfWeek,
+		date: monthOfYear + ' ' + day.getDate() + ', ' + day.getFullYear(),
+		year: day.getFullYear(),
+		isToday,
+		fullDate: day,
+		...data,
 	};
 };
 
@@ -254,7 +257,7 @@ const leftoversMenuItem = async (req, res) => {
 const getRandomWeightedRecipe = (recipes, amountToPick) => {
 	let totalWeight = 0;
 
-	const filteredRecipes = recipes.filter((r) => r.Category === 'Dinner');
+	const filteredRecipes = recipes.filter((r) => r.Category === 'Dinner' && r.IsActive);
 
 	// Recipes are assumed to be LastMade order with the newly made recipes first, with the lower weights
 	for (let itemIndex = 0; itemIndex < filteredRecipes.length; itemIndex++) {

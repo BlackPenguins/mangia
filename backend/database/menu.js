@@ -69,6 +69,18 @@ export const swapMenu = async (menuOne, menuTwo) => {
 	await updateMenu({ Day: firstDate }, menuTwo);
 };
 
+export const selectByRecipeID = (recipeID) => {
+	return new Promise((resolve, reject) => {
+		pool.query('SELECT * FROM MENU_DAY WHERE RecipeID = ? ORDER BY Day DESC LIMIT 10', [recipeID], (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve(result);
+			}
+		});
+	});
+};
+
 export const deleteWithRecipeID = (recipeID) => {
 	return new Promise((resolve, reject) => {
 		pool.query('UPDATE MENU_DAY SET RecipeID = null WHERE RecipeID = ?', [recipeID], (error) => {

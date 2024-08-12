@@ -1,9 +1,10 @@
 .change-recipe-container {
 	margin: 10px 0px;
+	height: 500px;
 }
 
 .change-recipe-container .recipes {
-	height: 500px;
+	height: 400px;
 	overflow-y: scroll;
 }
 

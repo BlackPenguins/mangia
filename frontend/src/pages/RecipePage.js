@@ -2,13 +2,14 @@ import { useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import './RecipePage.css';
-import { Button, Col, Row, Spinner } from 'reactstrap';
+import { Button, Col, Row } from 'reactstrap';
 import Rating from '../components/Settings/Rating';
-import Modal from '../components/Modal';
+import Modal from '../components/Common/Modal';
 import { utcToZonedTime } from 'date-fns-tz';
 import { formatDistance } from 'date-fns';
 import { Edit, Trash2 } from 'react-feather';
 import AuthContext from '../authentication/auth-context';
+import LoadingText from '../components/Common/LoadingText';
 
 const RecipePage = () => {
 	const params = useParams();
@@ -34,22 +35,25 @@ const RecipePage = () => {
 		fetchRecipe();
 	}, [fetchRecipe]);
 
+	const nameClasses = ['section-title'];
+
+	if (!recipe?.IsActive) {
+		nameClasses.push('hidden');
+	}
+
+	console.log('RECIP', recipe);
+
 	if (recipe === null) {
-		<div>
-			<Spinner
-				color="success"
-				style={{
-					height: '2em',
-					width: '2em',
-				}}
-			></Spinner>
-			<span className="loading-text">Loading recipe</span>
-		</div>;
+		return (
+			<div className="container">
+				<LoadingText text="Loading recipe" />
+			</div>
+		);
 	} else {
 		return (
 			<section className="hero">
 				<div className="container">
-					<div className="section-title">
+					<div className={nameClasses.join(' ')}>
 						<h2>{recipe.Name}</h2>
 					</div>
 
@@ -72,6 +76,8 @@ const RecipePage = () => {
 					</Row>
 					<Notes title="Notes" notes={recipe?.Notes} />
 					<Notes title="Day Preparation" notes={recipe?.DayPrep} />
+
+					<History history={recipe?.history} />
 
 					<Controls recipe={recipe} />
 				</div>
@@ -252,6 +258,29 @@ const Notes = ({ title, notes }) => {
 	);
 };
 
+const History = ({ history }) => {
+	console.log('HIS', history);
+	return (
+		<div className="notes history">
+			<h4>History</h4>
+			<ul>
+				{history &&
+					history.map((historyItem, index) => {
+						const classes = [];
+						if (historyItem.IsMade) {
+							classes.push('made');
+						}
+						return (
+							<li className={classes.join(' ')} key={index}>
+								{historyItem.date}
+							</li>
+						);
+					})}
+			</ul>
+		</div>
+	);
+};
+
 const ConfirmDeleteModal = ({ recipeID, closeModalHandler }) => {
 	const authContext = useContext(AuthContext);
 	const tokenFromStorage = authContext.token;
@@ -272,14 +301,20 @@ const ConfirmDeleteModal = ({ recipeID, closeModalHandler }) => {
 
 	return (
 		<>
-			<Modal className="confirm-modal" closeHandler={closeModalHandler}>
+			<Modal
+				title="Delete this Recipe"
+				className="confirm-modal"
+				closeHandler={closeModalHandler}
+				buttons={
+					<>
+						<Button onClick={closeModalHandler}>Close</Button>
+						<Button color="danger" onClick={deleteHandler}>
+							Yes, Delete
+						</Button>
+					</>
+				}
+			>
 				<div>Are you sure you want to delete this recipe?</div>
-				<div className="buttons">
-					<Button onClick={closeModalHandler}>Close</Button>
-					<Button color="danger" onClick={deleteHandler}>
-						Yes, Delete
-					</Button>
-				</div>
 			</Modal>
 		</>
 	);

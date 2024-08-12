@@ -1,9 +1,9 @@
 import { useContext, useRef, useState } from 'react';
 import { Button, Input } from 'reactstrap';
-import Modal from '../Modal';
+import Modal from 'components/Common/Modal';
 import { useNavigate } from 'react-router-dom';
 import './ImportRecipeModal.css';
-import AuthContext from '../../authentication/auth-context';
+import AuthContext from 'authentication/auth-context';
 
 const AddRecipeModal = ({ closeModalHandler }) => {
 	const authContext = useContext(AuthContext);
@@ -36,7 +36,7 @@ const AddRecipeModal = ({ closeModalHandler }) => {
 
 	return (
 		<>
-			<Modal closeHandler={closeModalHandler}>
+			<Modal title="Add Recipe" closeHandler={closeModalHandler} buttons={<Button onClick={addRecipeHandler}>Add Recipe</Button>}>
 				<div>
 					<Input
 						name="text"
@@ -46,9 +46,6 @@ const AddRecipeModal = ({ closeModalHandler }) => {
 						}}
 						value={recipeName}
 					/>
-				</div>
-				<div className="buttons">
-					<Button onClick={addRecipeHandler}>Add Recipe</Button>
 				</div>
 			</Modal>
 		</>

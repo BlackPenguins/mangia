@@ -1,3 +1,4 @@
+import LoadingText from 'components/Common/LoadingText';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { Button, Input } from 'reactstrap';
 import AuthContext from '../authentication/auth-context';
@@ -9,7 +10,7 @@ const ShoppingList = () => {
 	const tokenFromStorage = authContext.token;
 
 	const [recipes, setRecipes] = useState([]);
-	const [shoppingListItems, setShoppingListItems] = useState([]);
+	const [shoppingListItems, setShoppingListItems] = useState(null);
 
 	// const fetchMenu = useCallback(async () => {
 	// 	const response = await fetch(`/api/menu/-3`);
@@ -68,7 +69,7 @@ const ShoppingList = () => {
 
 	console.log('STORM', shoppingListItems);
 	return (
-		<>
+		<div className="container">
 			<div className="section-title">
 				<h2>Shopping List</h2>
 			</div>
@@ -82,6 +83,8 @@ const ShoppingList = () => {
 			)}
 
 			<div>
+				{shoppingListItems == null && <LoadingText text="Loading shopping list" />}
+				{shoppingListItems?.length == 0 && <span>No shopping list found</span>}
 				<ul>
 					{shoppingListItems &&
 						shoppingListItems.map((group, index) => (
@@ -108,7 +111,7 @@ const ShoppingList = () => {
 			</div>
 
 			{/* <RecipeData recipes={recipes} /> */}
-		</>
+		</div>
 	);
 };
 

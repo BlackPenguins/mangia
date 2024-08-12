@@ -134,6 +134,14 @@ ol {
 	margin: 0 auto;
 }
 
+.section-title.hidden h2 {
+	color: grey;
+}
+
+.section-title.hidden h2:after {
+	background: #ad3939;
+}
+
 .set-bg {
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -302,7 +310,7 @@ ol {
 }
 
 .header__top__right {
-	text-align: right;
+	float: right;
 	padding: 10px 0 13px;
 }
 
@@ -622,6 +630,12 @@ ol {
 	padding-left: 40px;
 	padding-top: 10px;
 	padding-bottom: 12px;
+
+	background-color: #f9f9f9;
+}
+
+.hero__categories li:hover {
+	font-weight: bold;
 }
 
 .hero__categories ul li {
@@ -2987,6 +3001,7 @@ ol {
 		position: absolute;
 		right: 15px;
 		top: 22px;
+		z-index: 4000;
 	}
 	.header .container {
 		position: relative;
@@ -3245,6 +3260,7 @@ ol {
 		position: absolute;
 		right: 15px;
 		top: 22px;
+		z-index: 4000;
 	}
 	.header .container {
 		position: relative;

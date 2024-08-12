@@ -2,8 +2,8 @@ import { useCallback, useContext, useState } from 'react';
 import { Button } from 'reactstrap';
 import './MenuNav.css';
 import PageNumberButton from './PageNumberButton';
-import Modal from '../Modal';
-import AuthContext from '../../authentication/auth-context';
+import Modal from 'components/Common/Modal';
+import AuthContext from 'authentication/auth-context';
 
 const MenuNav = ({ menus, weekOfYear, page, setPage, fetchMenu }) => {
 	const authContext = useContext(AuthContext);
@@ -63,14 +63,19 @@ const ConfirmGenerateModal = ({ generateMenu, closeModalHandler }) => {
 
 	return (
 		<>
-			<Modal className="confirm-modal" closeHandler={closeModalHandler}>
+			<Modal
+				title="Rebuild the Menu"
+				closeHandler={closeModalHandler}
+				buttons={
+					<>
+						<Button onClick={closeModalHandler}>Close</Button>
+						<Button color="danger" onClick={generateHandler}>
+							Yes, Rebuild
+						</Button>
+					</>
+				}
+			>
 				<div>Are you sure you want to re-build this menu? Your previous recipes will be lost for this week.</div>
-				<div className="buttons">
-					<Button onClick={closeModalHandler}>Close</Button>
-					<Button color="danger" onClick={generateHandler}>
-						Yes, Rebuild
-					</Button>
-				</div>
 			</Modal>
 		</>
 	);

@@ -6,23 +6,28 @@ import { deleteIngredientsByRecipeID, selectIngredientsByRecipeID, updateIngredi
 
 import Tesseract, { createWorker } from 'tesseract.js';
 import multer from 'multer';
-import { deleteWithRecipeID } from '../database/menu.js';
+import sharp from 'sharp';
+import { deleteWithRecipeID, selectByRecipeID } from '../database/menu.js';
 import { insertTag, selectTagByName } from '../database/tags.js';
 
 import fs from 'fs';
 import { checkAdminMiddleware } from './auth.js';
 import { insertIngredientTag, selectIngredientTagByName } from '../database/ingredientTags.js';
+import { withDateDetails } from './menu.js';
+
+export const THUMBNAIL_DIRECTORY = './images/thumbnails';
+const LARGE_PREFIX = 'large_';
 
 const thumbnailStorageEngine = multer.diskStorage({
 	destination: (req, file, callback) => {
-		console.log('CALL ME');
-		callback(null, './images/thumbs');
+		callback(null, THUMBNAIL_DIRECTORY);
 	},
 	filename: (req, file, callback) => {
-		console.log('FNAM');
 		const recipeID = req.params.recipeID;
 		console.log(file);
-		callback(null, `recipe_${recipeID}_${file.originalname}`);
+		const originalFileName = file.originalname;
+		const originalFileExt = originalFileName.substring(originalFileName.lastIndexOf('.'));
+		callback(null, `${LARGE_PREFIX}recipe_${recipeID}${originalFileExt}`);
 	},
 });
 
@@ -73,6 +78,15 @@ const getRecipe = async (req, res) => {
 				stepNumber: step.StepNumber,
 				instruction: step.Instruction,
 			});
+		}
+
+		const history = await selectByRecipeID(req.params.recipeID);
+
+		recipe.history = [];
+		for (const historyItem of history) {
+			if (!historyItem.IsSkipped && !historyItem.IsLeftovers) {
+				recipe.history.push(withDateDetails(historyItem.Day, historyItem));
+			}
 		}
 
 		const attachmentDirectory = `./images/attachments/${req.params.recipeID}`;
@@ -126,20 +140,66 @@ const importRecipeProcessor = async (req, res) => {
 };
 
 const uploadImage = async (req, res) => {
-	console.log('Upload image');
 	const recipeID = req.params.recipeID;
 	console.log(req.file, recipeID);
 
-	const updatedRecipe = {};
-
 	if (req.file) {
-		updatedRecipe.image = req.file.filename;
+		const beforeImageFileName = req.file.filename;
+		const afterImageFileName = beforeImageFileName.replace(LARGE_PREFIX, '');
+
+		resizeThumbnail(recipeID, THUMBNAIL_DIRECTORY, beforeImageFileName, afterImageFileName);
 	}
 
-	console.log(` Update Image for ${recipeID}`);
-	const recipe = await updateRecipe(updatedRecipe, recipeID);
+	res.status(200).json({});
+};
 
-	res.status(200).json('NONE');
+export const resizeThumbnail = async (recipeID, sourceDirectory, beforeImageFileName, afterImageFileName) => {
+	const beforeImageFile = `${sourceDirectory}/${beforeImageFileName}`;
+	const afterImageFile = `${THUMBNAIL_DIRECTORY}/${afterImageFileName}`;
+
+	if (beforeImageFile === afterImageFile) {
+		console.error('Input and output of thumbnail resize was same path.');
+		return;
+	}
+
+	const image = sharp(beforeImageFile);
+	const metadata = await image.metadata();
+
+	image.resize({ height: 500, fit: 'outside' }); // Resize to 500 px
+
+	// Dynamically set quality based on the format
+	switch (metadata.format) {
+		case 'jpeg':
+		case 'jpg':
+			image.jpeg({ quality: 100 });
+			break;
+		case 'png':
+			image.png({ compressionLevel: 0 });
+			break;
+		case 'webp':
+			image.webp({ quality: 100 });
+			break;
+		case 'tiff':
+			image.tiff({ quality: 100 });
+			break;
+		default:
+			console.warn(`Unknown or unsupported format: ${metadata.format}`);
+			break;
+	}
+
+	await image.toFile(afterImageFile);
+
+	console.log('Deleting thumbnail: ' + beforeImageFile);
+	fs.unlink(beforeImageFile, (err) => {
+		if (err) {
+			console.error('Error deleting the file:', err);
+		}
+	});
+
+	const updatedRecipe = {};
+	updatedRecipe.image = afterImageFileName;
+
+	await updateRecipe(updatedRecipe, recipeID);
 };
 
 const uploadAttachment = async (req, res) => {

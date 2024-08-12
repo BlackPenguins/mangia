@@ -24,7 +24,9 @@ const LoginDisplay = () => {
 			{authContext.token && (
 				<>
 					<span className="login-name">{nameDisplay}</span>
-					<span onClick={authContext.logoutHandler}>Logout</span>
+					<span className="logout-button" onClick={authContext.logoutHandler}>
+						Logout
+					</span>
 				</>
 			)}
 		</>
