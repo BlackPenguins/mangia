@@ -6,67 +6,91 @@
 	margin-bottom: 80px;
 }
 
-.shopping-list table {
-	min-width: 1000px !important;
+.shopping-list {
 	width: 100%;
 }
 
-.shopping-list table th {
+.shopping-list .heading .col {
+	display: flex;
+	align-items: center;
+}
+
+.shopping-list .heading {
 	background: #82ae46;
 	padding: 15px 20px;
 	color: #fff !important;
-	border: 1px solid transparent !important;
-	font-weight: normal;
+	font-weight: rgb(29, 29, 29);
+	border-top: 1px solid #ebebeb;
+	border-left: 1px solid #ebebeb;
+	border-right: 1px solid #ebebeb;
 }
 
-.shopping-list td {
+.shopping-list .list-row .col {
 	vertical-align: middle;
-	padding: 15px 20px;
-	border: 1px solid transparent !important;
 	border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
-	background-color: #ffffff;
+	background-color: #f9f9f9;
 }
 
-.shopping-list .name {
+.shopping-list .list-row {
+	overflow: hidden;
+	border-right: 1px solid #ebebeb;
+	border-left: 1px solid #ebebeb;
+}
+
+.shopping-list .list-row:last-child {
+	border-bottom: 1px solid #ebebeb;
+}
+
+.shopping-list .list-row .col {
 	font-size: 16px;
 }
 
-.shopping-list th:nth-child(1),
-.shopping-list td:nth-child(1) {
-	width: 5%;
+.shopping-list .list-row .stores-col {
+	padding: 15px 10px;
 }
 
-.shopping-list td:nth-child(1) .check-container {
+.shopping-list .list-row .stores-col input {
+	margin: 10px 0px;
+}
+
+.shopping-list .check-col {
 	display: flex;
-	justify-content: flex-end;
+	flex-direction: column;
+	justify-content: center;
 	align-items: center;
-	flex-wrap: nowrap;
-	align-content: center;
+	padding: 15px 0px 15px 10px;
 }
 
-.shopping-list td:nth-child(1) .check-container input {
-	font-size: 1.8em;
+.shopping-list .name-col,
+.shopping-list .count-col {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-start;
 }
 
-.shopping-list th:nth-child(2),
-.shopping-list td:nth-child(2) {
-	width: 80%;
+.shopping-list .name-col {
+	padding: 15px 0px 15px 15px;
 }
 
-.shopping-list th:nth-child(3),
-.shopping-list td:nth-child(3) {
-	width: 15%;
+.shopping-list .check-col input {
+	margin: 0;
+	font-size: 1.5em;
 }
 
-.shopping-list tr.checked .name {
+.shopping-list .list-row.checked .name-col {
 	text-decoration: line-through;
 }
 
-.shopping-list tr.checked .name,
-.shopping-list tr.checked .recipe-count {
-	color: grey;
+.shopping-list .list-row.checked .col {
+	background-color: #e0fdb7;
 }
 
-.shopping-list tr.checked td {
-	background-color: #e0fdb7;
+.shopping-list .lowest-price {
+	background-color: #f0e663;
+}
+
+.shopping-list-button {
+	text-align: center;
+	margin-bottom: 15px;
 }

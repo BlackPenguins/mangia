@@ -1,10 +1,10 @@
 import { useContext, useState } from 'react';
 import { Button, Col, FormText, Input, Row } from 'reactstrap';
 import AuthContext from 'authentication/auth-context';
-import Modal from 'components/Common/Modal';
-import './EditBooksModal.css';
+import './ScanModal.scss';
+import useBetterModal from 'components/Common/useBetterModal';
 
-const ScanModal = ({ attachments, fetchRecipe, closeModalHandler, recipeID }) => {
+const useScanModal = (fetchRecipe, attachments, recipeID) => {
 	const authContext = useContext(AuthContext);
 	const tokenFromStorage = authContext.token;
 
@@ -66,48 +66,46 @@ const ScanModal = ({ attachments, fetchRecipe, closeModalHandler, recipeID }) =>
 
 	const lines = text?.split('\n');
 
-	return (
-		<>
-			<Modal
-				title="Scan Reference Images"
-				closeHandler={closeModalHandler}
-				className="large"
-				buttons={
-					<Button size="sm" color="success" className="site-btn" onClick={importFile}>
-						Add Attachment
-					</Button>
-				}
-			>
-				<div className="container book-list">
-					<h3>Scanned Files</h3>
-					<ul>
-						{attachments.length === 0 && <div>No attachments found</div>}
-						{attachments &&
-							attachments.map((attachment, index) => {
-								const imageURL = `http://localhost:6200/attachments/${recipeID}/${attachment}`;
-								const clickHandler = () => {
-									parseText(attachment);
-								};
-								return <img key={index} alt={`attachment-${index}`} onClick={clickHandler} width={100} src={imageURL} />;
-							})}
-					</ul>
-					<Row>
-						<Col>
-							<Input id="recipe-image" name="file" type="file" onChange={fileChangeHandler} />
-							<FormText>The attachment image for the recipe.</FormText>
-						</Col>
-					</Row>
-					<div className="parsed-text">
-						{lines &&
-							lines.map((line, index) => {
-								return <div key={index}>{line}</div>;
-							})}
-						{!lines && <Progress progress={progress} />}
-					</div>
+	const { modal, openModal } = useBetterModal({
+		title: 'Scan Reference Images',
+		size: 'lg',
+		content: (closeModal) => (
+			<div className="container book-list">
+				<h3>Scanned Files</h3>
+				<ul>
+					{attachments.length === 0 && <div>No attachments found</div>}
+					{attachments &&
+						attachments.map((attachment, index) => {
+							const imageURL = `http://localhost:6200/attachments/${recipeID}/${attachment}`;
+							const clickHandler = () => {
+								parseText(attachment);
+							};
+							return <img key={index} alt={`attachment-${index}`} onClick={clickHandler} width={100} src={imageURL} />;
+						})}
+				</ul>
+				<Row>
+					<Col>
+						<Input id="recipe-image" name="file" type="file" onChange={fileChangeHandler} />
+						<FormText>The attachment image for the recipe.</FormText>
+					</Col>
+				</Row>
+				<div className="parsed-text">
+					{lines &&
+						lines.map((line, index) => {
+							return <div key={index}>{line}</div>;
+						})}
+					{!lines && <Progress progress={progress} />}
 				</div>
-			</Modal>
-		</>
-	);
+			</div>
+		),
+		buttons: (closeModal) => (
+			<Button size="sm" color="success" className="site-btn" onClick={importFile}>
+				Add Attachment
+			</Button>
+		),
+	});
+
+	return { modal, openModal };
 };
 
 const Progress = ({ progress }) => {
@@ -119,4 +117,4 @@ const Progress = ({ progress }) => {
 	return <span>Progress {progressValue}%</span>;
 };
 
-export default ScanModal;
+export default useScanModal;

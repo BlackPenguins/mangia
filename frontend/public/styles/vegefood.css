@@ -154,6 +154,13 @@
 	-ms-transition: all 0.3s ease;
 	transition: all 0.3s ease;
 }
+
+@media only screen and (max-width: 800px) {
+	.v-product .text .bottom-area {
+		opacity: 1;
+	}
+}
+
 .v-product .text .bottom-area span {
 	color: #fff;
 	width: 100%;

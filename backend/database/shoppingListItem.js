@@ -5,7 +5,7 @@ const pool = getPool();
 export const selectAllShoppingListItem = (weekID) => {
 	return new Promise((resolve, reject) => {
 		pool.query(
-			'SELECT s.ShoppingListItemID, s.Amount, s.IsChecked, s.RecipeCount, t.Name as TagName, d.Name as Department, d.Position as DepartmentPosition FROM SHOPPING_LIST_ITEM s LEFT JOIN INGREDIENT_TAG t ON s.IngredientTagID = t.IngredientTagID LEFT JOIN INGREDIENT_DEPARTMENT d on t.IngredientDepartmentID = d.IngredientDepartmentID WHERE WeekID = ?',
+			'SELECT s.IngredientTagID, s.ShoppingListItemID, s.Amount, s.IsChecked, s.RecipeCount, t.Name as TagName, d.Name as Department, d.Position as DepartmentPosition FROM SHOPPING_LIST_ITEM s LEFT JOIN INGREDIENT_TAG t ON s.IngredientTagID = t.IngredientTagID LEFT JOIN INGREDIENT_DEPARTMENT d on t.IngredientDepartmentID = d.IngredientDepartmentID WHERE WeekID = ?',
 			[weekID],
 			(error, result) => {
 				if (error) {

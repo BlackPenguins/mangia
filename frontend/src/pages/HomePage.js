@@ -1,6 +1,6 @@
+import RecipeContainer from 'components/Recipes/RecipeContainer';
 import { useState } from 'react';
-import FilteredRecipesControl, { HIDDEN_CATEGORY_FILTER } from '../components/Recipes/FilteredRecipesControl';
-import RecipeCard from '../components/Recipes/RecipeCard';
+import FilteredRecipes, { HIDDEN_CATEGORY_FILTER } from '../components/Recipes/FilteredRecipes';
 
 const HomePage = () => {
 	const [categoryFilter, setCategoryFilter] = useState(null);
@@ -44,7 +44,7 @@ const HomePage = () => {
 				</div>
 			</section>
 
-			<FilteredRecipesControl CardType={RecipeCard} layoutClass="lg-3 recipe-card" categoryFilter={categoryFilter} />
+			<FilteredRecipes CardType={RecipeContainer} layoutClass="lg-3 recipe-card" categoryFilter={categoryFilter} />
 		</>
 	);
 };

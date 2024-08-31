@@ -50,11 +50,12 @@
 	margin-right: 10px;
 }
 
-.logout-button {
+.login-logout-button {
 	cursor: pointer;
+	color: black;
 }
 
-.logout-button:hover {
+.login-logout-button:hover {
 	color: #218838;
 }
 

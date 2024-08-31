@@ -134,14 +134,6 @@ ol {
 	margin: 0 auto;
 }
 
-.section-title.hidden h2 {
-	color: grey;
-}
-
-.section-title.hidden h2:after {
-	background: #ad3939;
-}
-
 .set-bg {
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -3001,7 +2993,7 @@ ol {
 		position: absolute;
 		right: 15px;
 		top: 22px;
-		z-index: 4000;
+		z-index: 1050;
 	}
 	.header .container {
 		position: relative;
@@ -3260,7 +3252,7 @@ ol {
 		position: absolute;
 		right: 15px;
 		top: 22px;
-		z-index: 4000;
+		z-index: 1050;
 	}
 	.header .container {
 		position: relative;

@@ -1,0 +1,25 @@
+.menu-nav-container {
+	margin-bottom: 35px;
+	text-align: center;
+
+	.generate-button {
+		margin-bottom: 25px;
+	}
+
+	.menu-nav {
+		.week-button {
+			margin: 0px 20px;
+			background-color: grey;
+		}
+
+		.week-number {
+			font-size: 2em;
+		}
+
+		@media only screen and (max-width: 767px) {
+			.week-number {
+				font-size: 1.4em;
+			}
+		}
+	}
+}

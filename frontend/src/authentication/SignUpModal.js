@@ -1,15 +1,15 @@
+import useBetterModal from 'components/Common/useBetterModal';
 import { useState } from 'react';
 import { Button, Input, InputGroup, InputGroupText } from 'reactstrap';
-import Modal from '../components/Common/Modal';
 
-const SignUpModal = ({ closeModalHandler }) => {
+const useSignUpModal = () => {
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [passwordConfirm, setPasswordConfirm] = useState('');
 	const [name, setName] = useState('');
 	const [errorMessage, setErrorMessage] = useState('');
 
-	const signUpHandler = async () => {
+	const signUpHandler = async (closeModal) => {
 		const credentialsJSON = {
 			username,
 			password,
@@ -31,13 +31,14 @@ const SignUpModal = ({ closeModalHandler }) => {
 		if (response.status !== 200) {
 			setErrorMessage(data.message);
 		} else {
-			closeModalHandler();
+			closeModal();
 		}
 	};
 
-	return (
-		<>
-			<Modal title="Join Penguinore!" closeHandler={closeModalHandler} buttons={<Button onClick={signUpHandler}>Register!</Button>}>
+	const { modal, openModal, closeModal } = useBetterModal({
+		title: 'Join Penguinore!',
+		content: (closeModal) => (
+			<>
 				<InputGroup>
 					<InputGroupText>Username</InputGroupText>
 					<Input
@@ -83,9 +84,12 @@ const SignUpModal = ({ closeModalHandler }) => {
 					/>
 				</InputGroup>
 				<div>{errorMessage}</div>
-			</Modal>
-		</>
-	);
+			</>
+		),
+		buttons: (closeModal) => <Button onClick={() => signUpHandler(closeModal)}>Register!</Button>,
+	});
+
+	return { modal, openModal };
 };
 
-export default SignUpModal;
+export default useSignUpModal;

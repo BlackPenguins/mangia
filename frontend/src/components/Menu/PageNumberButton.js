@@ -1,13 +1,14 @@
 import { Button } from 'reactstrap';
 
-const PageNumberButton = ({ page, setPage, label }) => {
+const PageNumberButton = ({ page, setPage, mobileLabel, label }) => {
 	const setPageHandler = () => {
 		setPage(page);
 	};
 
 	return (
 		<Button className="site-btn week-button" onClick={setPageHandler}>
-			{label}
+			<span className="page-button-label">{label}</span>
+			<span className="page-button-mobile-label">{mobileLabel}</span>
 		</Button>
 	);
 };

@@ -1,26 +1,28 @@
+import useBetterModal from 'components/Common/useBetterModal';
 import { useContext, useState } from 'react';
 import { Button, Input, InputGroup, InputGroupText } from 'reactstrap';
-import Modal from '../components/Common/Modal';
 import AuthContext from './auth-context';
 
 import './LoginModal.css';
 
-const LoginModal = ({ closeModalHandler, showSignUpModal }) => {
+const useLoginModal = (openSignUpModal) => {
 	const authContext = useContext(AuthContext);
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [errorMessage, setErrorMessage] = useState('');
 
-	const signUpHandler = () => {
-		closeModalHandler();
-		showSignUpModal();
+	const signUpHandler = (closeModal) => {
+		closeModal();
+		openSignUpModal();
 	};
 
-	const loginHandler = () => authContext.loginHandler(username, password, setErrorMessage, closeModalHandler);
+	const loginHandler = (closeModal) => authContext.loginHandler(username, password, setErrorMessage, closeModal);
 
-	return (
-		<>
-			<Modal title="Login" closeHandler={closeModalHandler}>
+	const { modal, openModal, closeModal } = useBetterModal({
+		title: 'Login',
+		size: 'sm',
+		content: (closeModal) => (
+			<>
 				<InputGroup>
 					<InputGroupText>Username</InputGroupText>
 					<Input
@@ -44,18 +46,22 @@ const LoginModal = ({ closeModalHandler, showSignUpModal }) => {
 					/>
 				</InputGroup>
 				<div>{errorMessage}</div>
-				<div className="login-button">
-					<Button onClick={loginHandler}>Login</Button>
-				</div>
 				<div className="register">
 					Not a user?
-					<a className="link" onClick={signUpHandler}>
+					<a className="link" onClick={() => signUpHandler(closeModal)}>
 						Register now!
 					</a>
 				</div>
-			</Modal>
-		</>
-	);
+			</>
+		),
+		buttons: (closeModal) => (
+			<div className="login-button">
+				<Button onClick={() => loginHandler(closeModal)}>Login</Button>
+			</div>
+		),
+	});
+
+	return { modal, openModal };
 };
 
-export default LoginModal;
+export default useLoginModal;

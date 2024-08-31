@@ -26,6 +26,7 @@ const MigrationTab = () => {
 	return (
 		<div>
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="resizeImages" label="v1.1: Resize Images" />
+			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="createStore" label="v1.2: Create Store" />
 		</div>
 	);
 };
@@ -34,9 +35,11 @@ const MigrationButton = ({ migrationHandler, migrationKeyword, label }) => {
 	const [color, setColor] = useState('primary');
 
 	return (
-		<Button color={color} onClick={() => migrationHandler(migrationKeyword, setColor)}>
-			{label}
-		</Button>
+		<div className="migration-button">
+			<Button color={color} onClick={() => migrationHandler(migrationKeyword, setColor)}>
+				{label}
+			</Button>
+		</div>
 	);
 };
 

@@ -1,5 +1,6 @@
 import express from 'express';
 import { deleteShoppingListItems, insertShoppingListItem, selectAllShoppingListItem, updateShoppingListItemAsChecked } from '../database/shoppingListItem.js';
+import { selectAllStores, selectPrices } from '../database/store.js';
 import { checkAdminMiddleware } from './auth.js';
 import { getMenuForWeekOffset } from './menu.js';
 
@@ -14,15 +15,68 @@ const getCurrentWeekID = async () => {
 		menuDays,
 	};
 };
-const getShoppingListItems = async (req, res) => {
+const getShoppingListItemsHandler = async (req, res) => {
 	const { weekID } = await getCurrentWeekID();
 
 	const shoppingListItems = selectAllShoppingListItem(weekID);
 
 	shoppingListItems.then(
-		(result) => {
-			const groupedIngredients = groupByDepartment(result);
-			res.status(200).json(groupedIngredients);
+		async (result) => {
+			const ingredientsWithPrices = [];
+
+			for (const r of result) {
+				const pricesForStoresFromDB = await selectPrices(r.IngredientTagID);
+
+				let lowestPriceStoreID = null;
+				let lowestPrice = null;
+				let pricesForStores = [];
+
+				for (const priceFromDB of pricesForStoresFromDB) {
+					if (lowestPriceStoreID == null || priceFromDB.Price < lowestPrice) {
+						lowestPrice = priceFromDB.Price;
+						lowestPriceStoreID = priceFromDB.StoreID;
+					}
+
+					pricesForStores.push({
+						ingredientTagPriceID: priceFromDB.IngredientTagPriceID,
+						storeID: priceFromDB.StoreID,
+						price: priceFromDB.Price,
+					});
+				}
+
+				let store = pricesForStores.find((p) => p.storeID == lowestPriceStoreID);
+
+				if (store) {
+					store.isLowest = true;
+				}
+
+				ingredientsWithPrices.push({
+					amount: r.Amount,
+					name: r.TagName,
+					isChecked: r.IsChecked,
+					recipeCount: r.RecipeCount,
+					shoppingListItemID: r.ShoppingListItemID,
+					ingredientTagID: r.IngredientTagID,
+					department: r.Department,
+					departmentPosition: r.DepartmentPosition,
+					prices: pricesForStores,
+				});
+			}
+
+			const storesFromDB = await selectAllStores();
+			const stores = storesFromDB.map((s) => ({
+				storeID: s.StoreID,
+				storeName: s.Name,
+			}));
+
+			const departmentsWithIngredients = groupByDepartment(ingredientsWithPrices);
+
+			const response = {
+				stores,
+				departments: departmentsWithIngredients,
+			};
+
+			res.status(200).json(response);
 		},
 		(error) => {
 			res.status(500).json({ message: error });
@@ -30,21 +84,20 @@ const getShoppingListItems = async (req, res) => {
 	);
 };
 
-function groupByDepartment(arr) {
+function groupByDepartment(ingredients) {
 	// Step 1: Group by department and collect ingredients
-	const grouped = arr.reduce((acc, shoppingListItemFromDB) => {
-		const key = shoppingListItemFromDB.Department || 'Unknown';
-		if (!acc[key]) {
-			acc[key] = { department: key, position: shoppingListItemFromDB.DepartmentPosition, ingredients: [] };
+	const grouped = ingredients.reduce((departments, ingredient) => {
+		const key = ingredient.department || 'Unknown';
+		if (!departments[key]) {
+			departments[key] = {
+				department: key,
+				position: ingredient.departmentPosition,
+				ingredients: [],
+			};
 		}
-		acc[key].ingredients.push({
-			amount: shoppingListItemFromDB.Amount,
-			name: shoppingListItemFromDB.TagName,
-			isChecked: shoppingListItemFromDB.IsChecked,
-			recipeCount: shoppingListItemFromDB.RecipeCount,
-			shoppingListItemID: shoppingListItemFromDB.ShoppingListItemID,
-		});
-		return acc;
+
+		departments[key].ingredients.push(ingredient);
+		return departments;
 	}, {});
 
 	// Step 2: Convert the grouped object to an array
@@ -60,7 +113,7 @@ function groupByDepartment(arr) {
 	return result;
 }
 
-const updateChecked = (req, res) => {
+const updateCheckedHandler = (req, res) => {
 	const shoppingListItemID = req.body.shoppingListItemID;
 	const isChecked = req.body.isChecked;
 	// We can pass an object as long as the properties of the object match the column names in the DB table
@@ -76,7 +129,7 @@ const updateChecked = (req, res) => {
 	);
 };
 
-const buildShoppingList = async (req, res) => {
+const buildShoppingListHandler = async (req, res) => {
 	const { weekID, menuDays } = await getCurrentWeekID();
 
 	// Wipe out the list first
@@ -374,8 +427,8 @@ const convertToTeaspoons = (value) => {
 
 const router = express.Router();
 
-router.get('/api/shoppingListItem', getShoppingListItems);
-router.patch('/api/shoppingListItem/checked', checkAdminMiddleware, updateChecked);
-router.post('/api/shoppingListItem/build', checkAdminMiddleware, buildShoppingList);
+router.get('/api/shoppingListItem', getShoppingListItemsHandler);
+router.patch('/api/shoppingListItem/checked', checkAdminMiddleware, updateCheckedHandler);
+router.post('/api/shoppingListItem/build', checkAdminMiddleware, buildShoppingListHandler);
 
 export default router;

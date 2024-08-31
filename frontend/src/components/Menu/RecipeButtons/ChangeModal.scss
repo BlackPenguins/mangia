@@ -1,0 +1,62 @@
+.change-recipe-container {
+	margin: 10px 0px;
+	height: 500px;
+
+	.recipes {
+		height: 400px;
+		overflow-y: scroll;
+		align-content: flex-start;
+	}
+}
+
+
+.swap-days-container {
+	margin: 10px 15px;
+
+	select {
+		width: auto;
+		display: inline-block;
+	}
+
+	.site-btn {
+		margin-left: 10px;
+	}
+}
+
+.swap-days-buttons {
+	.row {
+		>div {
+			margin: 10px 0px;
+
+			.site-btn {
+				height: 100px;
+				width: 100%;
+
+				.recipe-name {
+					color: #b1ffb1;
+				}
+
+				&.today {
+					background: #3961ad;
+					cursor: default;
+
+					.recipe-name {
+						color: lightblue;
+					}
+				}
+
+				
+			}
+		}
+	}
+
+}
+
+
+.search-container {
+	input {
+		width: 60%;
+		display: inline-block;
+	}
+}
+

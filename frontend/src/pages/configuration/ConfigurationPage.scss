@@ -1,0 +1,18 @@
+.migration-button {
+    margin: 10px 0px;
+}
+
+.add-config-button {
+    margin: {
+        top: 20px;
+        bottom: 20px;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .edit-additional {
+        margin : {
+            top: 15px;
+        }
+    }
+}

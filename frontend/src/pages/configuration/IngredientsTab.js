@@ -4,12 +4,23 @@ import AuthContext from '../../authentication/auth-context';
 import BasicEditPanel from './BasicEditPanel';
 
 const IngredientsTab = () => {
-	return <BasicEditPanel label="Ingredient" apiFetch="/api/ingredientTags" apiUpdate="/api/ingredientTags" AdditionalOption={DepartmentDropdown} />;
+	return (
+		<BasicEditPanel
+			label="Ingredient"
+			apiFetch="/api/ingredientTags"
+			apiInsert="/api/ingredientTags"
+			apiUpdate="/api/ingredientTags"
+			idColumn="IngredientTagID"
+			AdditionalOption={DepartmentDropdown}
+		/>
+	);
 };
 
 const DepartmentDropdown = ({ element }) => {
 	const authContext = useContext(AuthContext);
 	const tokenFromStorage = authContext.token;
+
+	const [departmentID, setDepartmentID] = useState(element.IngredientDepartmentID);
 
 	const [departments, setDepartments] = useState(null);
 	const fetchDepartments = useCallback(async () => {
@@ -29,19 +40,20 @@ const DepartmentDropdown = ({ element }) => {
 	}, [fetchDepartments]);
 
 	const changeDepartment = async (option) => {
-		await fetch('/api/ingredientTags/department', {
+		await fetch('/api/ingredientTags', {
 			method: 'PATCH',
-			body: JSON.stringify({ IngredientDepartmentID: option, IngredientTagID: element.IngredientTagID }),
+			body: JSON.stringify({ departmentID: option, id: element.IngredientTagID }),
 			headers: {
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${tokenFromStorage}`,
 			},
 		});
+		setDepartmentID(option);
 	};
 
 	const classes = ['edit-book-dropdown'];
 
-	if (element.IngredientDepartmentID == null) {
+	if (departmentID == null) {
 		classes.push('unused');
 	}
 
@@ -53,7 +65,7 @@ const DepartmentDropdown = ({ element }) => {
 				onChange={(e) => {
 					changeDepartment(e.target.value);
 				}}
-				value={element.IngredientDepartmentID}
+				value={departmentID}
 			>
 				<option value={0}>None</option>
 				{departments &&

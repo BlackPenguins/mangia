@@ -41,11 +41,7 @@ export const insertIngredientTag = (newTag) => {
 	});
 };
 
-export const updateDepartment = (departmentID, tagID) => {
-	const update = {
-		IngredientDepartmentID: departmentID,
-	};
-
+export const updateIngredientTag = (tagID, update) => {
 	return new Promise((resolve, reject) => {
 		pool.query('UPDATE INGREDIENT_TAG SET ? WHERE IngredientTagID = ?', [update, tagID], (error) => {
 			if (error) {

@@ -1,0 +1,125 @@
+.recipe-edit-container,
+.recipe-details-container {
+	.section-title.hidden h2 {
+		color: grey;
+	}
+	
+	.section-title.hidden h2:after {
+		background: #ad3939;
+	}
+}
+
+.recipe-details-container {
+	.topSection {
+		margin-top: 20px;
+		display: flex;
+
+		.thumbnail-container {
+			position: relative;
+		}
+
+		.quick-facts {
+
+			.description {
+				font-style: italic;
+				padding: 10px 0px;
+			}
+			
+			div {
+				margin: 10px 0px;
+			}
+
+			.label {
+				font-weight: bold;
+				padding-right: 10px;
+			}
+		}
+	}
+	
+	.mainSection {
+		margin-top: 20px;
+		display: flex;
+
+		
+		.ingredients {
+			margin: 15px 0px 30px 0px;
+
+			ul {
+				margin: 15px 25px;
+			}
+
+			li {
+				list-style: square;
+				padding: 5px 0px;
+			}
+
+			h4 {
+				font-weight: bold;
+			}
+		}
+
+		
+		.steps {
+			margin: 15px 0px 30px 0px;
+
+			.step {
+				align-items: flex-start;
+				flex-direction: row;
+				padding-top: 16px;
+			
+				display: flex;
+				-webkit-box-align: center;
+				flex: 2 1 0%;
+				gap: 32px;
+				margin-bottom: 20px;
+
+				.number {
+					display: flex;
+
+					div {
+						width: 30px;
+						height: 30px;
+						display: flex;
+						-webkit-box-align: center;
+						align-items: center;
+						-webkit-box-pack: center;
+						justify-content: center;
+						background-color: #7fad39;
+						color: #fff;
+						border-radius: 50%;
+						text-align: center;
+						font-weight: 800;
+						font-family: 'Cairo', sans-serif;
+					}
+				}
+			}
+
+			h4 {
+				font-weight: bold;
+			}
+		}
+	}
+
+	.extraSection {
+		margin: 15px 0px 30px 0px;
+		
+		ul {
+			margin: 15px 25px;
+		}
+
+		li {
+			padding: 5px 0px;
+		}
+
+		h4 {
+			font-weight: bold;
+		}
+
+		&.history {
+			.made {
+				color: #7346ae;
+				font-weight: bold;
+			}
+		}
+	}
+}

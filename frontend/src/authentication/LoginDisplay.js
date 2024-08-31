@@ -1,30 +1,30 @@
 import { useContext, useState } from 'react';
 import AuthContext from './auth-context';
-import LoginModal from './LoginModal';
-import SignUpModal from './SignUpModal';
+import useLoginModal from './LoginModal';
+import useSignUpModal from './SignUpModal';
 
 const LoginDisplay = () => {
 	const authContext = useContext(AuthContext);
 
-	const [showLoginModal, setShowLoginModal] = useState(false);
-	const [showSignUpModal, setShowSignUpModal] = useState(false);
-
 	const nameDisplay = authContext.name ? `(${authContext.name})` : '';
+
+	const { modal: signUpModal, openModal: openSignUpModal } = useSignUpModal();
+	const { modal: loginModal, openModal: openLoginModal } = useLoginModal(openSignUpModal);
 
 	return (
 		<>
-			{showLoginModal && <LoginModal closeModalHandler={() => setShowLoginModal(false)} showSignUpModal={() => setShowSignUpModal(true)} />}
-			{showSignUpModal && <SignUpModal closeModalHandler={() => setShowSignUpModal(false)} />}
+			{loginModal}
+			{signUpModal}
 
 			{!authContext.token && (
-				<a href="#" onClick={() => setShowLoginModal(true)}>
-					<span>Login</span>
+				<a href="#" onClick={() => openLoginModal()}>
+					<span className="login-logout-button">Login</span>
 				</a>
 			)}
 			{authContext.token && (
 				<>
 					<span className="login-name">{nameDisplay}</span>
-					<span className="logout-button" onClick={authContext.logoutHandler}>
+					<span className="login-logout-button" onClick={authContext.logoutHandler}>
 						Logout
 					</span>
 				</>

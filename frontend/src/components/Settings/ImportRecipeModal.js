@@ -1,11 +1,11 @@
-import { useContext, useRef, useState } from 'react';
+import { useContext, useState } from 'react';
 import { Button, Input } from 'reactstrap';
-import Modal from 'components/Common/Modal';
 import { useNavigate } from 'react-router-dom';
-import './ImportRecipeModal.css';
+import './ImportRecipeModal.scss';
 import AuthContext from 'authentication/auth-context';
+import useBetterModal from 'components/Common/useBetterModal';
 
-const ImportRecipeModal = ({ closeModalHandler, currentRecipeID }) => {
+const useImportRecipeModal = () => {
 	const authContext = useContext(AuthContext);
 	const tokenFromStorage = authContext.token;
 
@@ -18,7 +18,7 @@ const ImportRecipeModal = ({ closeModalHandler, currentRecipeID }) => {
 	const [importFile, setImportFile] = useState('');
 
 	const viewRecipeHandler = () => {
-		closeModalHandler();
+		closeModal();
 		navigate(`/recipe/${newRecipeID}`);
 	};
 
@@ -27,7 +27,7 @@ const ImportRecipeModal = ({ closeModalHandler, currentRecipeID }) => {
 		console.log('Importing', url);
 		const response = await fetch(`/api/recipes/import`, {
 			method: 'POST',
-			body: JSON.stringify({ url, currentRecipeID }),
+			body: JSON.stringify({ url }),
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
 				'Content-Type': 'application/json',
@@ -61,23 +61,10 @@ const ImportRecipeModal = ({ closeModalHandler, currentRecipeID }) => {
 		setImportFile(event.target.files[0]);
 	};
 
-	return (
-		<>
-			<Modal
-				title="Import Recipe"
-				closeHandler={closeModalHandler}
-				buttons={
-					<>
-						{!newRecipeID && <Button onClick={importHandler}>Import Recipe</Button>}
-						{!newRecipeID && <Button onClick={importRecipeFile}>Import File</Button>}
-						{newRecipeID && (
-							<Button color="success" onClick={viewRecipeHandler}>
-								View Recipe
-							</Button>
-						)}
-					</>
-				}
-			>
+	const { modal, openModal, closeModal } = useBetterModal({
+		title: 'Import Recipe',
+		content: (closeModal) => (
+			<>
 				<div>Provide a URL to import a recipe. Not all websites can be imported.</div>
 				<div>
 					<Input
@@ -91,9 +78,22 @@ const ImportRecipeModal = ({ closeModalHandler, currentRecipeID }) => {
 					<input id="recipe-image" name="file" type="file" onChange={fileChangeHandler} />
 				</div>
 				<div className={statusClasses}>{status}</div>
-			</Modal>
-		</>
-	);
+			</>
+		),
+		buttons: (closeModal) => (
+			<>
+				{!newRecipeID && <Button onClick={importHandler}>Import Recipe</Button>}
+				{!newRecipeID && <Button onClick={importRecipeFile}>Import File</Button>}
+				{newRecipeID && (
+					<Button color="success" onClick={viewRecipeHandler}>
+						View Recipe
+					</Button>
+				)}
+			</>
+		),
+	});
+
+	return { modal, openModal };
 };
 
-export default ImportRecipeModal;
+export default useImportRecipeModal;

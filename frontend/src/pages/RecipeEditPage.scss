@@ -1,3 +1,5 @@
+
+
 .browse {
 	position: relative;
 }
@@ -29,10 +31,10 @@
 .edit-book-dropdown {
 	vertical-align: top;
 	display: inline-block;
-}
 
-.edit-book-dropdown.unused {
-	background-color: rgb(255, 209, 209);
+	&.unused {
+		background-color: rgb(255, 209, 209);
+	}
 }
 
 .edit-book-button {
@@ -68,24 +70,44 @@
 	display: inline-block;
 }
 
+
+
+.form-floating.ingredients textarea {
+	height: auto;
+}
+
+.form-floating.steps textarea {
+	height: auto;
+}
+
+.form-floating.notes textarea {
+	height: auto;
+}
+
 .form-control:focus {
 	border-color: #7fad39;
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(30, 255, 0, 0.6);
 }
 
 body {
-	background-image: url('/src/assets/images/kitchen_background.png');
+	background-image: url('/assets/images/kitchen_background.png');
 	background-repeat: repeat;
 }
-.edit-recipe-section .form-floating input,
-.edit-recipe-section .form-floating select,
-.edit-recipe-section .form-floating textarea {
+.recipe-edit-container .form-floating input,
+.recipe-edit-container .form-floating select,
+.recipe-edit-container .form-floating textarea {
 	font-size: 14px;
 	color: #3b3b3b;
 }
 
-.edit-recipe-section .form-floating {
+.recipe-edit-container .form-floating {
 	margin: 10px 0px;
+}
+
+.recipe-edit-container .rating-row {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .recipe-edit-btn {

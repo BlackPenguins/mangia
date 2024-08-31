@@ -3,16 +3,17 @@ import { Menu, Users } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from 'authentication/auth-context';
 import LoginDisplay from 'authentication/LoginDisplay';
-import AddRecipeModal from 'components/Settings/AddRecipeModal';
-import ImportRecipeModal from 'components/Settings/ImportRecipeModal';
+import useAddRecipeModal from 'components/Settings/useAddRecipeModal';
+import useImportRecipeModal from 'components/Settings/ImportRecipeModal';
 
 const Header = () => {
 	const authContext = useContext(AuthContext);
 	const navigate = useNavigate();
 
-	const [showImportModal, setShowImportModal] = useState(false);
-	const [showAddRecipeModal, setShowAddRecipeModal] = useState(false);
 	const [showSidebar, setShowSidebar] = useState(false);
+
+	const { modal: addModal, openModal: openAddModal } = useAddRecipeModal();
+	const { modal: importModal, openModal: openImportModal } = useImportRecipeModal();
 
 	const overlayClasses = ['humberger__menu__overlay'];
 	const sidebarClasses = ['humberger__menu__wrapper'];
@@ -28,12 +29,12 @@ const Header = () => {
 	};
 
 	const importRecipe = () => {
-		setShowImportModal(true);
+		openImportModal();
 		setShowSidebar(false);
 	};
 
 	const addRecipe = () => {
-		setShowAddRecipeModal(true);
+		openAddModal();
 		setShowSidebar(false);
 	};
 
@@ -78,8 +79,8 @@ const Header = () => {
 
 	return (
 		<>
-			{showImportModal && <ImportRecipeModal closeModalHandler={() => setShowImportModal(false)} />}
-			{showAddRecipeModal && <AddRecipeModal closeModalHandler={() => setShowAddRecipeModal(false)} />}
+			{importModal}
+			{addModal}
 			<div className={overlayClasses.join(' ')} onClick={() => setShowSidebar(false)}></div>
 			<div className={sidebarClasses.join(' ')}>
 				<div className="humberger__menu__logo">MANGIA!</div>
@@ -93,7 +94,6 @@ const Header = () => {
 				<nav className="humberger__menu__nav mobile-menu slicknav_nav">{links}</nav>
 				<div id="mobile-menu-wrap"></div>
 			</div>
-
 			<header className="header">
 				<div className="header__top">
 					<div className="container">
@@ -116,7 +116,6 @@ const Header = () => {
 					<div
 						className="humberger__open"
 						onClick={() => {
-							console.log('OPE');
 							setShowSidebar(true);
 						}}
 					>

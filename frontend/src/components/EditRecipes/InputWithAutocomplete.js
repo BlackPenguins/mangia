@@ -21,9 +21,9 @@ const InputWithAutocomplete = ({ fetchAvailableResults, selectedValue, setSelect
 	const inputKeyDownHandler = (e) => {
 		if (e.keyCode === 13) {
 			// ENTER KEY
-			if (showSuggestions && filteredResults.length) {
+			if (showSuggestions && filteredResults.length && resultSuggestionIndex > 0) {
 				// Use the selected suggestion
-				onkeyDownHandler(filteredResults[resultSuggestionIndex]);
+				onkeyDownHandler(filteredResults[resultSuggestionIndex - 1]);
 			} else {
 				// There is no result, use the exact value in the input
 				onkeyDownHandler(selectedValue);
@@ -42,7 +42,7 @@ const InputWithAutocomplete = ({ fetchAvailableResults, selectedValue, setSelect
 			setResultSuggestionIndex((prev) => prev - 1);
 		} else if (e.keyCode === 40) {
 			// DOWN ARROW KEY
-			if (resultSuggestionIndex - 1 === filteredResults.length) {
+			if (resultSuggestionIndex === filteredResults.length) {
 				// You can not go below the last suggestion
 				return;
 			}
@@ -84,14 +84,15 @@ const InputWithAutocomplete = ({ fetchAvailableResults, selectedValue, setSelect
 			{filteredResults.length > 0 && showSuggestions && (
 				<ul className="suggestions">
 					{filteredResults.map((result, index) => {
+						const selectionIndex = index + 1;
 						let className;
 
-						if (index === resultSuggestionIndex) {
+						if (selectionIndex === resultSuggestionIndex) {
 							className = 'suggestion-active';
 						}
 
 						return (
-							<li index={index} className={className}>
+							<li selectionIndex={selectionIndex} className={className}>
 								{result}
 							</li>
 						);

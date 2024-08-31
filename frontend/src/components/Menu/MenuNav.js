@@ -1,34 +1,48 @@
 import { useCallback, useContext, useState } from 'react';
 import { Button } from 'reactstrap';
-import './MenuNav.css';
+import './MenuNav.scss';
 import PageNumberButton from './PageNumberButton';
-import Modal from 'components/Common/Modal';
 import AuthContext from 'authentication/auth-context';
+import useBetterModal from 'components/Common/useBetterModal';
 
 const MenuNav = ({ menus, weekOfYear, page, setPage, fetchMenu }) => {
 	const authContext = useContext(AuthContext);
 	const tokenFromStorage = authContext.token;
 
-	const [showConfirmGenerate, setShowConfirmGenerate] = useState(false);
-
-	const generateMenu = useCallback(async () => {
-		await fetch(`/api/menu/generate/${page}`, {
-			method: 'POST',
-			headers: {
-				// This is required. NodeJS server won't know how to read it without it.
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${tokenFromStorage}`,
-			},
-		});
-		fetchMenu(page);
-	}, [page, fetchMenu]);
-
 	const hasAtLeastOneMenu = menus.filter((m) => m.menuID).length > 0;
-	console.log('MENU', menus, hasAtLeastOneMenu);
+
+	const generateMenu = useCallback(
+		async (closeModal) => {
+			await fetch(`/api/menu/generate/${page}`, {
+				method: 'POST',
+				headers: {
+					// This is required. NodeJS server won't know how to read it without it.
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${tokenFromStorage}`,
+				},
+			});
+			fetchMenu(page);
+			closeModal();
+		},
+		[page, fetchMenu]
+	);
+
+	const { modal, openModal, closeModal } = useBetterModal({
+		title: 'Rebuild the Menu',
+		size: 'md',
+		buttons: (closeModal) => (
+			<>
+				<Button color="danger" onClick={() => generateMenu(closeModal)}>
+					Yes, Rebuild
+				</Button>
+			</>
+		),
+		content: (closeModal) => <div>Are you sure you want to re-build this menu? Your previous recipes will be lost for this week.</div>,
+	});
 
 	const generateButtonHandler = useCallback(() => {
 		if (hasAtLeastOneMenu) {
-			setShowConfirmGenerate(true);
+			openModal();
 		} else {
 			generateMenu();
 		}
@@ -36,9 +50,7 @@ const MenuNav = ({ menus, weekOfYear, page, setPage, fetchMenu }) => {
 
 	return (
 		<div className="menu-nav-container">
-			{showConfirmGenerate && (
-				<ConfirmGenerateModal generateMenu={generateMenu} page={page} fetchMenu={fetchMenu} closeModalHandler={() => setShowConfirmGenerate(false)} />
-			)}
+			{modal}
 			{authContext.isAdmin && (
 				<div className="generate-button">
 					<Button color="success" onClick={generateButtonHandler} className="site-btn">
@@ -47,37 +59,11 @@ const MenuNav = ({ menus, weekOfYear, page, setPage, fetchMenu }) => {
 				</div>
 			)}
 			<div className="menu-nav">
-				<PageNumberButton label="Prev Week" page={page - 1} setPage={setPage} />
+				<PageNumberButton mobileLabel="<" label="Prev Week" page={page - 1} setPage={setPage} />
 				<span className="week-number">WEEK {weekOfYear + 1}</span>
-				<PageNumberButton label="Next Week" page={page + 1} setPage={setPage} />
+				<PageNumberButton mobileLabel=">" label="Next Week" page={page + 1} setPage={setPage} />
 			</div>
 		</div>
-	);
-};
-
-const ConfirmGenerateModal = ({ generateMenu, closeModalHandler }) => {
-	const generateHandler = () => {
-		generateMenu();
-		closeModalHandler();
-	};
-
-	return (
-		<>
-			<Modal
-				title="Rebuild the Menu"
-				closeHandler={closeModalHandler}
-				buttons={
-					<>
-						<Button onClick={closeModalHandler}>Close</Button>
-						<Button color="danger" onClick={generateHandler}>
-							Yes, Rebuild
-						</Button>
-					</>
-				}
-			>
-				<div>Are you sure you want to re-build this menu? Your previous recipes will be lost for this week.</div>
-			</Modal>
-		</>
 	);
 };
 

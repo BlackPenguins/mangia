@@ -4,12 +4,12 @@ import { debounce } from 'lodash';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, FormGroup, FormText, Input, Label, Row } from 'reactstrap';
 
-import './RecipeEditPage.css';
+import './RecipeEditPage.scss';
 import Rating from '../components/Settings/Rating';
 import Category from '../components/Recipes/Category';
 import Tag, { TagBox } from '../components/EditRecipes/Tag';
 import { ArrowDown, ArrowUpCircle, Book, Eye, PlusCircle, Printer, Save } from 'react-feather';
-import ScanModal from '../components/Settings/ScanModal';
+import useScanModal from '../components/Settings/useScanModal';
 import AuthContext from '../authentication/auth-context';
 import InputWithAutocomplete from '../components/EditRecipes/InputWithAutocomplete';
 import ImportRecipeModal from '../components/Settings/ImportRecipeModal';
@@ -225,95 +225,93 @@ const RecipeDetailsPage = () => {
 	}
 
 	return (
-		<>
+		<div className="container recipe-edit-container">
 			{showImportModal && <ImportRecipeModal closeModalHandler={() => setShowImportModal(true)} currentRecipeID={recipeID} />}
 
 			<div className={nameClasses.join(' ')}>
 				<h2>Edit Recipe</h2>
 			</div>
 
-			<section className="hero edit-recipe-section">
-				<div className="container">
-					<div>
-						<Row>
-							<Col lg={12}>
-								<ActiveCheckbox value={isActive} setValue={isActiveHandler} />
-							</Col>
-						</Row>
-						<Row>
-							<Col lg={9}>
-								<NameInput value={name} setValue={nameHandler} filteredRecipes={filteredRecipes} filterRecipesHandler={filterRecipesHandler} />
-								<DescriptionInput value={description} setValue={descriptionHandler} />
-								<Row>
-									<Col lg={4}>
-										<Category category={category} setCategory={categoryHandler} />
-									</Col>
-									<Col lg={8}>
-										<ProteinDropdown value={protein} setValue={proteinHandler} />
-									</Col>
-								</Row>
-								<Row>
-									<Col lg={12}>
-										<StepsTextarea value={steps} setValue={stepsHandler} />
-									</Col>
-								</Row>
-							</Col>
-							<Col lg={3}>
-								<NotesTextarea value={notes} setValue={notesHandler} />
-								<DayPrepTextarea value={dayPrep} setValue={dayPrepHandler} />
-								<DefrostInput value={defrost} setValue={defrostHandler} />
-							</Col>
-						</Row>
-						<Row>
-							<Col lg={9}>
-								<BooksSection
-									bookID={bookID}
-									setBookID={bookIDHandler}
-									page={page}
-									setPage={pageHandler}
-									attachments={attachments}
-									fetchRecipe={fetchRecipe}
-									recipeID={recipeID}
-								/>
-							</Col>
-							<Col lg={3} className="rating-row">
-								<Rating rating={rating} setRating={ratingHandler} size="48" />
-							</Col>
-						</Row>
+			<section className="hero">
+				<div>
+					<Row>
+						<Col lg={12}>
+							<ActiveCheckbox value={isActive} setValue={isActiveHandler} />
+						</Col>
+					</Row>
+					<Row>
+						<Col lg={9}>
+							<NameInput value={name} setValue={nameHandler} filteredRecipes={filteredRecipes} filterRecipesHandler={filterRecipesHandler} />
+							<DescriptionInput value={description} setValue={descriptionHandler} />
+							<Row>
+								<Col lg={4}>
+									<Category category={category} setCategory={categoryHandler} />
+								</Col>
+								<Col lg={8}>
+									<ProteinDropdown value={protein} setValue={proteinHandler} />
+								</Col>
+							</Row>
+							<Row>
+								<Col lg={12}>
+									<StepsTextarea value={steps} setValue={stepsHandler} />
+								</Col>
+							</Row>
+						</Col>
+						<Col lg={3}>
+							<NotesTextarea value={notes} setValue={notesHandler} />
+							<DayPrepTextarea value={dayPrep} setValue={dayPrepHandler} />
+							<DefrostInput value={defrost} setValue={defrostHandler} />
+						</Col>
+					</Row>
+					<Row>
+						<Col lg={9}>
+							<BooksSection
+								bookID={bookID}
+								setBookID={bookIDHandler}
+								page={page}
+								setPage={pageHandler}
+								attachments={attachments}
+								fetchRecipe={fetchRecipe}
+								recipeID={recipeID}
+							/>
+						</Col>
+						<Col lg={3} className="rating-row">
+							<Rating rating={rating} setRating={ratingHandler} size="48" />
+						</Col>
+					</Row>
 
-						<Row>
-							<Col>
-								<URLInput value={url} setValue={urlHandler} />
-							</Col>
-						</Row>
-						<Row>
-							<Col>
-								<ThumbnailSection setValue={thumbnailHandler} />
-							</Col>
-						</Row>
+					<Row>
+						<Col>
+							<URLInput value={url} setValue={urlHandler} />
+						</Col>
+					</Row>
+					<Row>
+						<Col>
+							<ThumbnailSection setValue={thumbnailHandler} />
+						</Col>
+					</Row>
 
-						<Tag recipeID={recipeID} />
+					<Tag recipeID={recipeID} />
 
-						<Row>
-							<Col lg={12}>
-								<IngredientsLines ingredients={ingredients} />
-							</Col>
-						</Row>
+					<Row>
+						<Col lg={12}>
+							<IngredientsLines ingredients={ingredients} />
+						</Col>
+					</Row>
 
-						<IngredientsTextarea value={ingredientsBulk} setValue={ingredientsHandler} />
+					<IngredientsTextarea value={ingredientsBulk} setValue={ingredientsHandler} />
 
-						<div className="bottom-buttons">
-							<Button className="site-btn muted" onClick={previewAction}>
-								<Eye /> Preview
-							</Button>
-							<Button className="site-btn muted" onClick={() => setShowImportModal(true)}>
-								<ArrowUpCircle /> Import
-							</Button>
-						</div>
+					<div className="bottom-buttons">
+						<Button className="site-btn muted" onClick={previewAction}>
+							<Eye /> Preview
+						</Button>
+						<Button className="site-btn muted" onClick={() => setShowImportModal(true)}>
+							<ArrowUpCircle /> Import
+						</Button>
 					</div>
 				</div>
 			</section>
-		</>
+		</div>
 	);
 };
 
@@ -487,6 +485,7 @@ const IngredientLine = ({ index, singleIngredient, debounceEditFunction, updateI
 							updateIngredientByID(e.target.value);
 						}}
 						value={value}
+						tabIndex={-1}
 					/>
 					<label for="recipe-ingredients">{`Ingredient ${index + 1}`}</label>
 				</div>
@@ -645,10 +644,6 @@ const URLInput = ({ value, setValue }) => {
 };
 const BooksSection = ({ bookID, setBookID, page, setPage, fetchRecipe, attachments, recipeID }) => {
 	const [books, setBooks] = useState([]);
-	const [showScanModal, setShowScanModal] = useState(false);
-
-	const showScanModalHandler = () => setShowScanModal(true);
-	const hideScanModalHandler = () => setShowScanModal(false);
 
 	const fetchBooks = useCallback(async () => {
 		const response = await fetch('/api/books', {
@@ -666,6 +661,8 @@ const BooksSection = ({ bookID, setBookID, page, setPage, fetchRecipe, attachmen
 		fetchBooks();
 	}, [fetchBooks]);
 
+	const { modal, openModal } = useScanModal(fetchRecipe, attachments, recipeID);
+
 	const bookOptions = books.map((book) => {
 		return (
 			<option key={book.BookID} value={book.BookID}>
@@ -676,7 +673,7 @@ const BooksSection = ({ bookID, setBookID, page, setPage, fetchRecipe, attachmen
 
 	return (
 		<Row>
-			{showScanModal && <ScanModal fetchRecipe={fetchRecipe} attachments={attachments} closeModalHandler={hideScanModalHandler} recipeID={recipeID} />}
+			{modal}
 			<Col lg={4}>
 				<div className="form-floating">
 					<Input
@@ -708,7 +705,7 @@ const BooksSection = ({ bookID, setBookID, page, setPage, fetchRecipe, attachmen
 				</div>
 			</Col>
 			<Col lg={6} className="recipe-edit-btn">
-				<Button className="site-btn muted" onClick={showScanModalHandler}>
+				<Button className="site-btn muted" onClick={openModal}>
 					<Printer /> Scan
 				</Button>
 			</Col>

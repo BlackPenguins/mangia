@@ -3,6 +3,7 @@ import { Button, Card, CardText, CardTitle, Col, Nav, NavItem, Row, TabContent, 
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 
 import '../ShoppingList.css';
+import './ConfigurationPage.scss';
 
 const ConfigurationPage = () => {
 	const navigate = useNavigate();
@@ -32,8 +33,13 @@ const ConfigurationPage = () => {
 									</a>
 								</li>
 								<li>
-									<a href="#" onClick={() => navigate('department')}>
+									<a href="#" onClick={() => navigate('departments')}>
 										Department
+									</a>
+								</li>
+								<li>
+									<a href="#" onClick={() => navigate('stores')}>
+										Stores
 									</a>
 								</li>
 								<li>

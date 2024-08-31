@@ -40,3 +40,15 @@ export const insertBook = (newBook) => {
 		});
 	});
 };
+
+export const updateBook = (bookID, update) => {
+	return new Promise((resolve, reject) => {
+		pool.query('UPDATE BOOK SET ? WHERE BookID = ?', [update, bookID], (error) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve();
+			}
+		});
+	});
+};

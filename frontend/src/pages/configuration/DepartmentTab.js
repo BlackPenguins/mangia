@@ -4,7 +4,16 @@ import AuthContext from '../../authentication/auth-context';
 import BasicEditPanel from './BasicEditPanel';
 
 const DepartmentTab = () => {
-	return <BasicEditPanel label="Department" apiFetch="/api/ingredientDepartments" apiUpdate="/api/ingredientDepartments" AdditionalOption={PositionInput} />;
+	return (
+		<BasicEditPanel
+			label="Department"
+			apiFetch="/api/ingredientDepartments"
+			apiInsert="/api/ingredientDepartments"
+			apiUpdate="/api/ingredientDepartments"
+			idColumn="IngredientDepartmentID"
+			AdditionalOption={PositionInput}
+		/>
+	);
 };
 
 const PositionInput = ({ element }) => {
@@ -14,7 +23,7 @@ const PositionInput = ({ element }) => {
 	const changePosition = async (option) => {
 		await fetch('/api/ingredientDepartments', {
 			method: 'PATCH',
-			body: JSON.stringify({ IngredientDepartmentID: element.IngredientDepartmentID, Position: option }),
+			body: JSON.stringify({ id: element.IngredientDepartmentID, position: option }),
 			headers: {
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${tokenFromStorage}`,

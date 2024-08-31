@@ -2,7 +2,7 @@ import express from 'express';
 import { insertIngredientDepartment, selectAllIngredientDepartments, updateDepartment } from '../database/ingredientDepartment.js';
 import { checkAdminMiddleware } from './auth.js';
 
-const getAllIngredientDepartments = (req, res) => {
+const getAllIngredientDepartmentsHandler = (req, res) => {
 	const selectPromise = selectAllIngredientDepartments();
 
 	selectPromise.then(
@@ -15,7 +15,7 @@ const getAllIngredientDepartments = (req, res) => {
 	);
 };
 
-const addIngredientDepartment = (req, res) => {
+const addIngredientDepartmentHandler = (req, res) => {
 	// We need a middleman object so the person using the API can't change whichever columns they want
 	const newIngredientDepartment = {
 		name: req.body.name,
@@ -34,12 +34,25 @@ const addIngredientDepartment = (req, res) => {
 	);
 };
 
-const updateIngredientDepartment = (req, res) => {
-	const ingredientDepartmentID = req.body.IngredientDepartmentID;
-	const position = req.body.Position;
+const updateIngredientDepartmentHandler = (req, res) => {
+	const ingredientDepartmentID = req.body.id;
+	const position = req.body.position;
+	const name = req.body.name;
+
+	const update = {};
+
+	if (position) {
+		update.Position = position;
+	}
+
+	if (name) {
+		update.Name = name;
+	}
+
+	console.log(`Updating Ingredient Department [${ingredientDepartmentID}]`, update);
 
 	// We can pass an object as long as the properties of the object match the column names in the DB table
-	const insertPromise = updateDepartment(ingredientDepartmentID, position);
+	const insertPromise = updateDepartment(ingredientDepartmentID, update);
 
 	insertPromise.then(
 		(result) => {
@@ -53,8 +66,8 @@ const updateIngredientDepartment = (req, res) => {
 
 const router = express.Router();
 
-router.get('/api/ingredientDepartments', getAllIngredientDepartments);
-router.patch('/api/ingredientDepartments', checkAdminMiddleware, updateIngredientDepartment);
-router.put('/api/ingredientDepartments', checkAdminMiddleware, addIngredientDepartment);
+router.get('/api/ingredientDepartments', getAllIngredientDepartmentsHandler);
+router.patch('/api/ingredientDepartments', checkAdminMiddleware, updateIngredientDepartmentHandler);
+router.put('/api/ingredientDepartments', checkAdminMiddleware, addIngredientDepartmentHandler);
 
 export default router;

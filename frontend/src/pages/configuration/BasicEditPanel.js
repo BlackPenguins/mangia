@@ -3,9 +3,10 @@ import { Button, Col, Input, Row } from 'reactstrap';
 import AuthContext from '../../authentication/auth-context';
 import LoadingText from '../../components/Common/LoadingText';
 
-const BasicEditPanel = ({ label, apiFetch, apiUpdate, AdditionalOption }) => {
-	const [elements, setElements] = useState(null);
-	const fetchElements = useCallback(async () => {
+const BasicEditPanel = ({ label, apiFetch, apiInsert, apiUpdate, idColumn, AdditionalOption }) => {
+	const [items, setItems] = useState(null);
+
+	const fetchItems = useCallback(async () => {
 		const response = await fetch(apiFetch, {
 			method: 'GET',
 			headers: {
@@ -13,27 +14,27 @@ const BasicEditPanel = ({ label, apiFetch, apiUpdate, AdditionalOption }) => {
 			},
 		});
 		const data = await response.json();
-		const fetchedElements = data;
-		setElements(fetchedElements);
+		const fetchedItems = data;
+		setItems(fetchedItems);
 	}, []);
 
 	useEffect(() => {
-		fetchElements();
-	}, [fetchElements]);
+		fetchItems();
+	}, [fetchItems]);
 
 	const authContext = useContext(AuthContext);
 	const tokenFromStorage = authContext.token;
 
-	const addElementInputRef = useRef();
+	const addItemInputRef = useRef();
 
-	const onAddElementHandler = async () => {
-		const newElement = {
-			name: addElementInputRef.current.value,
+	const onAddItemHandler = async () => {
+		const newItem = {
+			name: addItemInputRef.current.value,
 		};
 
-		const response = await fetch(apiUpdate, {
+		const response = await fetch(apiInsert, {
 			method: 'PUT',
-			body: JSON.stringify(newElement),
+			body: JSON.stringify(newItem),
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
 				'Content-Type': 'application/json',
@@ -43,47 +44,91 @@ const BasicEditPanel = ({ label, apiFetch, apiUpdate, AdditionalOption }) => {
 		const data = await response.json();
 
 		if (data.success) {
-			fetchElements();
+			fetchItems();
 		}
-		addElementInputRef.current.value = '';
+		addItemInputRef.current.value = '';
 	};
 
 	return (
 		<div className="container book-list">
 			<h3>{label} List</h3>
+			<Row className="add-config-button">
+				<Col lg={7}>
+					<div className="form-floating">
+						<Input id="item-name" type="text" placeholder="Item Name" innerRef={addItemInputRef}></Input>
+						<label for="item-name">{label} Name</label>
+					</div>
+				</Col>
+				<Col lg={5} className="recipe-edit-btn">
+					<Button size="sm" color="success" onClick={onAddItemHandler} className="site-btn">
+						Add {label}
+					</Button>
+				</Col>
+			</Row>
 			<div class="shoping__cart__table">
-				{elements == null && <LoadingText text={`Loading ${label}s`} />}
-				{elements && elements?.length === 0 && <div>No {label.toLowerCase()}s found</div>}
+				{items == null && <LoadingText text={`Loading ${label}s`} />}
+				{items && items?.length === 0 && <div>No {label.toLowerCase()}s found</div>}
 				<table>
 					<tbody>
-						{elements &&
-							elements.map((book) => (
-								<tr key={book.BookID}>
-									<td className="shoping__cart__item" lg="6">
-										{book.Name}
-									</td>
-									<td className="shoping__cart__item" lg="6">
-										{AdditionalOption && <AdditionalOption element={book} />}
+						{items &&
+							items.map((item) => (
+								<tr key={item[idColumn]}>
+									<td className="shoping__cart__item">
+										<Row>
+											<Col lg={(AdditionalOption && 6) || 12} sm={12}>
+												<NameInput item={item} apiUpdate={apiUpdate} idColumn={idColumn} tokenFromStorage={tokenFromStorage} />
+											</Col>
+											<Col lg={6} sm={12} className="edit-additional">
+												{AdditionalOption && <AdditionalOption element={item} />}
+											</Col>
+										</Row>
 									</td>
 								</tr>
 							))}
 					</tbody>
 				</table>
 			</div>
-			<Row>
-				<Col lg={4}>
-					<div className="form-floating">
-						<Input id="book-name" type="text" placeholder="Book Name" innerRef={addElementInputRef}></Input>
-						<label for="book-name">{label} Name</label>
-					</div>
-				</Col>
-				<Col lg={4} className="recipe-edit-btn">
-					<Button size="sm" color="success" onClick={onAddElementHandler} className="site-btn">
-						Add {label}
-					</Button>
-				</Col>
-				<Col lg={4}></Col>
-			</Row>
+		</div>
+	);
+};
+
+const NameInput = ({ item, apiUpdate, idColumn, tokenFromStorage }) => {
+	const [value, setValue] = useState(item.Name);
+
+	const onUpdateHandler = async () => {
+		const newElement = {
+			id: item[idColumn],
+			name: value,
+		};
+
+		const response = await fetch(apiUpdate, {
+			method: 'PATCH',
+			body: JSON.stringify(newElement),
+			headers: {
+				// This is required. NodeJS server won't know how to read it without it.
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
+			},
+		});
+		await response.json();
+	};
+
+	return (
+		<div className="form-floating notes">
+			<Input
+				className="editInput"
+				id="edit-name"
+				type="text"
+				placeholder="Name"
+				onChange={(e) => {
+					setValue(e.target.value);
+				}}
+				onBlur={(e) => {
+					onUpdateHandler();
+				}}
+				value={value}
+			/>
+			<label for="edit-name">Name</label>
 		</div>
 	);
 };

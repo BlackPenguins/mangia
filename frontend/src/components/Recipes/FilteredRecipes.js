@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Input, Row } from 'reactstrap';
 import LoadingText from '../Common/LoadingText';
-import './FilteredRecipesControl.css';
 
 export const HIDDEN_CATEGORY_FILTER = 'Hidden';
-const FilteredRecipesControl = ({ CardType, layoutClass, onClickHandler, categoryFilter }) => {
+const FilteredRecipes = ({ CardType, layoutClass, onClickHandler, categoryFilter }) => {
 	const fetchRecipes = async () => {
 		const response = await fetch('/api/recipes');
 		const data = await response.json();
@@ -79,30 +78,23 @@ const FilteredRecipesControl = ({ CardType, layoutClass, onClickHandler, categor
 
 const SearchBox = ({ search, setSearch, filteredRecipes, filterRecipesHandler }) => {
 	return (
-		<div className="row">
-			<div className="col-lg-9">
-				<div className="hero__search">
-					<div className="hero__search__form">
-						<form action="#">
-							<Input
-								id="recipe-category"
-								type="text"
-								placeholder={!search && `Search all ${filteredRecipes?.length || ''} recipes...`}
-								onChange={(e) => {
-									setSearch(e.target.value);
-									filterRecipesHandler(e.target.value);
-								}}
-								value={search}
-							/>
-							<button type="submit" className="site-btn">
-								SEARCH
-							</button>
-						</form>
-					</div>
-				</div>
+		<div className="hero__search">
+			<div className="search-container">
+				<form action="#">
+					<Input
+						id="recipe-category"
+						type="text"
+						placeholder={!search && `Search all ${filteredRecipes?.length || ''} recipes...`}
+						onChange={(e) => {
+							setSearch(e.target.value);
+							filterRecipesHandler(e.target.value);
+						}}
+						value={search}
+					/>
+				</form>
 			</div>
 		</div>
 	);
 };
 
-export default FilteredRecipesControl;
+export default FilteredRecipes;

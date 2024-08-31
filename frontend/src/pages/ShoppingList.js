@@ -1,24 +1,29 @@
+import { ContactSupportOutlined } from '@mui/icons-material';
 import LoadingText from 'components/Common/LoadingText';
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { Button, Input } from 'reactstrap';
+import { Button, Input, Row, Col } from 'reactstrap';
 import AuthContext from '../authentication/auth-context';
 
 import './ShoppingList.css';
+
+const CHECKBOX_WIDTH = 1;
+const NAME_WIDTH = 5;
+const RECIPE_COUNT_WIDTH = 1;
+const STORE_PRICES_SECTION_WIDTH = 5;
+const STORE_PRICES_WIDTH = 4;
+
+const MOBILE_CHECKBOX_WIDTH = 1;
+const MOBILE_NAME_WIDTH = 9;
+const MOBILE_RECIPE_COUNT_WIDTH = 2;
+const MOBILE_STORE_PRICES_SECTION_WIDTH = 12;
+const MOBILE_STORE_PRICES_WIDTH = 4;
 
 const ShoppingList = () => {
 	const authContext = useContext(AuthContext);
 	const tokenFromStorage = authContext.token;
 
-	const [recipes, setRecipes] = useState([]);
 	const [shoppingListItems, setShoppingListItems] = useState(null);
-
-	// const fetchMenu = useCallback(async () => {
-	// 	const response = await fetch(`/api/menu/-3`);
-	// 	const data = await response.json();
-	// 	const menu = data.days;
-	// 	console.log('Retrieved Menu from Server', menu);
-	// 	setRecipes(menu.filter((m) => m.recipe).map((m) => m.recipe));
-	// }, []);
+	const [stores, setStores] = useState(null);
 
 	const fetchShoppingList = useCallback(async () => {
 		const response = await fetch(`/api/shoppingListItem`, {
@@ -30,30 +35,15 @@ const ShoppingList = () => {
 			},
 		});
 		const data = await response.json();
-		setShoppingListItems(data);
+		setShoppingListItems(data.departments);
+		setStores(data.stores);
+
+		console.log('DAT', data);
 	}, []);
 
 	useEffect(() => {
-		// fetchMenu();
 		fetchShoppingList();
 	}, [fetchShoppingList]);
-
-	// let ingredientsOld = [];
-	// let groupedIngredients = [];
-
-	// if (recipes.length > 0) {
-	// 	ingredientsOld = recipes.flatMap((r) => r.ingredients);
-
-	// 	console.log('ingredients', { ingredients: ingredientsOld });
-
-	// 	const ingredientTotals = sumIngredients(ingredientsOld);
-
-	// 	console.log('ingredientTotals', { ingredientTotals });
-
-	// 	groupedIngredients = groupByDepartment(ingredientTotals);
-
-	// 	console.log('groups', { groupedIngredients });
-	// }
 
 	const buildShoppingList = useCallback(async () => {
 		await fetch(`/api/shoppingListItem/build`, {
@@ -67,51 +57,97 @@ const ShoppingList = () => {
 		fetchShoppingList();
 	}, [fetchShoppingList]);
 
-	console.log('STORM', shoppingListItems);
+	const [selectedStore, setSelectedStore] = useState(null);
+
 	return (
-		<div className="container">
-			<div className="section-title">
-				<h2>Shopping List</h2>
-			</div>
-
-			{authContext.isAdmin && (
-				<div className="generate-button">
-					<Button color="success" onClick={buildShoppingList} className="site-btn">
-						Build Shopping List
-					</Button>
+		<section className="hero">
+			<div className="container">
+				<div className="section-title">
+					<h2>Shopping List</h2>
 				</div>
-			)}
 
-			<div>
-				{shoppingListItems == null && <LoadingText text="Loading shopping list" />}
-				{shoppingListItems?.length == 0 && <span>No shopping list found</span>}
-				<ul>
-					{shoppingListItems &&
-						shoppingListItems.map((group, index) => (
-							<div class="container">
+				{authContext.isAdmin && (
+					<div className="shopping-list-button">
+						<Button color="success" onClick={buildShoppingList} className="site-btn">
+							Build Shopping List
+						</Button>
+					</div>
+				)}
+
+				<div class="row">
+					<div class="col-lg-3">
+						<StoreFilters stores={stores} setSelectedStore={setSelectedStore} />
+					</div>
+					<div class="col-lg-9">
+						<ShoppingListTable shoppingListItems={shoppingListItems} stores={stores} tokenFromStorage={tokenFromStorage} selectedStore={selectedStore} />
+					</div>
+				</div>
+			</div>
+		</section>
+	);
+};
+
+const StoreFilters = ({ stores, setSelectedStore }) => {
+	return (
+		<div class="hero__categories">
+			<div class="hero__categories__all">
+				<span>Stores</span>
+			</div>
+			<ul>
+				<li>
+					<a href="#" onClick={() => setSelectedStore(null)}>
+						All
+					</a>
+				</li>
+
+				{stores &&
+					stores.map((store) => {
+						return (
+							<li>
+								<a href="#" onClick={() => setSelectedStore(store.storeID)}>
+									{store.storeName}
+								</a>
+							</li>
+						);
+					})}
+			</ul>
+		</div>
+	);
+};
+const ShoppingListTable = ({ shoppingListItems, stores, tokenFromStorage, selectedStore }) => {
+	return (
+		<>
+			{shoppingListItems == null && <LoadingText text="Loading shopping list" />}
+			{shoppingListItems?.length == 0 && <span>No shopping list found</span>}
+			{shoppingListItems &&
+				shoppingListItems.map((group, index) => {
+					const hasLowestPriceInDepartment = group.ingredients.some((i) => storeHasLowestPrice(selectedStore, i));
+
+					const showGroup = hasLowestPriceInDepartment;
+
+					if (!showGroup) {
+						return null;
+					} else {
+						return (
+							<div className="container">
 								<div class="shopping-list">
-									<table class="table">
-										<thead>
-											<tr>
-												<th>&nbsp;</th>
-												<th>{group.department}</th>
-												<th>Recipe Count</th>
-											</tr>
-										</thead>
-										<tbody>
-											{group.ingredients.map((ingredient, i) => (
-												<ShoppingListRow ingredient={ingredient} tokenFromStorage={tokenFromStorage} />
-											))}
-										</tbody>
-									</table>
+									<Row className="heading">
+										<Col className="col" lg={NAME_WIDTH + 1} sm={MOBILE_NAME_WIDTH} xs={MOBILE_NAME_WIDTH}>
+											{group.department}
+										</Col>
+										<Col className="col" lg={RECIPE_COUNT_WIDTH} sm={MOBILE_RECIPE_COUNT_WIDTH} xs={MOBILE_RECIPE_COUNT_WIDTH}>
+											Count
+										</Col>
+									</Row>
+									{group.ingredients.map((ingredient, i) => (
+										<ShoppingListTableRow ingredient={ingredient} tokenFromStorage={tokenFromStorage} stores={stores} selectedStore={selectedStore} />
+									))}
 								</div>
 							</div>
-						))}
-				</ul>
-			</div>
-
-			{/* <RecipeData recipes={recipes} /> */}
-		</div>
+						);
+					}
+				})}
+		</>
 	);
 };
 
@@ -128,345 +164,158 @@ const updateShoppingList = async (shoppingListItemID, isChecked, tokenFromStorag
 	});
 };
 
-const ShoppingListRow = ({ ingredient, tokenFromStorage }) => {
+const ShoppingListTableRow = ({ ingredient, tokenFromStorage, stores, selectedStore }) => {
 	const [isChecked, setIsChecked] = useState(ingredient.isChecked);
+	const [prices, setPrices] = useState([]);
+
+	useEffect(() => {
+		setPrices(ingredient.prices);
+	}, [ingredient]);
 
 	const setValue = (isChecked) => {
 		setIsChecked(isChecked);
 		updateShoppingList(ingredient.shoppingListItemID, isChecked, tokenFromStorage);
 	};
 
-	const classes = [];
+	if (!storeHasLowestPrice(selectedStore, ingredient)) {
+		// Hide rows that don't have the lowest price for that selected store
+		return null;
+	}
+
+	const classes = ['list-row'];
 
 	if (isChecked) {
 		classes.push('checked');
 	}
 
 	return (
-		<tr className={classes.join(' ')}>
-			<td>
-				<div className="check-container">
-					<Input
-						checked={isChecked}
-						onClick={() => {
-							setValue(!isChecked);
-						}}
-						type="checkbox"
-					/>
-				</div>
-			</td>
-			<td className="product-name">
-				<span className="name">
-					{ingredient.amount} {ingredient.name}
-				</span>
-			</td>
-			<td className="recipe-count product-name">{ingredient.recipeCount}</td>
-		</tr>
+		<Row className={classes.join(' ')}>
+			<Col className="check-col col" lg={CHECKBOX_WIDTH} sm={MOBILE_CHECKBOX_WIDTH} xs={MOBILE_CHECKBOX_WIDTH}>
+				<Input
+					checked={isChecked}
+					onClick={() => {
+						setValue(!isChecked);
+					}}
+					type="checkbox"
+				/>
+			</Col>
+			<Col className="name-col col" lg={NAME_WIDTH} sm={MOBILE_NAME_WIDTH} xs={MOBILE_NAME_WIDTH}>
+				{ingredient.amount} {ingredient.name}
+			</Col>
+			<Col className="count-col col" lg={RECIPE_COUNT_WIDTH} sm={MOBILE_RECIPE_COUNT_WIDTH} xs={MOBILE_RECIPE_COUNT_WIDTH}>
+				{ingredient.recipeCount}
+			</Col>
+			<Col className="stores-col col" lg={STORE_PRICES_SECTION_WIDTH} sm={MOBILE_STORE_PRICES_SECTION_WIDTH} xs={MOBILE_STORE_PRICES_SECTION_WIDTH}>
+				<Row>
+					{stores &&
+						stores.map((store) => {
+							return <PriceInput ingredientTagID={ingredient.ingredientTagID} store={store} prices={prices} tokenFromStorage={tokenFromStorage} />;
+						})}
+				</Row>
+			</Col>
+		</Row>
 	);
 };
 
-const RecipeData = ({ recipes }) => {
-	return (
-		<div>
-			{recipes.map((recipe) => {
-				const ingredients = recipe?.ingredients;
-				return (
-					<>
-						<div>
-							<b>{recipe.Name}</b>
-						</div>
-						{ingredients && (
-							<ul className="ingredient-debug">
-								{ingredients.map((i) => {
-									const teaspoonResults = convertToTeaspoons(i.calculatedAmount);
-									const tagName = i.tagName || 'NO TAG';
-									const isWholeUnits = teaspoonResults.wholeUnits ? 'YES' : 'NO';
-									const teaspoonAmount = teaspoonResults.amount || 0;
-
-									return (
-										<>
-											<li>{i.name}</li>
-											<ul>
-												<li>{`Tag [${tagName}]`}</li>
-												<li>{`Whole Units? [${isWholeUnits}]`}</li>
-												<li>{`Calculated Amount [${i.calculatedAmount}]`}</li>
-												<li>{`Calculated Value [${i.calculatedValue}]`}</li>
-												<li>{`Total Teaspoons [${teaspoonAmount}]`}</li>
-											</ul>
-										</>
-									);
-								})}
-							</ul>
-						)}
-					</>
-				);
-			})}
-		</div>
-	);
-};
-const sumIngredients = (ingredients) => {
-	const finalIngredients = [];
-
-	for (const ingredient of ingredients) {
-		if (ingredient.tagID != null) {
-			// It can be tracked
-			if (ingredient.calculatedAmount) {
-				const converted = convertToTeaspoons(ingredient.calculatedAmount);
-
-				const foundTotalIndex = finalIngredients.findIndex((i) => i.name === ingredient.tagName && i.wholeUnits === converted.wholeUnits);
-
-				if (foundTotalIndex === -1) {
-					finalIngredients.push({
-						name: ingredient.tagName,
-						value: converted.amount,
-						wholeUnits: converted.wholeUnits,
-						unit: converted.unit,
-						recipeCount: 1,
-						ingredientDepartment: ingredient.ingredientDepartment,
-						ingredientDepartmentPosition: ingredient.ingredientDepartmentPosition,
-					});
-				} else {
-					finalIngredients[foundTotalIndex].value += converted.amount;
-					finalIngredients[foundTotalIndex].recipeCount++;
-				}
-			} else {
-				console.log('NOT FOUND ', ingredient);
-			}
+const storeHasLowestPrice = (selectedStore, ingredient) => {
+	if (selectedStore != null) {
+		// We are filtering by stores
+		const lowestStorePrice = ingredient?.prices.find((p) => p.isLowest);
+		if (lowestStorePrice && selectedStore !== lowestStorePrice.storeID) {
+			return false;
 		}
 	}
 
-	// 1 TB =  3 TSP
-	// 1/4 CUP = 12 TSP
-	// 1/3 CUP = 16 TSP
-	// 1/2 CUP = 24 TSP
-	// 2/3 CUP = 32 TSP
-	// 3/4 CUP = 36 TSP
-	//   1 CUP = 48 TSP
+	return true;
+};
 
-	// const testFinalIngredients = [
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 1,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 3,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 6,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 7,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 12,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 16,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 24,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 32,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 36,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 48,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 60,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 64,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 72,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 80,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 84,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 96,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 100,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 712,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 52,
-	// 		wholeUnits: false,
-	// 	},
-	// ];
+const PriceInput = ({ ingredientTagID, prices, store, tokenFromStorage }) => {
+	const [price, setPrice] = useState(null);
+	const [isLowest, setIsLowest] = useState(false);
+	const [ingredientTagPriceID, setIngredientTagPriceID] = useState(null);
 
-	console.log('ENTERING', finalIngredients);
+	useEffect(() => {
+		const priceForStore = prices.find((p) => p.storeID == store.storeID);
 
-	for (const finalIngredient of finalIngredients) {
-		if (!finalIngredient.wholeUnits) {
-			let convertedValue = '';
-			let totalCups = '';
-			let leftOverCups = '';
-			let teaspoonAmount = finalIngredient.value;
-			if (teaspoonAmount >= 48) {
-				totalCups = Math.round(teaspoonAmount / 48);
-				leftOverCups = teaspoonAmount % 48;
-				convertedValue = totalCups;
-			} else {
-				leftOverCups = teaspoonAmount;
-			}
+		if (priceForStore) {
+			setPrice(priceForStore.price.toFixed(2));
+			setIngredientTagPriceID(priceForStore.ingredientTagPriceID);
+			setIsLowest(priceForStore?.isLowest);
+		}
+	}, [prices]);
 
-			if (leftOverCups > 0) {
-				if (leftOverCups < 12) {
-					if (totalCups > 0) {
-						convertedValue += ' cups ';
-					}
+	const updatePrice = async (price) => {
+		const body = {
+			Price: price,
+			IngredientTagPriceID: ingredientTagPriceID,
+		};
 
-					if (leftOverCups < 2) {
-						convertedValue += ' ' + leftOverCups + ' tsp';
-					} else {
-						convertedValue += ' ' + Math.round(leftOverCups / 3) + ' tb';
-					}
-				} else if (leftOverCups < 16) {
-					convertedValue += ' 1/4 cup';
-				} else if (leftOverCups < 24) {
-					convertedValue += ' 1/3 cup';
-				} else if (leftOverCups < 32) {
-					convertedValue += ' 1/2 cup';
-				} else if (leftOverCups < 36) {
-					convertedValue += ' 2/3 cup';
-				} else if (leftOverCups < 48) {
-					convertedValue += ' 3/4 cup';
-				}
-			} else {
-				convertedValue += ' cups';
-			}
+		await fetch(`/api/stores/prices`, {
+			method: 'PATCH',
+			body: JSON.stringify(body),
+			headers: {
+				// This is required. NodeJS server won't know how to read it without it.
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
+			},
+		});
+	};
 
-			finalIngredient.finalValue = convertedValue;
+	const insertPrice = async (price) => {
+		const body = {
+			Price: price,
+			StoreID: store.storeID,
+			IngredientTagID: ingredientTagID,
+		};
+
+		console.log('Inserting recipe', body);
+		const response = await fetch(`/api/stores/prices`, {
+			method: 'PUT',
+			body: JSON.stringify(body),
+			headers: {
+				// This is required. NodeJS server won't know how to read it without it.
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
+			},
+		});
+
+		const data = await response.json();
+		setIngredientTagPriceID(data.ingredientTagPriceID);
+	};
+
+	const priceHandler = () => {
+		if (ingredientTagPriceID === null) {
+			insertPrice(price);
 		} else {
-			finalIngredient.finalValue = `${finalIngredient.value} ${finalIngredient.unit}`;
+			updatePrice(price);
 		}
+	};
 
-		console.log(`---------------${finalIngredient.value} ====> ${finalIngredient.finalValue}`);
+	const classes = [];
+
+	if (isLowest) {
+		classes.push('lowest-price');
 	}
 
-	return finalIngredients;
-};
-
-const convertToTeaspoons = (value) => {
-	if (!value) {
-		return `UNCONVERTED`;
-	}
-
-	const smarterRe = /([\d\/\s]+)\s*(cup|teaspoon|tsp|tb|tablespoon|pound|ounce)?(?:s)?/;
-
-	const matches = value.match(smarterRe);
-
-	const amount = matches[1]?.trim();
-	const measurement = matches[2]?.trim();
-
-	console.log(`Amount [${amount}] Measurement [${measurement}]`);
-
-	let baseTeaspoons = 0;
-	let baseMultiplier = 0;
-
-	let isWholeUnit = false;
-	let unit = null;
-
-	switch (measurement) {
-		case 'cup':
-			baseTeaspoons = 48;
-			break;
-		case 'tb':
-		case 'tablespoon':
-			baseTeaspoons = 3;
-			break;
-		case 'tsp':
-		case 'teaspoon':
-			baseTeaspoons = 1;
-			break;
-		case 'ounce':
-			isWholeUnit = true;
-			unit = 'ounce';
-			break;
-		case 'pound':
-			isWholeUnit = true;
-			unit = 'pound';
-			break;
-		default:
-			isWholeUnit = true;
-			unit = '';
-	}
-
-	switch (amount) {
-		case '1/2':
-			baseMultiplier = 0.5;
-			break;
-		case '1/4':
-			baseMultiplier = 0.25;
-			break;
-		case '1/3':
-			baseMultiplier = 0.33333333;
-			break;
-		case '2/3':
-			baseMultiplier = 0.66666666;
-			break;
-		case '1/8':
-			baseMultiplier = 0.125;
-			break;
-		case '3/4':
-			baseMultiplier = 0.75;
-			break;
-		default:
-			baseMultiplier = amount;
-	}
-
-	if (isWholeUnit) {
-		return { wholeUnits: true, unit, amount: parseFloat(baseMultiplier) };
-	} else {
-		return { wholeUnits: false, amount: parseFloat(baseTeaspoons * baseMultiplier) };
-	}
+	console.log('NA', store);
+	return (
+		<Col className={classes.join(' ')} lg={STORE_PRICES_WIDTH} sm={MOBILE_STORE_PRICES_WIDTH} xs={MOBILE_STORE_PRICES_WIDTH}>
+			<div className="form-floating notes">
+				<Input
+					type="text"
+					id="store-name"
+					value={price}
+					onChange={(e) => {
+						setPrice(e.target.value);
+					}}
+					onBlur={(e) => {
+						priceHandler(e.target.value);
+					}}
+				/>
+				<label for="store-name">{store.storeName}</label>
+			</div>
+		</Col>
+	);
 };
 
 export default ShoppingList;

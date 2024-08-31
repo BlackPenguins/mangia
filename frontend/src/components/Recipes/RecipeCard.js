@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import Rating from '../Settings/Rating';
-import './RecipeCard.css';
+import './RecipeCard.scss';
 import { utcToZonedTime } from 'date-fns-tz';
 import { differenceInDays, formatDistance } from 'date-fns';
 
@@ -35,7 +35,7 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 
 	const categoryClass = recipe?.Category?.toLowerCase();
 
-	const classes = ['v-product'];
+	const classes = ['v-product', categoryClass];
 
 	if (isMenu) {
 		classes.push('menu');
@@ -49,7 +49,7 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 			<div className="text py-3 pb-4 px-3 text-center">
 				{!hideInformation && (
 					<>
-						<h3 className={`card-title ${categoryClass}`}>
+						<h3 className={`category-label ${categoryClass}`}>
 							<span>{recipeName}</span>
 						</h3>
 						<DaysAgo lastMade={recipe?.lastmade} />
@@ -92,40 +92,40 @@ const DaysAgo = ({ lastMade }) => {
 };
 
 const CardStatus = ({ isSkipped, skipReason, recipe, isMade, isLeftovers }) => {
-	const layerClasses = ['layer'];
+	const layerClasses = ['status-overlay'];
 
 	if (isSkipped) {
 		layerClasses.push('skipped');
-	} else if (isLeftovers) {
-		layerClasses.push('leftovers');
 	} else if (isMade) {
 		layerClasses.push('made');
+	} else if (isLeftovers) {
+		layerClasses.push('leftovers');
 	} else if (!recipe) {
 		layerClasses.push('available');
+	} else {
+		layerClasses.push('on-menu');
 	}
 
-	let statusLabel = null;
+	let statusText = null;
 	if (!!isSkipped) {
-		const reasonText = skipReason || 'SKIPPED';
-		statusLabel = <span className="skipped-label layer-label">{reasonText}</span>;
+		statusText = skipReason || 'SKIPPED';
 	} else if (!recipe) {
 		// No recipe yet
-		statusLabel = <span className="available-label layer-label">AVAILABLE</span>;
+		statusText = 'AVAILABLE';
 	} else if (isMade) {
 		// No recipe yet
-		statusLabel = <span className="made-label layer-label">MADE</span>;
+		statusText = 'MADE';
 	} else if (isLeftovers) {
 		// No recipe yet
-		statusLabel = <span className="leftovers-label layer-label">LEFTOVERS</span>;
-	} else {
-		//Recipe chosen, no status
-		statusLabel = null;
+		statusText = 'LEFTOVERS';
 	}
 
 	return (
 		<>
-			<div className={layerClasses.join(' ')}></div>
-			{statusLabel}
+			<div className={layerClasses.join(' ')}>
+				<div className="status-overlay-background" />
+				<span className="status-overlay-label">{statusText}</span>
+			</div>
 		</>
 	);
 };

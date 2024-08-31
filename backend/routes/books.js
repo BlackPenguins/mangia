@@ -1,8 +1,8 @@
 import express from 'express';
-import { insertBook, selectAllBooks, selectBookByID } from '../database/books.js';
+import { insertBook, selectAllBooks, selectBookByID, updateBook } from '../database/books.js';
 import { checkAdminMiddleware } from './auth.js';
 
-const getBookByID = async (req, res) => {
+const getBookByIDHandler = async (req, res) => {
 	const book = await selectBookByID(req.params.bookID);
 
 	if (!book) {
@@ -12,7 +12,7 @@ const getBookByID = async (req, res) => {
 	}
 };
 
-const getAllBooks = (req, res) => {
+const getAllBooksHandler = (req, res) => {
 	const selectPromise = selectAllBooks();
 
 	selectPromise.then(
@@ -25,7 +25,7 @@ const getAllBooks = (req, res) => {
 	);
 };
 
-const addBook = (req, res) => {
+const addBookHandler = (req, res) => {
 	// We need a middleman object so the person using the API can't change whichever columns they want
 	const newBook = {
 		name: req.body.name,
@@ -44,10 +44,36 @@ const addBook = (req, res) => {
 	);
 };
 
+const updateBookHandler = (req, res) => {
+	const bookID = req.body.id;
+	const bookName = req.body.name;
+
+	const update = {};
+
+	if (bookName) {
+		update.Name = bookName;
+	}
+
+	console.log(`Updating Book [${bookID}]`, update);
+
+	// We can pass an object as long as the properties of the object match the column names in the DB table
+	const insertPromise = updateBook(bookID, update);
+
+	insertPromise.then(
+		(result) => {
+			res.status(200).json({ success: true, result });
+		},
+		(error) => {
+			res.status(500).json({ message: error });
+		}
+	);
+};
+
 const router = express.Router();
 
-router.get('/api/books/:bookID', getBookByID);
-router.get('/api/books', getAllBooks);
-router.put('/api/books', checkAdminMiddleware, addBook);
+router.get('/api/books/:bookID', getBookByIDHandler);
+router.get('/api/books', getAllBooksHandler);
+router.put('/api/books', checkAdminMiddleware, addBookHandler);
+router.patch('/api/books', checkAdminMiddleware, updateBookHandler);
 
 export default router;

@@ -29,11 +29,7 @@ export const insertIngredientDepartment = (newDepartment) => {
 	});
 };
 
-export const updateDepartment = (tagID, position) => {
-	const update = {
-		Position: position,
-	};
-
+export const updateDepartment = (tagID, update) => {
 	return new Promise((resolve, reject) => {
 		pool.query('UPDATE INGREDIENT_DEPARTMENT SET ? WHERE IngredientDepartmentID = ?', [update, tagID], (error) => {
 			if (error) {

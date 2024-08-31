@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { Row } from 'reactstrap';
-import './MenuSection.css';
+import './MenuSection.scss';
 import RecipeCard from '../Recipes/RecipeCard';
 import MenuNav from './MenuNav';
 import RerollButton from './RecipeButtons/RerollButton';
@@ -11,6 +11,8 @@ import LeftoversButton from './RecipeButtons/LeftoversButton';
 import ChangeButton from './RecipeButtons/ChangeButton';
 import AuthContext from '../../authentication/auth-context';
 import LoadingText from 'components/Common/LoadingText';
+import RecipeContainer from 'components/Recipes/RecipeContainer';
+import MenuContainer from './MenuContainer';
 
 const MenuSection = () => {
 	const [page, setPage] = useState(0);
@@ -111,23 +113,25 @@ const MenuCard = ({ menu, fetchMenu, page, currentRecipeIDs, tomorrowsRecipe, av
 	}
 
 	return (
-		<div className="col-md-6 col-lg-3 ftco-animate fadeInUp ftco-animated recipe-card">
-			<div className={cardClasses.join(' ')}>
-				{authContext.isAdmin && <ChangeButton fetchMenu={fetchMenu} menu={menu} page={page} availableSwapDays={availableSwapDays} />}
-				<div>{menu.week}</div>
-				<div>{menu.date}</div>
-			</div>
-			<RecipeCard
-				key={menu.id}
-				isMenu
-				recipe={menu.recipe}
-				isMade={menu?.isMade}
-				isSkipped={menu?.isSkipped}
-				skipReason={menu?.skipReason}
-				isLeftovers={menu?.isLeftovers}
-				bottomButtons={bottomButtons}
-			/>
-			<DayPreparation tomorrowsRecipe={tomorrowsRecipe} />
+		<div className="col-md-6 col-lg-3 ftco-animate fadeInUp ftco-animated recipe-card menu-card">
+			<MenuContainer>
+				<div className={cardClasses.join(' ')}>
+					{authContext.isAdmin && <ChangeButton fetchMenu={fetchMenu} menu={menu} page={page} availableSwapDays={availableSwapDays} />}
+					<div>{menu.week}</div>
+					<div>{menu.date}</div>
+				</div>
+				<RecipeCard
+					key={menu.id}
+					isMenu
+					recipe={menu.recipe}
+					isMade={menu?.isMade}
+					isSkipped={menu?.isSkipped}
+					skipReason={menu?.skipReason}
+					isLeftovers={menu?.isLeftovers}
+					bottomButtons={bottomButtons}
+				/>
+				<DayPreparation tomorrowsRecipe={tomorrowsRecipe} />
+			</MenuContainer>
 		</div>
 	);
 };

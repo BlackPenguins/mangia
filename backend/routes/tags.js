@@ -1,7 +1,7 @@
 import express from 'express';
 import { selectAllTags } from '../database/tags.js';
 
-const getAllTags = (req, res) => {
+const getAllTagsHandler = (req, res) => {
 	const selectPromise = selectAllTags();
 
 	selectPromise.then(
@@ -16,6 +16,6 @@ const getAllTags = (req, res) => {
 
 const router = express.Router();
 
-router.get('/api/tags', getAllTags);
+router.get('/api/tags', getAllTagsHandler);
 
 export default router;

@@ -1,15 +1,15 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import './RecipePage.css';
+import './RecipePage.scss';
 import { Button, Col, Row } from 'reactstrap';
 import Rating from '../components/Settings/Rating';
-import Modal from '../components/Common/Modal';
 import { utcToZonedTime } from 'date-fns-tz';
 import { formatDistance } from 'date-fns';
 import { Edit, Trash2 } from 'react-feather';
 import AuthContext from '../authentication/auth-context';
 import LoadingText from '../components/Common/LoadingText';
+import useBetterModal from 'components/Common/useBetterModal';
 
 const RecipePage = () => {
 	const params = useParams();
@@ -41,8 +41,6 @@ const RecipePage = () => {
 		nameClasses.push('hidden');
 	}
 
-	console.log('RECIP', recipe);
-
 	if (recipe === null) {
 		return (
 			<div className="container">
@@ -52,7 +50,7 @@ const RecipePage = () => {
 	} else {
 		return (
 			<section className="hero">
-				<div className="container">
+				<div className="container recipe-details-container">
 					<div className={nameClasses.join(' ')}>
 						<h2>{recipe.Name}</h2>
 					</div>
@@ -105,7 +103,7 @@ const Statistics = ({ recipe, book }) => {
 	}, [fetchRecipeTags]);
 
 	return (
-		<div className="statistics">
+		<div className="quick-facts">
 			{recipeTags.length > 0 && (
 				<div className="tag-container">
 					{recipeTags.map((tag, index) => {
@@ -121,34 +119,34 @@ const Statistics = ({ recipe, book }) => {
 			<Description description={recipe?.Description} />
 			{recipe?.Category && (
 				<div>
-					<span className="statisticLabel">Category:</span> {recipe.Category}
+					<span className="label">Category:</span> {recipe.Category}
 				</div>
 			)}
 			{recipe?.lastmade && (
 				<div>
-					<span className="statisticLabel">Last Made:</span> {days}
+					<span className="label">Last Made:</span> {days}
 				</div>
 			)}
 			{book && (
 				<>
 					<div>
-						<span className="statisticLabel">Book:</span> {book.Name} (Page {recipe.Page})
+						<span className="label">Book:</span> {book.Name} (Page {recipe.Page})
 					</div>
 				</>
 			)}
 			{recipe?.Protein && (
 				<div>
-					<span className="statisticLabel">Protein:</span> {recipe.Protein}
+					<span className="label">Protein:</span> {recipe.Protein}
 				</div>
 			)}
 			{recipe?.Defrost && (
 				<div>
-					<span className="statisticLabel">Defrost:</span> {recipe.Defrost}
+					<span className="label">Defrost:</span> {recipe.Defrost}
 				</div>
 			)}
 			{recipe?.URL && (
 				<div>
-					<span className="statisticLabel">URL:</span> <a href={recipe.URL}>{recipe.URL}</a>
+					<span className="label">URL:</span> <a href={recipe.URL}>{recipe.URL}</a>
 				</div>
 			)}
 		</div>
@@ -158,7 +156,8 @@ const Statistics = ({ recipe, book }) => {
 const Controls = ({ recipe }) => {
 	const authContext = useContext(AuthContext);
 
-	const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+	const { modal, openModal } = useConfirmDeleteModal(recipe?.RecipeID);
+
 	const navigate = useNavigate();
 
 	if (!authContext.isAdmin) {
@@ -167,10 +166,10 @@ const Controls = ({ recipe }) => {
 
 	return (
 		<>
-			{showConfirmDelete && <ConfirmDeleteModal recipeID={recipe?.RecipeID} closeModalHandler={() => setShowConfirmDelete(false)} />}
+			{modal}
 
 			<div className="bottom-buttons">
-				<Button className="site-btn danger" color="danger" onClick={() => setShowConfirmDelete(true)}>
+				<Button className="site-btn danger" color="danger" onClick={() => openModal()}>
 					<Trash2 /> Delete
 				</Button>
 				<Button className="site-btn" color="success" onClick={() => navigate(`/recipe/${recipe?.RecipeID}/edit`)}>
@@ -247,7 +246,7 @@ const Notes = ({ title, notes }) => {
 	const notesSplit = notes.split('\n');
 
 	return (
-		<div className="notes">
+		<div className="extraSection">
 			<h4>{title}</h4>
 			<ul>
 				{notesSplit.map((note, index) => {
@@ -261,7 +260,7 @@ const Notes = ({ title, notes }) => {
 const History = ({ history }) => {
 	console.log('HIS', history);
 	return (
-		<div className="notes history">
+		<div className="extraSection history">
 			<h4>History</h4>
 			<ul>
 				{history &&
@@ -281,7 +280,7 @@ const History = ({ history }) => {
 	);
 };
 
-const ConfirmDeleteModal = ({ recipeID, closeModalHandler }) => {
+const useConfirmDeleteModal = (recipeID) => {
 	const authContext = useContext(AuthContext);
 	const tokenFromStorage = authContext.token;
 
@@ -299,25 +298,18 @@ const ConfirmDeleteModal = ({ recipeID, closeModalHandler }) => {
 		navigate('/home');
 	};
 
-	return (
-		<>
-			<Modal
-				title="Delete this Recipe"
-				className="confirm-modal"
-				closeHandler={closeModalHandler}
-				buttons={
-					<>
-						<Button onClick={closeModalHandler}>Close</Button>
-						<Button color="danger" onClick={deleteHandler}>
-							Yes, Delete
-						</Button>
-					</>
-				}
-			>
-				<div>Are you sure you want to delete this recipe?</div>
-			</Modal>
-		</>
-	);
+	const { modal, openModal } = useBetterModal({
+		title: 'Delete this Recipe',
+		content: (closeModal) => <div>Are you sure you want to delete this recipe?</div>,
+		buttons: (closeModal) => (
+			<>
+				<Button color="danger" onClick={deleteHandler}>
+					Yes, Delete
+				</Button>
+			</>
+		),
+	});
+	return { modal, openModal };
 };
 
 export default RecipePage;

@@ -2,7 +2,7 @@ import { useCallback, useContext, useEffect, useState } from 'react';
 import { Button, Col, Input, Row } from 'reactstrap';
 import { Tag as TagIcon } from 'react-feather';
 
-import './Tag.css';
+import './Tag.scss';
 import AuthContext from '../../authentication/auth-context';
 import InputWithAutocomplete from './InputWithAutocomplete';
 

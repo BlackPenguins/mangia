@@ -1,18 +1,17 @@
 import { useContext, useRef, useState } from 'react';
 import { Button, Input } from 'reactstrap';
-import Modal from 'components/Common/Modal';
 import { useNavigate } from 'react-router-dom';
-import './ImportRecipeModal.css';
 import AuthContext from 'authentication/auth-context';
+import useBetterModal from 'components/Common/useBetterModal';
 
-const AddRecipeModal = ({ closeModalHandler }) => {
+const useAddRecipeModal = () => {
 	const authContext = useContext(AuthContext);
 	const tokenFromStorage = authContext.token;
 
 	const navigate = useNavigate();
 	const [recipeName, setRecipeName] = useState('');
 
-	const addRecipeHandler = async () => {
+	const addRecipeHandler = async (closeModal) => {
 		console.log('Adding new recipe', recipeName);
 		const response = await fetch('/api/recipes', {
 			method: 'PUT',
@@ -27,29 +26,33 @@ const AddRecipeModal = ({ closeModalHandler }) => {
 
 		if (response.status === 200) {
 			console.log('Recipe added successfully.', data);
-			closeModalHandler();
+			closeModal();
 			navigate(`/recipe/${data.recipeID}`);
 		} else {
 			console.error('ERROR: ' + data.message);
 		}
 	};
 
-	return (
-		<>
-			<Modal title="Add Recipe" closeHandler={closeModalHandler} buttons={<Button onClick={addRecipeHandler}>Add Recipe</Button>}>
-				<div>
-					<Input
-						name="text"
-						placeholder="Recipe Name"
-						onChange={(e) => {
-							setRecipeName(e.target.value);
-						}}
-						value={recipeName}
-					/>
-				</div>
-			</Modal>
-		</>
-	);
+	const inputRef = useRef();
+
+	const { modal, openModal, closeModal } = useBetterModal({
+		title: 'Add Recipe',
+		buttons: (closeModal) => <Button onClick={() => addRecipeHandler(closeModal)}>Add Recipe</Button>,
+		content: (closeModal) => (
+			<Input
+				innerRef={inputRef}
+				name="text"
+				placeholder="Recipe Name"
+				onChange={(e) => {
+					setRecipeName(e.target.value);
+				}}
+				value={recipeName}
+			/>
+		),
+		inputRef,
+	});
+
+	return { modal, openModal };
 };
 
-export default AddRecipeModal;
+export default useAddRecipeModal;

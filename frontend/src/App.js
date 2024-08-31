@@ -5,7 +5,6 @@ import NotFoundPage from './pages/NotFound.Page';
 import HomePage from './pages/HomePage';
 import RecipeDetailsPage from './pages/RecipeEditPage';
 import RecipePage from './pages/RecipePage';
-import NewHomePage from './pages/NewHomePage';
 import Footer from './components/Common/Footer.js';
 import MenuPage from './pages/MenuPage';
 import ShoppingList from './pages/ShoppingList';
@@ -14,6 +13,7 @@ import BooksTab from './pages/configuration/BooksTab';
 import IngredientsTab from './pages/configuration/IngredientsTab';
 import DepartmentTab from './pages/configuration/DepartmentTab';
 import MigrationTab from 'pages/configuration/MigrationTab';
+import StoreTab from 'pages/configuration/StoreTab';
 
 function App() {
 	return (
@@ -23,13 +23,13 @@ function App() {
 				<Routes>
 					<Route path="/" element={<Navigate to="home" />} />
 					<Route path="home" element={<HomePage />} />
-					<Route path="newhome" element={<NewHomePage />} />
 					<Route path="menu" element={<MenuPage />} />
 					<Route path="shoppingList" element={<ShoppingList />} />
 					<Route path="configuration" element={<ConfigurationPage />}>
 						<Route path="books" element={<BooksTab />} />
 						<Route path="ingredients" element={<IngredientsTab />} />
-						<Route path="department" element={<DepartmentTab />} />
+						<Route path="departments" element={<DepartmentTab />} />
+						<Route path="stores" element={<StoreTab />} />
 						<Route path="migration" element={<MigrationTab />} />
 					</Route>
 					<Route path="recipe" element={<RecipeDetailsPage />} />

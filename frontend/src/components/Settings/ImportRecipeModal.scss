@@ -1,0 +1,11 @@
+.status {
+	margin: 30px 0px;
+
+	&.success {
+		color: green;
+	}
+
+	&.failure {
+		color: darkred;
+	}
+}

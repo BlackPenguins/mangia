@@ -1,0 +1,17 @@
+.modal-dialog {
+	z-index: 15000;
+	.modal-content {
+		.modal-header {
+			padding: 10px;
+			background-color: rgb(187, 187, 187);
+
+			.modal-title {
+				font-weight: bold;
+			}
+			.btn-close {
+				margin: 0;
+				padding: .25em .25em;
+			}
+		}
+	}
+}

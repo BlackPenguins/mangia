@@ -319,7 +319,9 @@ const updateRecipeProcessor = async (req, res) => {
 		updatedRecipe.category = req.body.category;
 	}
 
-	updatedRecipe.IsActive = req.body?.isActive ? 1 : 0;
+	if (req.body.isActive != undefined) {
+		updatedRecipe.IsActive = req.body.isActive ? 1 : 0;
+	}
 
 	if (req.body.protein) {
 		updatedRecipe.protein = req.body.protein;

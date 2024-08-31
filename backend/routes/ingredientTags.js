@@ -1,8 +1,8 @@
 import express from 'express';
-import { insertIngredientTag, selectAllIngredientTags, updateDepartment } from '../database/ingredientTags.js';
+import { insertIngredientTag, selectAllIngredientTags, updateIngredientTag } from '../database/ingredientTags.js';
 import { checkAdminMiddleware } from './auth.js';
 
-const getAllIngredientTags = (req, res) => {
+const getAllIngredientTagsHandler = (req, res) => {
 	const selectPromise = selectAllIngredientTags();
 
 	selectPromise.then(
@@ -15,7 +15,7 @@ const getAllIngredientTags = (req, res) => {
 	);
 };
 
-const addIngredientTag = (req, res) => {
+const addIngredientTagHandler = (req, res) => {
 	// We need a middleman object so the person using the API can't change whichever columns they want
 	const newIngredientTag = {
 		name: req.body.name,
@@ -34,12 +34,25 @@ const addIngredientTag = (req, res) => {
 	);
 };
 
-const updateIngredientDepartment = (req, res) => {
-	const ingredientTagID = req.body.IngredientTagID;
-	const ingredientDepartmentID = req.body.IngredientDepartmentID;
+const updateIngredientHandler = (req, res) => {
+	const ingredientTagID = req.body.id;
+	const ingredientDepartmentID = req.body.departmentID;
+	const ingredientTagName = req.body.name;
+
+	const update = {};
+
+	if (ingredientDepartmentID) {
+		update.IngredientDepartmentID = ingredientDepartmentID;
+	}
+
+	if (ingredientTagName) {
+		update.Name = ingredientTagName;
+	}
+
+	console.log(`Updating Ingredient Tag [${ingredientTagID}]`, update);
 
 	// We can pass an object as long as the properties of the object match the column names in the DB table
-	const insertPromise = updateDepartment(ingredientDepartmentID, ingredientTagID);
+	const insertPromise = updateIngredientTag(ingredientTagID, update);
 
 	insertPromise.then(
 		(result) => {
@@ -53,8 +66,8 @@ const updateIngredientDepartment = (req, res) => {
 
 const router = express.Router();
 
-router.get('/api/ingredientTags', getAllIngredientTags);
-router.patch('/api/ingredientTags/department', checkAdminMiddleware, updateIngredientDepartment);
-router.put('/api/ingredientTags', checkAdminMiddleware, addIngredientTag);
+router.get('/api/ingredientTags', getAllIngredientTagsHandler);
+router.patch('/api/ingredientTags', checkAdminMiddleware, updateIngredientHandler);
+router.put('/api/ingredientTags', checkAdminMiddleware, addIngredientTagHandler);
 
 export default router;

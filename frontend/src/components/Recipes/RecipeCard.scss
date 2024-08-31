@@ -1,0 +1,165 @@
+.recipe-container,
+.menu-container {
+
+	.thumbnail-container {
+		position: relative;
+	}
+
+	margin-bottom: 30px;
+
+	.v-product {
+
+		.category-label {
+			span:after {
+				content: '';
+				display: block;
+				margin: 5px auto 0px auto;
+				width: 20%;
+				border-bottom: solid 2px #5d9cd4;
+			}
+		}
+
+		&.dinner {
+			.category-label {
+				span:after {
+					border-color: #5d9cd4;
+				}
+			}
+		}
+
+		&.dessert {
+			.category-label {
+				span:after {
+					border-color: rgb(255, 124, 185);
+				}
+			}
+		}
+
+		&.appetizer {
+			.category-label {
+				span:after {
+					border-color: rgb(110, 255, 122);
+				}
+			}
+		}
+
+		&.sidedish {
+			.category-label {
+				span:after {
+					border-color: rgb(185, 175, 27);
+				}
+			}
+		}
+
+		&.undefined {
+			.category-label {
+				span:after {
+					border-color: rgb(187, 187, 187);
+				}
+			}
+		}
+	}
+
+	
+	.last-made {
+		font-size: 0.75em;
+		font-style: normal;
+		padding-top: 10px;
+		text-align: right;
+
+		&.recent {
+			color: darkred;
+			font-weight: bold;
+		}
+	}
+}
+
+.menu-container {
+	.status-overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 1000;
+
+		/* Click through the layer to the thumbnail link below for edit pages */
+		pointer-events: none;
+
+		.status-overlay-background {
+			opacity: 0.6;
+			width: 100%;
+			height: 100%;
+		}
+
+		.status-overlay-label {
+			font-weight: 800;
+			font-family: 'Cairo', sans-serif;
+			font-size: 1.4em;
+			text-transform: uppercase;
+			border-radius: 10px;
+			padding: 10px;
+			z-index: 1200;
+			position: absolute;
+		
+			/* Center the text equally */
+			top: 70px;
+			left: 0;
+			right: 0;
+			margin: auto;
+			display: inline-table;
+			text-align: center;
+		
+			/* Wrap the custom skip message */
+			max-width: 215px;
+		}
+		
+		&.skipped {
+			.status-overlay-background {
+				background-color: #ffd0d0;
+			}
+
+			.status-overlay-label {
+				background-color: #ae4646;
+				color: rgb(255, 240, 240);
+			}
+		}
+
+		&.leftovers {
+			.status-overlay-background {
+				background-color: #d0ecff;
+			}
+
+			.status-overlay-label {
+				background-color: #465eae;
+				color: rgb(240, 245, 255);
+			}
+		}
+
+		&.made {
+			.status-overlay-background {
+				background-color: #dad0ff;
+			}
+
+			.status-overlay-label {
+				background-color: #7346ae;
+				color: rgb(240, 245, 255);
+			}
+		}
+
+		&.available {
+			.status-overlay-background {
+				background-color: #d8ffd0;
+			}
+
+			.status-overlay-label {
+				background-color: #82ae46;
+				color: rgb(240, 255, 240);
+			}
+		}
+	}
+}
+
+
+
+

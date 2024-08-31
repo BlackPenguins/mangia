@@ -1,16 +1,56 @@
-import { useCallback, useContext, useState } from 'react';
+import useBetterModal from 'components/Common/useBetterModal.js';
+import { useCallback, useContext, useRef, useState } from 'react';
 import { Play, Slash } from 'react-feather';
+import { Button, Input } from 'reactstrap';
 import AuthContext from '../../../authentication/auth-context.js';
 import BottomButton from './BottomButton.js';
-import SkipModal from './SkipModal';
 
 const SkipButton = ({ fetchMenu, menu, page }) => {
 	const authContext = useContext(AuthContext);
 	const tokenFromStorage = authContext.token;
+	const inputRef = useRef(null);
+	const [skipReason, setSkipReason] = useState(menu?.skipReason);
 
 	const isSkipped = menu?.isSkipped;
 
-	const [showSkipModal, setShowSkipModal] = useState(false);
+	const setSkipHandler = async (closeModal) => {
+		await fetch(`/api/menu/skip/${menu?.menuID}`, {
+			method: 'PATCH',
+			body: JSON.stringify({ isSkipped: true, skipReason }),
+			headers: {
+				// This is required. NodeJS server won't know how to read it without it.
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
+			},
+		});
+		fetchMenu(page);
+		closeModal();
+	};
+
+	const { modal, openModal, closeModal } = useBetterModal({
+		title: 'Skip Day',
+		size: 'sm',
+		buttons: (closeModal) => <Button onClick={() => setSkipHandler(closeModal)}>Skip Day</Button>,
+		content: (closeModal) => (
+			<Input
+				innerRef={inputRef}
+				autoFocus
+				name="text"
+				placeholder="Skip Reason"
+				onChange={(e) => {
+					setSkipReason(e.target.value);
+				}}
+				onKeyDown={(e) => {
+					if (e.key === 'Enter') {
+						e.preventDefault();
+						setSkipHandler(closeModal);
+					}
+				}}
+				value={skipReason}
+			/>
+		),
+		inputRef,
+	});
 
 	const skipHandler = useCallback(async () => {
 		if (isSkipped) {
@@ -26,7 +66,7 @@ const SkipButton = ({ fetchMenu, menu, page }) => {
 			});
 			fetchMenu(page);
 		} else {
-			setShowSkipModal(true);
+			openModal();
 		}
 	}, [page, menu, fetchMenu, isSkipped, tokenFromStorage]);
 
@@ -39,9 +79,10 @@ const SkipButton = ({ fetchMenu, menu, page }) => {
 		className = 'unskip-button';
 		Icon = Play;
 	}
+
 	return (
 		<>
-			{showSkipModal && <SkipModal closeModalHandler={() => setShowSkipModal(false)} menu={menu} fetchMenu={fetchMenu} page={page} />}
+			{modal}
 			<BottomButton Icon={Icon} action={skipHandler} buttonClass="skip-button" />
 		</>
 	);

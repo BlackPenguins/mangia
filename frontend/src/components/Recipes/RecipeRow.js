@@ -1,4 +1,4 @@
-import './RecipeRow.css';
+import './RecipeRow.scss';
 
 const RecipeRow = ({ recipe, onClickHandler }) => {
 	let recipeName = recipe?.Name;
