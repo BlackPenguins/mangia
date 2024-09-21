@@ -8,11 +8,12 @@ import './RecipeEditPage.scss';
 import Rating from '../components/Settings/Rating';
 import Category from '../components/Recipes/Category';
 import Tag, { TagBox } from '../components/EditRecipes/Tag';
-import { ArrowDown, ArrowUpCircle, Book, Eye, PlusCircle, Printer, Save } from 'react-feather';
+import { ArrowUpCircle, Eye, Printer } from 'react-feather';
 import useScanModal from '../components/Settings/useScanModal';
 import AuthContext from '../authentication/auth-context';
 import InputWithAutocomplete from '../components/EditRecipes/InputWithAutocomplete';
 import ImportRecipeModal from '../components/Settings/ImportRecipeModal';
+import { useToast } from 'context/toast-context';
 
 const RecipeDetailsPage = () => {
 	const navigate = useNavigate();
@@ -55,12 +56,13 @@ const RecipeDetailsPage = () => {
 	const [name, setName] = useState('');
 	const [category, setCategory] = useState('');
 	const [protein, setProtein] = useState('');
+	const [preheat, setPreheat] = useState('');
+	const [prepTime, setPrepTime] = useState('');
 	const [defrost, setDefrost] = useState('');
 	const [description, setDescription] = useState('');
 	const [steps, setSteps] = useState('');
 	const [ingredients, setIngredients] = useState([]);
 	const [ingredientsBulk, setIngredientsBulk] = useState('');
-	const [ingredientsDebug, setIngredientsDebug] = useState('');
 	const [bookID, setBookID] = useState(0);
 	const [isActive, setIsActive] = useState(true);
 	const [page, setPage] = useState('');
@@ -68,7 +70,6 @@ const RecipeDetailsPage = () => {
 	const [dayPrep, setDayPrep] = useState('');
 	const [rating, setRating] = useState(1);
 	const [url, setURL] = useState('');
-	const [imageFile, setImageFile] = useState('');
 	const [attachments, setAttachments] = useState([]);
 
 	const fetchRecipe = useCallback(async () => {
@@ -83,6 +84,8 @@ const RecipeDetailsPage = () => {
 			setPage(recipe.Page);
 			setCategory(recipe.Category);
 			setProtein(recipe.Protein);
+			setPreheat(recipe.Preheat);
+			setPrepTime(recipe.PrepTime);
 			setDefrost(recipe.Defrost);
 			setNotes(recipe.Notes);
 			setDayPrep(recipe.DayPrep);
@@ -95,10 +98,8 @@ const RecipeDetailsPage = () => {
 			setSteps(finalSteps);
 
 			const ingredientsBulk = recipe.ingredients.map((ingredient) => ingredient.name).join('\n');
-			console.log('SET IT', ingredientsBulk);
 			setIngredients(recipe.ingredients);
 			setIngredientsBulk(ingredientsBulk);
-			setIngredientsDebug(recipe.ingredients);
 		}
 	}, [recipeID]);
 
@@ -110,9 +111,11 @@ const RecipeDetailsPage = () => {
 
 	const [showImportModal, setShowImportModal] = useState(false);
 
-	const updateRecipe = async (recipe) => {
+	const showToast = useToast();
+
+	const updateRecipe = async (recipe, label) => {
 		console.log('Updating recipe', recipe);
-		const response = await fetch(`/api/recipes/${recipeID}`, {
+		await fetch(`/api/recipes/${recipeID}`, {
 			method: 'PATCH',
 			body: JSON.stringify(recipe),
 			headers: {
@@ -121,16 +124,15 @@ const RecipeDetailsPage = () => {
 				Authorization: `Bearer ${tokenFromStorage}`,
 			},
 		});
+
+		showToast('Recipe Edited', `${label} has been saved`);
 	};
 
 	const updateImage = async (imageFile) => {
-		console.log('Image updated successfully.', imageFile);
-
 		if (imageFile) {
 			const imageData = new FormData();
 			imageData.append('imageFile', imageFile);
 
-			console.log('posting', imageFile);
 			await fetch(`/api/recipes/image/${recipeID}`, {
 				method: 'POST',
 				body: imageData,
@@ -138,6 +140,8 @@ const RecipeDetailsPage = () => {
 					Authorization: `Bearer ${tokenFromStorage}`,
 				},
 			});
+
+			showToast('Recipe Edited', 'Thumbnail has been uploaded');
 		}
 	};
 
@@ -145,77 +149,86 @@ const RecipeDetailsPage = () => {
 
 	const isActiveHandler = (value) => {
 		setIsActive(value);
-		debounceEditFunction({ isActive: value });
+		debounceEditFunction({ isActive: value }, 'Show Recipe in Book');
 	};
 
 	const nameHandler = (value) => {
 		setName(value);
-		debounceEditFunction({ name: value });
+		debounceEditFunction({ name: value }, 'Name');
 	};
 
 	const descriptionHandler = (value) => {
 		setDescription(value);
-		debounceEditFunction({ description: value });
+		debounceEditFunction({ description: value }, 'Description');
 	};
 
 	const categoryHandler = (value) => {
 		setCategory(value);
-		debounceEditFunction({ category: value });
+		debounceEditFunction({ category: value }, 'Category');
 	};
 
 	const proteinHandler = (value) => {
 		setProtein(value);
-		debounceEditFunction({ protein: value });
+		debounceEditFunction({ protein: value }, 'Protein');
+	};
+
+	const preheatHandler = (value) => {
+		setPreheat(value);
+		debounceEditFunction({ preheat: value }, 'Preheat');
+	};
+
+	const prepTimeHandler = (value) => {
+		setPrepTime(value);
+		debounceEditFunction({ prepTime: value }, 'Prep Time');
 	};
 
 	const stepsHandler = (value) => {
 		setSteps(value);
-		debounceEditFunction({ steps: value.split('\n') });
+		debounceEditFunction({ steps: value.split('\n') }, 'Steps');
 	};
 
 	const ingredientsHandler = (value) => {
 		setIngredientsBulk(value);
-		debounceEditFunction({ ingredients: value.split('\n') });
+		debounceEditFunction({ ingredients: value.split('\n') }, 'Ingredients');
 	};
 
 	const notesHandler = (value) => {
 		setNotes(value);
-		debounceEditFunction({ notes: value });
+		debounceEditFunction({ notes: value }, 'Notes');
 	};
 
 	const dayPrepHandler = (value) => {
 		setDayPrep(value);
-		debounceEditFunction({ dayPrep: value });
+		debounceEditFunction({ dayPrep: value }, 'Day Prep');
 	};
 
 	const urlHandler = (value) => {
 		setURL(value);
-		debounceEditFunction({ url: value });
+		debounceEditFunction({ url: value }, 'URL');
 	};
 
 	const thumbnailHandler = (value) => {
-		setImageFile(value);
 		updateImage(value);
 	};
 
 	const ratingHandler = (value) => {
 		setRating(value);
-		debounceEditFunction({ rating: value });
+		debounceEditFunction({ rating: value }, 'Rating');
 	};
 
 	const defrostHandler = (value) => {
 		setDefrost(value);
-		debounceEditFunction({ defrost: value });
+		debounceEditFunction({ defrost: value }, 'Defrost');
 	};
 
 	const pageHandler = (value) => {
 		setPage(value);
-		debounceEditFunction({ page: value });
+		debounceEditFunction({ page: value }, 'Book Page');
 	};
 
 	const bookIDHandler = (value) => {
 		setBookID(value);
-		debounceEditFunction({ bookID: value });
+		debounceEditFunction({ bookID: value }, 'Book');
 	};
 
 	const nameClasses = ['section-title'];
@@ -259,6 +272,8 @@ const RecipeDetailsPage = () => {
 						</Col>
 						<Col lg={3}>
 							<NotesTextarea value={notes} setValue={notesHandler} />
+							<PrepTimeDropdown value={prepTime} setValue={prepTimeHandler} />
+							<PreheatInput value={preheat} setValue={preheatHandler} />
 							<DayPrepTextarea value={dayPrep} setValue={dayPrepHandler} />
 							<DefrostInput value={defrost} setValue={defrostHandler} />
 						</Col>
@@ -416,12 +431,50 @@ const ProteinDropdown = ({ value, setValue }) => {
 	);
 };
 
+export const PrepTimeLabel = ({ value }) => {
+	let display = '';
+
+	switch (value) {
+		case 'OneHour':
+			display = 'One Hour';
+			break;
+		case 'FewHours':
+			display = 'Few Hours';
+			break;
+		case 'AllDay':
+			display = 'All Day';
+			break;
+	}
+
+	return <span className="prep-time-label">{display}</span>;
+};
+
+const PrepTimeDropdown = ({ value, setValue }) => {
+	return (
+		<div className="form-floating">
+			<Input
+				id="prep-time-dropdown"
+				className="edit-prep-time-dropdown"
+				type="select"
+				onChange={(e) => {
+					setValue(e.target.value);
+				}}
+				value={value}
+			>
+				<option value="OneHour">One Hour</option>
+				<option value="FewHours">Few Hours</option>
+				<option value="AllDay">All Day</option>
+			</Input>
+			<label for="prep-time-dropdown">Prep Time</label>
+		</div>
+	);
+};
+
 const IngredientsLines = ({ ingredients }) => {
 	const authContext = useContext(AuthContext);
 	const tokenFromStorage = authContext.token;
 
 	const updateIngredientHandler = async (ingredientID, value) => {
-		console.log('Set Tag', value);
 		const response = await fetch(`/api/recipes/123/ingredient/${ingredientID}`, {
 			method: 'PATCH',
 			body: JSON.stringify(value),
@@ -440,7 +493,6 @@ const IngredientsLines = ({ ingredients }) => {
 
 	const debounceEditFunction = useCallback(debounce(updateIngredientHandler, 1500), [tokenFromStorage]);
 
-	console.log('INGREDIDENT ON EDIT PAGE', ingredients);
 	return (
 		<div>
 			{ingredients &&
@@ -516,7 +568,9 @@ const IngredientTagDropdown = ({ ingredientID, updateIngredientHandler, setTagNa
 			},
 		});
 		const data = await response.json();
-		return data.map((d) => d.Name);
+		const ingredients = data.ingredientsWithPrices;
+
+		return ingredients.map((d) => d.Name);
 	};
 
 	return (
@@ -602,6 +656,25 @@ const DayPrepTextarea = ({ value, setValue }) => {
 				value={value}
 			/>
 			<label for="recipe-day-prep">Day Earlier Preparation</label>
+		</div>
+	);
+};
+
+const PreheatInput = ({ value, setValue }) => {
+	return (
+		<div className="form-floating">
+			<Input
+				id="preheat"
+				className="mb-3"
+				style={{ width: '100%' }}
+				type="text"
+				placeholder="Preheat"
+				onChange={(e) => {
+					setValue(e.target.value);
+				}}
+				value={value}
+			/>
+			<label for="preheat">Preheat Temp.</label>
 		</div>
 	);
 };

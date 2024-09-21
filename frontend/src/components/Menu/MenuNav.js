@@ -11,28 +11,30 @@ const MenuNav = ({ menus, weekOfYear, page, setPage, fetchMenu }) => {
 
 	const hasAtLeastOneMenu = menus.filter((m) => m.menuID).length > 0;
 
-	const generateMenu = useCallback(
-		async (closeModal) => {
-			await fetch(`/api/menu/generate/${page}`, {
-				method: 'POST',
-				headers: {
-					// This is required. NodeJS server won't know how to read it without it.
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${tokenFromStorage}`,
-				},
-			});
-			fetchMenu(page);
-			closeModal();
-		},
-		[page, fetchMenu]
-	);
+	const generateMenu = useCallback(async () => {
+		await fetch(`/api/menu/generate/${page}`, {
+			method: 'POST',
+			headers: {
+				// This is required. NodeJS server won't know how to read it without it.
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
+			},
+		});
+		fetchMenu(page);
+	}, [page, fetchMenu]);
 
-	const { modal, openModal, closeModal } = useBetterModal({
+	const { modal, openModal } = useBetterModal({
 		title: 'Rebuild the Menu',
 		size: 'md',
 		buttons: (closeModal) => (
 			<>
-				<Button color="danger" onClick={() => generateMenu(closeModal)}>
+				<Button
+					color="danger"
+					onClick={() => {
+						generateMenu();
+						closeModal();
+					}}
+				>
 					Yes, Rebuild
 				</Button>
 			</>

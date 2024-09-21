@@ -1,17 +1,16 @@
 import useBetterModal from 'components/Common/useBetterModal';
-import { Search, Settings } from 'react-feather';
+import { Settings } from 'react-feather';
 import { useContext, useState } from 'react';
 import { Button, Col, Input, Row } from 'reactstrap';
 import AuthContext from 'authentication/auth-context';
 import FilteredRecipes from 'components/Recipes/FilteredRecipes';
 import RecipeRow from 'components//Recipes/RecipeRow';
 import './ChangeModal.scss';
+import { useToast } from 'context/toast-context';
 
 const ChangeButton = ({ fetchMenu, menu, page, availableSwapDays }) => {
 	const authContext = useContext(AuthContext);
 	const tokenFromStorage = authContext.token;
-
-	const [swapMenuID, setSwapDay] = useState(null);
 
 	const changeHandler = async (recipe, closeModal) => {
 		if (menu) {
@@ -31,11 +30,13 @@ const ChangeButton = ({ fetchMenu, menu, page, availableSwapDays }) => {
 		}
 	};
 
-	const { modal, openModal, closeModal } = useBetterModal({
+	const { modal, openModal } = useBetterModal({
 		title: 'Edit Menu',
 		size: 'lg',
 		content: (closeModal) => (
 			<>
+				<DailyNotes menu={menu} fetchMenu={fetchMenu} tokenFromStorage={tokenFromStorage} page={page} />
+
 				<h3>Swap Days</h3>
 				<SwapDaysButtons
 					page={page}
@@ -62,6 +63,49 @@ const ChangeButton = ({ fetchMenu, menu, page, availableSwapDays }) => {
 				<Settings onClick={openModal} />
 			</span>
 		</>
+	);
+};
+
+const DailyNotes = ({ menu, fetchMenu, tokenFromStorage, page }) => {
+	const menuID = menu.menuID;
+
+	const [value, setValue] = useState(menu.dailyNotes);
+
+	const showToast = useToast();
+
+	const notesHandler = async (dayID) => {
+		if (dayID) {
+			await fetch(`/api/menu/notes/${menuID}`, {
+				method: 'POST',
+				body: JSON.stringify({ dailyNotes: value }),
+				headers: {
+					// This is required. NodeJS server won't know how to read it without it.
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${tokenFromStorage}`,
+				},
+			});
+
+			fetchMenu(page);
+			showToast('Menu', `Notes saved for ${menu.date}`);
+		}
+	};
+
+	return (
+		<div className="form-floating daily-notes">
+			<Input
+				className="editInput"
+				id="recipe-steps"
+				type="textarea"
+				placeholder="Daily Notes"
+				onChange={(e) => {
+					setValue(e.target.value);
+				}}
+				onBlur={notesHandler}
+				value={value}
+				rows={3}
+			/>
+			<label for="recipe-steps">Daily Notes</label>
+		</div>
 	);
 };
 

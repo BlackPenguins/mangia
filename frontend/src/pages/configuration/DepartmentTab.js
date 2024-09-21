@@ -29,8 +29,6 @@ const PositionInput = ({ element }) => {
 				Authorization: `Bearer ${tokenFromStorage}`,
 			},
 		});
-
-		console.log('OPTION', { option, element });
 	};
 
 	const [position, setPosition] = useState(element.Position);

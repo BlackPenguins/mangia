@@ -1,13 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Button, Card, CardText, CardTitle, Col, Nav, NavItem, Row, TabContent, TabPane } from 'reactstrap';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 
 import '../ShoppingList.css';
 import './ConfigurationPage.scss';
 
 const ConfigurationPage = () => {
-	const navigate = useNavigate();
+	const location = useLocation();
 
+	console.log('WRONG', location);
 	return (
 		<section className="hero">
 			<div className="container">
@@ -23,29 +22,34 @@ const ConfigurationPage = () => {
 							</div>
 							<ul>
 								<li>
-									<a href="#" onClick={() => navigate('books')}>
+									<NavLink to="books" activeClassName="active">
 										Books
-									</a>
+									</NavLink>
 								</li>
 								<li>
-									<a href="#" onClick={() => navigate('ingredients')}>
+									<NavLink to="ingredients" activeClassName="active">
 										Ingredients
-									</a>
+									</NavLink>
 								</li>
 								<li>
-									<a href="#" onClick={() => navigate('departments')}>
+									<NavLink to="departments" activeClassName="active">
 										Department
-									</a>
+									</NavLink>
 								</li>
 								<li>
-									<a href="#" onClick={() => navigate('stores')}>
+									<NavLink to="stores" activeClassName="active">
 										Stores
-									</a>
+									</NavLink>
 								</li>
 								<li>
-									<a href="#" onClick={() => navigate('migration')}>
+									<NavLink to="import-failures" activeClassName="active">
+										Import Failures
+									</NavLink>
+								</li>
+								<li>
+									<NavLink to="migration" activeClassName="active">
 										Migration
-									</a>
+									</NavLink>
 								</li>
 							</ul>
 						</div>

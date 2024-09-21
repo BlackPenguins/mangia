@@ -637,8 +637,27 @@ ol {
 .hero__categories ul li a {
 	font-size: 16px;
 	color: #1c1c1c;
-	line-height: 39px;
+	line-height: 40px;
 	display: block;
+}
+
+.hero__categories ul li button {
+	font-size: 16px;
+	color: #1c1c1c;
+	line-height: 25px;
+	display: block;
+}
+
+.hero__categories ul li button:hover {
+	font-weight: bold;
+	text-decoration: none;
+	color: black;
+}
+
+.hero__categories ul li a.active,
+.hero__categories ul li button.active {
+	font-weight: bold;
+	color: darkgreen;
 }
 
 .hero__search {

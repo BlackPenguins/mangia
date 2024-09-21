@@ -1,7 +1,7 @@
-import { ContactSupportOutlined } from '@mui/icons-material';
 import LoadingText from 'components/Common/LoadingText';
+import { useToast } from 'context/toast-context';
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { Button, Input, Row, Col } from 'reactstrap';
+import { Button, Input, Row, Col, FormGroup, Label } from 'reactstrap';
 import AuthContext from '../authentication/auth-context';
 
 import './ShoppingList.css';
@@ -37,9 +37,7 @@ const ShoppingList = () => {
 		const data = await response.json();
 		setShoppingListItems(data.departments);
 		setStores(data.stores);
-
-		console.log('DAT', data);
-	}, []);
+	}, [tokenFromStorage]);
 
 	useEffect(() => {
 		fetchShoppingList();
@@ -55,9 +53,10 @@ const ShoppingList = () => {
 			},
 		});
 		fetchShoppingList();
-	}, [fetchShoppingList]);
+	}, [fetchShoppingList, tokenFromStorage]);
 
 	const [selectedStore, setSelectedStore] = useState(null);
+	const [hideCheckedItems, setHideCheckedItems] = useState(false);
 
 	return (
 		<section className="hero">
@@ -71,15 +70,34 @@ const ShoppingList = () => {
 						<Button color="success" onClick={buildShoppingList} className="site-btn">
 							Build Shopping List
 						</Button>
+
+						<span class="hide-checked-items">
+							<FormGroup switch>
+								<Input
+									type="switch"
+									checked={hideCheckedItems}
+									onClick={() => {
+										setHideCheckedItems(!hideCheckedItems);
+									}}
+								/>
+								<Label check>Hide Checked Items</Label>
+							</FormGroup>
+						</span>
 					</div>
 				)}
 
 				<div class="row">
 					<div class="col-lg-3">
-						<StoreFilters stores={stores} setSelectedStore={setSelectedStore} />
+						<StoreFilters stores={stores} selectedStore={selectedStore} setSelectedStore={setSelectedStore} />
 					</div>
 					<div class="col-lg-9">
-						<ShoppingListTable shoppingListItems={shoppingListItems} stores={stores} tokenFromStorage={tokenFromStorage} selectedStore={selectedStore} />
+						<ShoppingListTable
+							hideCheckedItems={hideCheckedItems}
+							shoppingListItems={shoppingListItems}
+							stores={stores}
+							tokenFromStorage={tokenFromStorage}
+							selectedStore={selectedStore}
+						/>
 					</div>
 				</div>
 			</div>
@@ -87,7 +105,7 @@ const ShoppingList = () => {
 	);
 };
 
-const StoreFilters = ({ stores, setSelectedStore }) => {
+const StoreFilters = ({ stores, selectedStore, setSelectedStore }) => {
 	return (
 		<div class="hero__categories">
 			<div class="hero__categories__all">
@@ -95,18 +113,18 @@ const StoreFilters = ({ stores, setSelectedStore }) => {
 			</div>
 			<ul>
 				<li>
-					<a href="#" onClick={() => setSelectedStore(null)}>
+					<Button className={selectedStore === null ? 'active' : 'non-active'} color="link" onClick={() => setSelectedStore(null)}>
 						All
-					</a>
+					</Button>
 				</li>
 
 				{stores &&
 					stores.map((store) => {
 						return (
 							<li>
-								<a href="#" onClick={() => setSelectedStore(store.storeID)}>
+								<Button className={selectedStore === store.storeID ? 'active' : 'non-active'} color="link" onClick={() => setSelectedStore(store.storeID)}>
 									{store.storeName}
-								</a>
+								</Button>
 							</li>
 						);
 					})}
@@ -114,11 +132,11 @@ const StoreFilters = ({ stores, setSelectedStore }) => {
 		</div>
 	);
 };
-const ShoppingListTable = ({ shoppingListItems, stores, tokenFromStorage, selectedStore }) => {
+const ShoppingListTable = ({ hideCheckedItems, shoppingListItems, stores, tokenFromStorage, selectedStore }) => {
 	return (
 		<>
 			{shoppingListItems == null && <LoadingText text="Loading shopping list" />}
-			{shoppingListItems?.length == 0 && <span>No shopping list found</span>}
+			{shoppingListItems?.length === 0 && <span>No shopping list found</span>}
 			{shoppingListItems &&
 				shoppingListItems.map((group, index) => {
 					const hasLowestPriceInDepartment = group.ingredients.some((i) => storeHasLowestPrice(selectedStore, i));
@@ -129,7 +147,7 @@ const ShoppingListTable = ({ shoppingListItems, stores, tokenFromStorage, select
 						return null;
 					} else {
 						return (
-							<div className="container">
+							<div key={index} className="container">
 								<div class="shopping-list">
 									<Row className="heading">
 										<Col className="col" lg={NAME_WIDTH + 1} sm={MOBILE_NAME_WIDTH} xs={MOBILE_NAME_WIDTH}>
@@ -140,7 +158,14 @@ const ShoppingListTable = ({ shoppingListItems, stores, tokenFromStorage, select
 										</Col>
 									</Row>
 									{group.ingredients.map((ingredient, i) => (
-										<ShoppingListTableRow ingredient={ingredient} tokenFromStorage={tokenFromStorage} stores={stores} selectedStore={selectedStore} />
+										<ShoppingListTableRow
+											key={i}
+											hideCheckedItems={hideCheckedItems}
+											ingredient={ingredient}
+											tokenFromStorage={tokenFromStorage}
+											stores={stores}
+											selectedStore={selectedStore}
+										/>
 									))}
 								</div>
 							</div>
@@ -164,7 +189,7 @@ const updateShoppingList = async (shoppingListItemID, isChecked, tokenFromStorag
 	});
 };
 
-const ShoppingListTableRow = ({ ingredient, tokenFromStorage, stores, selectedStore }) => {
+const ShoppingListTableRow = ({ ingredient, hideCheckedItems, tokenFromStorage, stores, selectedStore }) => {
 	const [isChecked, setIsChecked] = useState(ingredient.isChecked);
 	const [prices, setPrices] = useState([]);
 
@@ -186,6 +211,10 @@ const ShoppingListTableRow = ({ ingredient, tokenFromStorage, stores, selectedSt
 
 	if (isChecked) {
 		classes.push('checked');
+
+		if (hideCheckedItems) {
+			return null;
+		}
 	}
 
 	return (
@@ -229,20 +258,20 @@ const storeHasLowestPrice = (selectedStore, ingredient) => {
 	return true;
 };
 
-const PriceInput = ({ ingredientTagID, prices, store, tokenFromStorage }) => {
+export const PriceInput = ({ ingredientTagID, prices, store, tokenFromStorage }) => {
 	const [price, setPrice] = useState(null);
 	const [isLowest, setIsLowest] = useState(false);
 	const [ingredientTagPriceID, setIngredientTagPriceID] = useState(null);
 
 	useEffect(() => {
-		const priceForStore = prices.find((p) => p.storeID == store.storeID);
+		const priceForStore = prices.find((p) => p.storeID === store.storeID);
 
 		if (priceForStore) {
 			setPrice(priceForStore.price.toFixed(2));
 			setIngredientTagPriceID(priceForStore.ingredientTagPriceID);
 			setIsLowest(priceForStore?.isLowest);
 		}
-	}, [prices]);
+	}, [prices, store]);
 
 	const updatePrice = async (price) => {
 		const body = {
@@ -268,7 +297,7 @@ const PriceInput = ({ ingredientTagID, prices, store, tokenFromStorage }) => {
 			IngredientTagID: ingredientTagID,
 		};
 
-		console.log('Inserting recipe', body);
+		console.log('Inserting price', body);
 		const response = await fetch(`/api/stores/prices`, {
 			method: 'PUT',
 			body: JSON.stringify(body),
@@ -283,12 +312,15 @@ const PriceInput = ({ ingredientTagID, prices, store, tokenFromStorage }) => {
 		setIngredientTagPriceID(data.ingredientTagPriceID);
 	};
 
+	const showToast = useToast();
+
 	const priceHandler = () => {
 		if (ingredientTagPriceID === null) {
 			insertPrice(price);
 		} else {
 			updatePrice(price);
 		}
+		showToast('Shopping List', `Price updated for ${store.storeName}`);
 	};
 
 	const classes = [];
@@ -297,10 +329,9 @@ const PriceInput = ({ ingredientTagID, prices, store, tokenFromStorage }) => {
 		classes.push('lowest-price');
 	}
 
-	console.log('NA', store);
 	return (
 		<Col className={classes.join(' ')} lg={STORE_PRICES_WIDTH} sm={MOBILE_STORE_PRICES_WIDTH} xs={MOBILE_STORE_PRICES_WIDTH}>
-			<div className="form-floating notes">
+			<div className="form-floating store-price">
 				<Input
 					type="text"
 					id="store-name"

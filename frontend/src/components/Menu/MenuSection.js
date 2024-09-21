@@ -11,8 +11,9 @@ import LeftoversButton from './RecipeButtons/LeftoversButton';
 import ChangeButton from './RecipeButtons/ChangeButton';
 import AuthContext from '../../authentication/auth-context';
 import LoadingText from 'components/Common/LoadingText';
-import RecipeContainer from 'components/Recipes/RecipeContainer';
 import MenuContainer from './MenuContainer';
+import { PrepTimeLabel } from 'pages/RecipeEditPage';
+import { Clock, Thermometer } from 'react-feather';
 
 const MenuSection = () => {
 	const [page, setPage] = useState(0);
@@ -44,8 +45,6 @@ const MenuSection = () => {
 			</section>
 		);
 	} else {
-		const sundayRecipe = menus[1]?.recipe;
-
 		const availableSwapDays = menus.map((m) => ({
 			dayOfWeek: m?.week,
 			menuID: m?.menuID,
@@ -64,19 +63,11 @@ const MenuSection = () => {
 	}
 };
 
-const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, size, availableSwapDays }) => {
+const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, availableSwapDays }) => {
 	return (
 		<Row>
 			{menus?.map((menu, index) => {
 				const tomorrowsRecipe = menus[index + 1]?.recipe;
-				let cardSize = size;
-				if (index === 0) {
-					cardSize = {
-						size,
-						offset: 1,
-					};
-				}
-
 				return (
 					<MenuCard
 						key={index}
@@ -130,8 +121,51 @@ const MenuCard = ({ menu, fetchMenu, page, currentRecipeIDs, tomorrowsRecipe, av
 					isLeftovers={menu?.isLeftovers}
 					bottomButtons={bottomButtons}
 				/>
+				<DailyNotes menu={menu} />
 				<DayPreparation tomorrowsRecipe={tomorrowsRecipe} />
 			</MenuContainer>
+		</div>
+	);
+};
+
+const DailyNotes = ({ menu }) => {
+	console.log('MEN', menu);
+	const notes = menu.dailyNotes;
+	const prepTime = menu.recipe?.PrepTime;
+	const preheat = menu.recipe?.Preheat;
+
+	console.log('GUN', prepTime);
+
+	if (!notes && !prepTime && !preheat) {
+		return null;
+	}
+	return (
+		<div className="menu-footer daily-notes">
+			{(prepTime || preheat) && (
+				<div className="menu-prep-icons">
+					{preheat && (
+						<span className="preheat">
+							<Thermometer size={14} />
+							{preheat}&deg;
+						</span>
+					)}
+
+					{prepTime && (
+						<>
+							<Clock size={14} />
+							<PrepTimeLabel value={prepTime} />
+						</>
+					)}
+				</div>
+			)}
+			{notes && (
+				<>
+					<div className="menu-footer-title">Daily Notes</div>
+					<div>
+						<div className="content">{notes}</div>
+					</div>
+				</>
+			)}
 		</div>
 	);
 };
@@ -148,13 +182,13 @@ const DayPreparation = ({ tomorrowsRecipe }) => {
 	const defrostSplit = (defrost && defrost.split(',')) || [];
 
 	return (
-		<div className="prep-footer">
-			<div className="prep-title">Tomorrow's Prep</div>
+		<div className="menu-footer prep">
+			<div className="menu-footer-title">Tomorrow's Prep</div>
 			<div>
 				{defrostSplit.map((defrost, index) => {
 					return (
-						<div key={index} className="defrost">
-							<AcUnit /> {defrost}
+						<div key={index} className="content">
+							<AcUnit fontSize="small" /> {defrost}
 						</div>
 					);
 				})}

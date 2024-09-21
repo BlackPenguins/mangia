@@ -3,7 +3,7 @@ import { useState } from 'react';
 import FilteredRecipes, { HIDDEN_CATEGORY_FILTER } from '../components/Recipes/FilteredRecipes';
 
 const HomePage = () => {
-	const [categoryFilter, setCategoryFilter] = useState(null);
+	const [categoryFilter, setCategoryFilter] = useState('Dinner');
 	return (
 		<>
 			<section>

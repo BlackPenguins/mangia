@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 const AuthContext = React.createContext({
 	// Dummy data to VS Code has auto-complete
@@ -23,7 +23,6 @@ export const AuthContextProvider = ({ children }) => {
 			password,
 		};
 
-		console.log('SENDING', credentialsJSON);
 		const response = await fetch('/auth/login', {
 			method: 'POST',
 			body: JSON.stringify(credentialsJSON),
@@ -53,20 +52,7 @@ export const AuthContextProvider = ({ children }) => {
 		localStorage.removeItem('token');
 	};
 
-	useEffect(() => {
-		// If you refresh the page, we need to get that token back into the state so we hide the login button
-		const tokenFromStorage = localStorage.getItem('token');
-		setToken(tokenFromStorage);
-		fetchUserData();
-		fetchUsers();
-	}, []);
-
-	useEffect(() => {
-		// If that token changes, or is set, fetch that user information
-		fetchUserData();
-	}, [token]);
-
-	const fetchUserData = () => {
+	const fetchUserData = useCallback(() => {
 		const response = fetch(`/auth/checkuser`, {
 			method: 'POST',
 			headers: {
@@ -92,9 +78,9 @@ export const AuthContextProvider = ({ children }) => {
 					setUserID(json.userID);
 				}
 			});
-	};
+	}, [token]);
 
-	const fetchUsers = () => {
+	const fetchUsers = useCallback(() => {
 		const response = fetch(`/auth/users`, {
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
@@ -108,7 +94,20 @@ export const AuthContextProvider = ({ children }) => {
 			.then((json) => {
 				setUsers(json);
 			});
-	};
+	}, []);
+
+	useEffect(() => {
+		// If that token changes, or is set, fetch that user information
+		fetchUserData();
+	}, [fetchUserData, token]);
+
+	useEffect(() => {
+		// If you refresh the page, we need to get that token back into the state so we hide the login button
+		const tokenFromStorage = localStorage.getItem('token');
+		setToken(tokenFromStorage);
+		fetchUserData();
+		fetchUsers();
+	}, [fetchUserData, fetchUsers]);
 
 	const isNotAdmin = () => {
 		return userID !== 0 && !isAdmin;

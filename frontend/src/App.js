@@ -13,32 +13,37 @@ import BooksTab from './pages/configuration/BooksTab';
 import IngredientsTab from './pages/configuration/IngredientsTab';
 import DepartmentTab from './pages/configuration/DepartmentTab';
 import MigrationTab from 'pages/configuration/MigrationTab';
+import ImportFailuresTab from 'pages/configuration/ImportFailuresTab';
 import StoreTab from 'pages/configuration/StoreTab';
+import { ToastProvider } from 'context/toast-context';
 
 function App() {
 	return (
 		<div>
-			<Header />
-			<div className="app">
-				<Routes>
-					<Route path="/" element={<Navigate to="home" />} />
-					<Route path="home" element={<HomePage />} />
-					<Route path="menu" element={<MenuPage />} />
-					<Route path="shoppingList" element={<ShoppingList />} />
-					<Route path="configuration" element={<ConfigurationPage />}>
-						<Route path="books" element={<BooksTab />} />
-						<Route path="ingredients" element={<IngredientsTab />} />
-						<Route path="departments" element={<DepartmentTab />} />
-						<Route path="stores" element={<StoreTab />} />
-						<Route path="migration" element={<MigrationTab />} />
-					</Route>
-					<Route path="recipe" element={<RecipeDetailsPage />} />
-					<Route path="recipe/:recipeID" element={<RecipePage />} />
-					<Route path="recipe/:recipeID/edit" element={<RecipeDetailsPage />} />
-					<Route path="*" element={<NotFoundPage />} />
-				</Routes>
-			</div>
-			<Footer />
+			<ToastProvider>
+				<Header />
+				<div className="app">
+					<Routes>
+						<Route path="/" element={<Navigate to="home" />} />
+						<Route path="home" element={<HomePage />} />
+						<Route path="menu" element={<MenuPage />} />
+						<Route path="shoppingList" element={<ShoppingList />} />
+						<Route path="configuration" element={<ConfigurationPage />}>
+							<Route path="books" element={<BooksTab />} />
+							<Route path="ingredients" element={<IngredientsTab />} />
+							<Route path="departments" element={<DepartmentTab />} />
+							<Route path="stores" element={<StoreTab />} />
+							<Route path="migration" element={<MigrationTab />} />
+							<Route path="import-failures" element={<ImportFailuresTab />} />
+						</Route>
+						<Route path="recipe" element={<RecipeDetailsPage />} />
+						<Route path="recipe/:recipeID" element={<RecipePage />} />
+						<Route path="recipe/:recipeID/edit" element={<RecipeDetailsPage />} />
+						<Route path="*" element={<NotFoundPage />} />
+					</Routes>
+				</div>
+				<Footer />
+			</ToastProvider>
 		</div>
 	);
 }

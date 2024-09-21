@@ -1,19 +1,27 @@
 import { match } from 'assert';
 import { deleteIngredientsByRecipeID, insertIngredient } from '../database/ingredient.js';
-import { deleteRecipe, insertRecipe, selectRecipeByName, updateRecipe } from '../database/recipes.js';
+import { deleteRecipe, insertImportFailureURL, insertRecipe, selectRecipeByName, updateRecipe } from '../database/recipes.js';
 import { deleteStepsByRecipeID, insertStep } from '../database/step.js';
 import { scrape } from '../scrapers/ScraperFactory.js';
 
 export const importRecipe = async (url, currentRecipeID) => {
 	const importResponse = {};
 
-	const recipeObject = await scrape(url);
+	let scrapeSuccess = false;
+
+	try {
+		const recipeObject = await scrape(url);
+		scrapeSuccess = recipeObject.success;
+	} catch (error) {
+		scrapeSuccess = false;
+	}
 
 	console.log(`Importing recipe for URL [${url}] CurrentRecipeID[${currentRecipeID}]`);
 
-	if (!recipeObject.success) {
+	if (!scrapeSuccess) {
 		importResponse.success = false;
 		importResponse.status = `Failed to parse recipe from the URL "${url}"`;
+		await insertImportFailureURL(url);
 	} else {
 		const recipeName = recipeObject.name;
 		const ingredientsToAdd = recipeObject.ingredients;

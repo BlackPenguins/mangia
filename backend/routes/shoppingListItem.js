@@ -1,22 +1,13 @@
 import express from 'express';
+import { selectByWeekID } from '../database/menu.js';
 import { deleteShoppingListItems, insertShoppingListItem, selectAllShoppingListItem, updateShoppingListItemAsChecked } from '../database/shoppingListItem.js';
 import { selectAllStores, selectPrices } from '../database/store.js';
+import { getOrInsertWeek } from '../database/week.js';
 import { checkAdminMiddleware } from './auth.js';
 import { getMenuForWeekOffset } from './menu.js';
 
-const getCurrentWeekID = async () => {
-	const data = await getMenuForWeekOffset(0);
-	const menuDays = data.days;
-	const firstMenuDay = menuDays[0];
-	const weekID = firstMenuDay.weekID;
-
-	return {
-		weekID,
-		menuDays,
-	};
-};
 const getShoppingListItemsHandler = async (req, res) => {
-	const { weekID } = await getCurrentWeekID();
+	const { weekID } = await getOrInsertWeek(0);
 
 	const shoppingListItems = selectAllShoppingListItem(weekID);
 
@@ -25,31 +16,6 @@ const getShoppingListItemsHandler = async (req, res) => {
 			const ingredientsWithPrices = [];
 
 			for (const r of result) {
-				const pricesForStoresFromDB = await selectPrices(r.IngredientTagID);
-
-				let lowestPriceStoreID = null;
-				let lowestPrice = null;
-				let pricesForStores = [];
-
-				for (const priceFromDB of pricesForStoresFromDB) {
-					if (lowestPriceStoreID == null || priceFromDB.Price < lowestPrice) {
-						lowestPrice = priceFromDB.Price;
-						lowestPriceStoreID = priceFromDB.StoreID;
-					}
-
-					pricesForStores.push({
-						ingredientTagPriceID: priceFromDB.IngredientTagPriceID,
-						storeID: priceFromDB.StoreID,
-						price: priceFromDB.Price,
-					});
-				}
-
-				let store = pricesForStores.find((p) => p.storeID == lowestPriceStoreID);
-
-				if (store) {
-					store.isLowest = true;
-				}
-
 				ingredientsWithPrices.push({
 					amount: r.Amount,
 					name: r.TagName,
@@ -59,7 +25,7 @@ const getShoppingListItemsHandler = async (req, res) => {
 					ingredientTagID: r.IngredientTagID,
 					department: r.Department,
 					departmentPosition: r.DepartmentPosition,
-					prices: pricesForStores,
+					prices: await getPricesForStore(r.IngredientTagID),
 				});
 			}
 
@@ -82,6 +48,35 @@ const getShoppingListItemsHandler = async (req, res) => {
 			res.status(500).json({ message: error });
 		}
 	);
+};
+
+export const getPricesForStore = async (ingredientTagID) => {
+	const pricesForStoresFromDB = await selectPrices(ingredientTagID);
+
+	let lowestPriceStoreID = null;
+	let lowestPrice = null;
+	let pricesForStores = [];
+
+	for (const priceFromDB of pricesForStoresFromDB) {
+		if (lowestPriceStoreID == null || priceFromDB.Price < lowestPrice) {
+			lowestPrice = priceFromDB.Price;
+			lowestPriceStoreID = priceFromDB.StoreID;
+		}
+
+		pricesForStores.push({
+			ingredientTagPriceID: priceFromDB.IngredientTagPriceID,
+			storeID: priceFromDB.StoreID,
+			price: priceFromDB.Price,
+		});
+	}
+
+	let store = pricesForStores.find((p) => p.storeID == lowestPriceStoreID);
+
+	if (store) {
+		store.isLowest = true;
+	}
+
+	return pricesForStores;
 };
 
 function groupByDepartment(ingredients) {
@@ -130,13 +125,16 @@ const updateCheckedHandler = (req, res) => {
 };
 
 const buildShoppingListHandler = async (req, res) => {
-	const { weekID, menuDays } = await getCurrentWeekID();
+	console.log('Building shopping list.');
+	const { weekID, startDate } = await getOrInsertWeek(0);
 
 	// Wipe out the list first
 	await deleteShoppingListItems(weekID);
 
+	const menuDays = (await getMenuForWeekOffset(weekID, startDate)).days;
+
 	// Build the new list with that week's items
-	const recipes = menuDays.filter((m) => m.recipe).map((m) => m.recipe);
+	const recipes = menuDays.filter((m) => m.recipe && !m.isSkipped && !m.isLeftovers).map((m) => m.recipe);
 
 	let ingredients = [];
 	let ingredientTotals = [];
@@ -201,104 +199,6 @@ const sumIngredients = (ingredients) => {
 	// 3/4 CUP = 36 TSP
 	//   1 CUP = 48 TSP
 
-	// const testFinalIngredients = [
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 1,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 3,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 6,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 7,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 12,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 16,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 24,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 32,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 36,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 48,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 60,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 64,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 72,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 80,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 84,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 96,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 100,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 712,
-	// 		wholeUnits: false,
-	// 	},
-	// 	{
-	// 		name: 'Egg',
-	// 		value: 52,
-	// 		wholeUnits: false,
-	// 	},
-	// ];
-
 	for (const finalIngredient of finalIngredients) {
 		if (!finalIngredient.wholeUnits) {
 			let convertedValue = '';
@@ -320,9 +220,15 @@ const sumIngredients = (ingredients) => {
 					}
 
 					if (leftOverCups < 2) {
-						convertedValue += ' ' + leftOverCups + ' tsp';
+						if (leftOverCups === 0.25) {
+							leftOverCups = '1/4';
+						} else if (leftOverCups === 0.5) {
+							leftOverCups = '1/2';
+						}
+
+						convertedValue += ' ' + leftOverCups + ' teaspoon';
 					} else {
-						convertedValue += ' ' + Math.round(leftOverCups / 3) + ' tb';
+						convertedValue += ' ' + Math.round(leftOverCups / 3) + ' tablespoon';
 					}
 				} else if (leftOverCups < 16) {
 					convertedValue += ' 1/4 cup';
@@ -343,8 +249,6 @@ const sumIngredients = (ingredients) => {
 		} else {
 			finalIngredient.finalValue = `${finalIngredient.value} ${finalIngredient.unit}`;
 		}
-
-		console.log(`---------------${finalIngredient.value} ====> ${finalIngredient.finalValue}`);
 	}
 
 	return finalIngredients;

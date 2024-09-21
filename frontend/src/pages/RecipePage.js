@@ -10,6 +10,7 @@ import { Edit, Trash2 } from 'react-feather';
 import AuthContext from '../authentication/auth-context';
 import LoadingText from '../components/Common/LoadingText';
 import useBetterModal from 'components/Common/useBetterModal';
+import { PrepTimeLabel } from './RecipeEditPage';
 
 const RecipePage = () => {
 	const params = useParams();
@@ -144,6 +145,16 @@ const Statistics = ({ recipe, book }) => {
 					<span className="label">Defrost:</span> {recipe.Defrost}
 				</div>
 			)}
+			{recipe?.PrepTime && (
+				<div>
+					<span className="label">Prep Time:</span> <PrepTimeLabel value={recipe.PrepTime} />
+				</div>
+			)}
+			{recipe?.Preheat && (
+				<div>
+					<span className="label">Preheat Temp:</span> {recipe.Preheat}&deg;
+				</div>
+			)}
 			{recipe?.URL && (
 				<div>
 					<span className="label">URL:</span> <a href={recipe.URL}>{recipe.URL}</a>
@@ -258,7 +269,6 @@ const Notes = ({ title, notes }) => {
 };
 
 const History = ({ history }) => {
-	console.log('HIS', history);
 	return (
 		<div className="extraSection history">
 			<h4>History</h4>

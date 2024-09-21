@@ -1,3 +1,4 @@
+import { useToast } from 'context/toast-context';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Button, Col, Input, Row } from 'reactstrap';
 import AuthContext from '../../authentication/auth-context';
@@ -15,8 +16,9 @@ const BasicEditPanel = ({ label, apiFetch, apiInsert, apiUpdate, idColumn, Addit
 		});
 		const data = await response.json();
 		const fetchedItems = data;
+		console.log('FETCHED', fetchedItems);
 		setItems(fetchedItems);
-	}, []);
+	}, [apiFetch]);
 
 	useEffect(() => {
 		fetchItems();
@@ -76,7 +78,7 @@ const BasicEditPanel = ({ label, apiFetch, apiInsert, apiUpdate, idColumn, Addit
 									<td className="shoping__cart__item">
 										<Row>
 											<Col lg={(AdditionalOption && 6) || 12} sm={12}>
-												<NameInput item={item} apiUpdate={apiUpdate} idColumn={idColumn} tokenFromStorage={tokenFromStorage} />
+												<NameInput label={label} item={item} apiUpdate={apiUpdate} idColumn={idColumn} tokenFromStorage={tokenFromStorage} />
 											</Col>
 											<Col lg={6} sm={12} className="edit-additional">
 												{AdditionalOption && <AdditionalOption element={item} />}
@@ -92,8 +94,10 @@ const BasicEditPanel = ({ label, apiFetch, apiInsert, apiUpdate, idColumn, Addit
 	);
 };
 
-const NameInput = ({ item, apiUpdate, idColumn, tokenFromStorage }) => {
+export const NameInput = ({ label, item, apiUpdate, idColumn, tokenFromStorage }) => {
 	const [value, setValue] = useState(item.Name);
+
+	const showToast = useToast();
 
 	const onUpdateHandler = async () => {
 		const newElement = {
@@ -111,6 +115,8 @@ const NameInput = ({ item, apiUpdate, idColumn, tokenFromStorage }) => {
 			},
 		});
 		await response.json();
+
+		showToast('Configuration', `${label} name edited`);
 	};
 
 	return (

@@ -1,5 +1,5 @@
 import express from 'express';
-import { addTag, deleteRecipe, deleteTag, insertRecipe, selectAllRecipes, selectRecipeByID, selectTags, updateRecipe } from '../database/recipes.js';
+import { addTag, deleteRecipe, deleteTag, insertRecipe, selectAllRecipes, selectimportFailureURLs, selectRecipeByID, selectTags, updateRecipe } from '../database/recipes.js';
 import { breakdownIngredient, createIngredients, createSteps, importRecipe } from '../scrapers/RecipeImporter.js';
 import { deleteStepsByRecipeID, selectStepsByRecipeID } from '../database/step.js';
 import { deleteIngredientsByRecipeID, selectIngredientsByRecipeID, updateIngredient } from '../database/ingredient.js';
@@ -62,6 +62,11 @@ const getTagsForRecipe = (req, res) => {
 			res.status(500).json({ message: error });
 		}
 	);
+};
+
+const getImportFailureURLs = async (req, res) => {
+	const urls = await selectimportFailureURLs();
+	res.status(200).json(urls);
 };
 
 const getRecipe = async (req, res) => {
@@ -135,8 +140,12 @@ const getAllRecipes = (req, res) => {
 const importRecipeProcessor = async (req, res) => {
 	let url = req.body.url;
 	let currentRecipeID = req.body.currentRecipeID;
-	const importResponse = await importRecipe(url, currentRecipeID);
-	res.status(200).json(importResponse);
+	try {
+		const importResponse = await importRecipe(url, currentRecipeID);
+		res.status(200).json(importResponse);
+	} catch (e) {
+		res.status(200).json({ success: false });
+	}
 };
 
 const uploadImage = async (req, res) => {
@@ -219,13 +228,15 @@ const addRecipe = (req, res) => {
 		description: req.body.description,
 		category: req.body.category,
 		protein: req.body.protein,
+		preheat: req.body.preheat,
+		prepTime: req.body.prepTime,
 		defrost: req.body.defrost,
 		page: req.body.page,
 		notes: req.body.notes,
 		dayPrep: req.body.dayPrep,
 		rating: req.body.rating,
 		url: req.body.url,
-		isActive: req.body.isActive,
+		isActive: true,
 	};
 
 	const bookID = req.body.bookID;
@@ -327,6 +338,14 @@ const updateRecipeProcessor = async (req, res) => {
 		updatedRecipe.protein = req.body.protein;
 	}
 
+	if (req.body.preheat) {
+		updatedRecipe.preheat = req.body.preheat;
+	}
+
+	if (req.body.prepTime) {
+		updatedRecipe.prepTime = req.body.prepTime;
+	}
+
 	if (req.body.defrost) {
 		updatedRecipe.defrost = req.body.defrost;
 	}
@@ -363,8 +382,12 @@ const updateRecipeProcessor = async (req, res) => {
 		updatedRecipe.url = req.body.url;
 	}
 
-	console.log(` Update Recipe for ${recipeID}`, updatedRecipe);
-	const recipe = await updateRecipe(updatedRecipe, recipeID);
+	let recipe = null;
+
+	if (Object.keys(updatedRecipe).length) {
+		console.log(` Update Recipe for ${recipeID}`, updatedRecipe);
+		recipe = await updateRecipe(updatedRecipe, recipeID);
+	}
 
 	updateStepsAndIngredients(req.body, recipeID);
 	res.status(200).json({ success: true, recipe });
@@ -487,6 +510,7 @@ const router = express.Router();
 router.get('/api/recipes/parseTextProgress', getParseTextProgress);
 router.get('/api/recipes/:recipeID/tags', getTagsForRecipe);
 router.get('/api/recipes/:recipeID', getRecipe);
+router.get('/api/recipe/importFailureURLs', getImportFailureURLs);
 router.get('/api/recipes', getAllRecipes);
 router.post('/api/recipes/import', [checkAdminMiddleware], importRecipeProcessor);
 router.post('/api/recipes/image/:recipeID', [checkAdminMiddleware, upload.single('imageFile')], uploadImage);

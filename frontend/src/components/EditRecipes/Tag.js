@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { Button, Col, Input, Row } from 'reactstrap';
+import { Button, Col, Row } from 'reactstrap';
 import { Tag as TagIcon } from 'react-feather';
 
 import './Tag.scss';
@@ -59,7 +59,6 @@ const Tag = ({ recipeID }) => {
 			},
 		});
 
-		console.log('REMOVE TAG', selectedValue);
 		fetchRecipeTags();
 	};
 

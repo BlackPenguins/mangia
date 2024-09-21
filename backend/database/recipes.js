@@ -120,3 +120,36 @@ export const selectTags = (recipeID) => {
 		});
 	});
 };
+
+export const insertImportFailureURL = (url) => {
+	const insert = {
+		Date: new Date(),
+		URL: url,
+	};
+
+	return new Promise((resolve, reject) => {
+		pool.query('INSERT INTO IMPORT_FAILURE_URL SET ?', [insert], (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				const responseObject = {
+					id: result.insertId,
+				};
+
+				return resolve(responseObject);
+			}
+		});
+	});
+};
+
+export const selectimportFailureURLs = () => {
+	return new Promise((resolve, reject) => {
+		pool.query('SELECT * FROM IMPORT_FAILURE_URL', (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve(result);
+			}
+		});
+	});
+};

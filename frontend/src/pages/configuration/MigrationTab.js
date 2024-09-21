@@ -27,6 +27,12 @@ const MigrationTab = () => {
 		<div>
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="resizeImages" label="v1.1: Resize Images" />
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="createStore" label="v1.2: Create Store" />
+			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="importFail" label="v1.3: Create ImportFailureURL" />
+			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addDailyNotes" label="v1.3: Add DailyNotes" />
+			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addPrepTime" label="v1.3: Add PrepTime" />
+			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addPreheat" label="v1.3: Add Preheat" />
+			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="updateWeek" label="v1.3: Update Week" />
+			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="setWeekIDForAllMenuDays" label="v1.3: Set WeekID for all MENU_DAY" />
 		</div>
 	);
 };

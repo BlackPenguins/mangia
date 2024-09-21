@@ -92,3 +92,27 @@ export const deleteWithRecipeID = (recipeID) => {
 		});
 	});
 };
+
+export const selectAllMenuDay = (day) => {
+	return new Promise((resolve, reject) => {
+		pool.query('SELECT * FROM MENU_DAY', (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve(result);
+			}
+		});
+	});
+};
+
+export const selectByWeekID = (weekID) => {
+	return new Promise((resolve, reject) => {
+		pool.query('SELECT * FROM MENU_DAY WHERE WeekID = ?', [weekID], (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve(result);
+			}
+		});
+	});
+};

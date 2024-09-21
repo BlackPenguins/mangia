@@ -17,7 +17,6 @@ const useSignUpModal = () => {
 			name,
 		};
 
-		console.log('SENDING', credentialsJSON);
 		const response = await fetch('/auth/register', {
 			method: 'POST',
 			body: JSON.stringify(credentialsJSON),
@@ -35,7 +34,7 @@ const useSignUpModal = () => {
 		}
 	};
 
-	const { modal, openModal, closeModal } = useBetterModal({
+	const { modal, openModal } = useBetterModal({
 		title: 'Join Penguinore!',
 		content: (closeModal) => (
 			<>

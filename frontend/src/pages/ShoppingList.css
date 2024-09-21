@@ -86,11 +86,22 @@
 	background-color: #e0fdb7;
 }
 
-.shopping-list .lowest-price {
+.shopping-list .lowest-price,
+.ingredient-list .lowest-price {
 	background-color: #f0e663;
 }
 
 .shopping-list-button {
 	text-align: center;
 	margin-bottom: 15px;
+}
+
+.hide-checked-items {
+	float: right;
+
+	@media only screen and (max-width: 767px) {
+		display: block;
+		margin: 10px 0px;
+		float: none;
+	}
 }

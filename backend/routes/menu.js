@@ -1,9 +1,9 @@
 import express from 'express';
 import { selectAllRecipes, selectRecipeByID, updateRecipe } from '../database/recipes.js';
-import { insertMenu, selectMenuByDay, selectMenuByMenuID, swapMenu, updateMenu } from '../database/menu.js';
+import { insertMenu, selectByWeekID, selectMenuByDay, selectMenuByMenuID, swapMenu, updateMenu } from '../database/menu.js';
 import { checkAdminMiddleware } from './auth.js';
 import { addIngredientsToRecipe } from './recipes.js';
-import { insertWeek } from '../database/week.js';
+import { getOrInsertWeek } from '../database/week.js';
 
 const DAYS_OF_WEEK = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
 const MONTHS_OF_YEAR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -11,46 +11,49 @@ const MONTHS_OF_YEAR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 
 const getMenuForWeek = async (req, res) => {
 	let weekOffset = req.params.weekOffset;
 
-	const responseObject = await getMenuForWeekOffset(weekOffset);
+	// Every time you VIEW a new week, it will insert a new WEEK if needed
+	// This mean when you click Generate there will always be a WeekID ready
+	const { weekID, startDate } = await getOrInsertWeek(weekOffset);
+
+	const responseObject = await getMenuForWeekOffset(weekID, startDate);
 	// No DB calls, no promises needed because there is no async
 	res.status(200).json(responseObject);
 };
 
-export const getMenuForWeekOffset = async (weekOffset) => {
-	const daysArray = getDaysForAWeek(weekOffset);
-
+export const getMenuForWeekOffset = async (weekID, startDate) => {
 	let formattedDaysArray = [];
 
-	const firstDayOfWeek = daysArray[0];
-	const firstDayOfTheYear = new Date(firstDayOfWeek.getFullYear(), 0, 1);
-	const dayOfYear = Math.floor((firstDayOfWeek - firstDayOfTheYear) / (24 * 60 * 60 * 1000));
+	const menuDays = await selectByWeekID(weekID);
+
+	const firstDayOfTheYear = new Date(startDate.getFullYear(), 0, 1);
+	const dayOfYear = Math.floor((startDate - firstDayOfTheYear) / (24 * 60 * 60 * 1000));
 	const weekOfYear = Math.floor(dayOfYear / 7);
 
-	for (const day of daysArray) {
-		const formattedDateForDB = day.toISOString().slice(0, 10);
-
-		const doesExistPromise = await selectMenuByDay(formattedDateForDB);
-
-		let menuExistsDetails = {};
-
-		if (doesExistPromise.length > 0) {
-			const menuFromDB = doesExistPromise[0];
-			if (menuFromDB?.RecipeID) {
-				const recipeFromDB = await selectRecipeByID(menuFromDB.RecipeID);
+	if (menuDays.length == 0) {
+		for (let i = 0; i < 7; i++) {
+			const day = new Date(startDate.getTime());
+			day.setHours(24 * i);
+			formattedDaysArray.push(withDateDetails(day));
+		}
+	} else {
+		for (const menuDay of menuDays) {
+			if (menuDay?.RecipeID) {
+				const recipeFromDB = await selectRecipeByID(menuDay.RecipeID);
 				await addIngredientsToRecipe(recipeFromDB);
-				menuExistsDetails = {
-					menuID: menuFromDB.MenuID,
-					isMade: menuFromDB.IsMade,
-					isSkipped: menuFromDB.IsSkipped,
-					isLeftovers: menuFromDB.IsLeftovers,
-					skipReason: menuFromDB.skipReason,
-					weekID: menuFromDB.WeekID,
-					recipe: recipeFromDB,
-				};
+				formattedDaysArray.push(
+					withDateDetails(new Date(menuDay.Day), {
+						menuID: menuDay.MenuID,
+						isMade: menuDay.IsMade,
+						isSkipped: menuDay.IsSkipped,
+						isLeftovers: menuDay.IsLeftovers,
+						skipReason: menuDay.skipReason,
+						weekID: menuDay.WeekID,
+						dailyNotes: menuDay.DailyNotes,
+						recipe: recipeFromDB,
+					})
+				);
 			}
 		}
-
-		formattedDaysArray.push(withDateDetails(day, menuExistsDetails));
 	}
 
 	return {
@@ -100,6 +103,19 @@ const changeMenuItem = async (req, res) => {
 	res.status(200).json({ success: true });
 };
 
+const changeMenuNotes = async (req, res) => {
+	const menuID = req.params.menuID;
+	const dailyNotes = req.body.dailyNotes;
+
+	const update = {
+		DailyNotes: dailyNotes,
+	};
+
+	await updateMenu(update, menuID);
+
+	res.status(200).json({ success: true });
+};
+
 const generateMenu = async (req, res) => {
 	let weekOffset = req.params.weekOffset;
 
@@ -107,22 +123,24 @@ const generateMenu = async (req, res) => {
 		weekOffset = 0;
 	}
 
-	const daysArray = getDaysForAWeek(weekOffset);
-	const newWeekID = (await insertWeek()).id;
+	// When you VIEWED the week it already made a WEEK for you, so this will never be an insert
+	const { weekID, startDate } = await getOrInsertWeek(weekOffset);
 
 	let recipes = await selectAllRecipes();
 
-	const pickedRecipes = getRandomWeightedRecipe(recipes, daysArray.length);
+	const pickedRecipes = getRandomWeightedRecipe(recipes, 7);
 
-	for (let dayIndex = 0; dayIndex < daysArray.length; dayIndex++) {
-		const day = daysArray[dayIndex];
+	for (let i = 0; i < 7; i++) {
+		const day = new Date(startDate.getTime());
+		day.setHours(24 * i);
+
 		const formattedDateForDB = day.toISOString().slice(0, 10);
-		const pickedRecipe = pickedRecipes[dayIndex];
+		const pickedRecipe = pickedRecipes[i];
 
 		const existingMenu = await selectMenuByDay(formattedDateForDB);
 
 		if (existingMenu.length === 0) {
-			await insertMenu(day, pickedRecipe.RecipeID, newWeekID);
+			await insertMenu(day, pickedRecipe.RecipeID, weekID);
 			console.log(`Day inserted into Menu - ${pickedRecipe.RecipeID}, ${pickedRecipe.Name}, ${pickedRecipe.weight}`);
 		} else {
 			const updatedMenu = {
@@ -314,7 +332,36 @@ const getRandomWeightedRecipe = (recipes, amountToPick) => {
 	return pickedRecipes;
 };
 
-const getDaysForAWeek = (weekOffset) => {
+export const getWeekRange = (date) => {
+	let dayOfWeek = date.getDay();
+
+	// We need to offset the day of the week so Saturday is the start of the week
+	// Actual day => desired offset
+	// 6 - Saturday   => 0
+	// 0 - Sunday 	  => 1
+	// 1 - Monday     => 2
+	// 2 - Tuesday    => 3
+	// 3 - Wednesday  => 4
+	// 4 - Thursday   => 5
+	// 5 - Friday     => 6
+	let dayOfWeekWithSaturdayOffset = (dayOfWeek + 1) % 7;
+
+	const daysAgoStart = dayOfWeekWithSaturdayOffset * -1;
+	const daysFutureEnd = 6 - dayOfWeekWithSaturdayOffset;
+
+	let startDate = new Date(date.getTime());
+	startDate.setHours(24 * daysAgoStart);
+
+	let endDate = new Date(date.getTime());
+	endDate.setHours(24 * daysFutureEnd);
+
+	return {
+		startDate,
+		endDate,
+	};
+};
+
+export const getDaysForAWeek = (weekOffset) => {
 	// Page -2 - Two weeks ago
 	// Page -1 - Last week
 	// Page 0 or "current" - Current week
@@ -339,8 +386,6 @@ const getDaysForAWeek = (weekOffset) => {
 	// 4 - Thursday   => 5
 	// 5 - Friday     => 6
 	let dayOfWeekWithSaturdayOffset = (dayOfWeek + 1) % 7;
-
-	console.log('Day of Week with Saturday offset', dayOfWeekWithSaturdayOffset);
 
 	const daysAgoStart = dayOfWeekWithSaturdayOffset * -1;
 	const daysFutureEnd = 6 - dayOfWeekWithSaturdayOffset;
@@ -367,6 +412,7 @@ const router = express.Router();
 router.get('/api/menu/:weekOffset', getMenuForWeek);
 router.post('/api/menu/move/:menuID', [checkAdminMiddleware], moveMenuItem);
 router.post('/api/menu/change/:menuID', [checkAdminMiddleware], changeMenuItem);
+router.post('/api/menu/notes/:menuID', [checkAdminMiddleware], changeMenuNotes);
 router.post('/api/menu/generate/:weekOffset', [checkAdminMiddleware], generateMenu);
 router.post('/api/menu/reroll/:menuID', [checkAdminMiddleware], rerollMenuItem);
 router.post('/api/menu/made/:menuID', [checkAdminMiddleware], madeMenuItem);

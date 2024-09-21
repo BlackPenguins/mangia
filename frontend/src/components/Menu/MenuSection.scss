@@ -44,23 +44,58 @@
 		}
 	}
 
-	.prep-footer {
+	.menu-footer {
 		width: 100%;
 		text-align: center;
-		background-color: #5e70ac;
-		color: white;
 		padding: 15px;
 
-		.prep-title {
+		&.prep {
+			background-color: #5e70ac;
+			color: white;
+
+			.content {
+				margin-left: -27px;
+				color: #b7daff;
+			}
+		}
+
+		&.daily-notes {
+			background-color: #b1a32b;
+			color: white;
+
+			.content {
+				font-size: 0.9em;
+				color: #fff9c5;
+			}
+
+			.menu-prep-icons {
+				font-size: 12px;
+
+				.preheat {
+					margin: {
+						right: 20px;
+					}
+				}
+
+				.prep-time-label {
+					margin: {
+						left: 3px;
+					}
+				}
+
+				&:not(:last-child) {
+					margin: {
+						bottom: 15px;
+					}
+				}
+			}
+		}
+
+		.menu-footer-title {
 			font-weight: bold;
 			font-size: 1.1em;
 			text-transform: uppercase;
-			margin-bottom: 15px;
-		}
-
-		.defrost {
-			margin-left: -27px;
-			color: #b7daff;
+			margin-bottom: 5px;
 		}
 
 		.prep-notes {

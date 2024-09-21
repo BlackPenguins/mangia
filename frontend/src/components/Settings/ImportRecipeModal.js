@@ -24,7 +24,6 @@ const useImportRecipeModal = () => {
 
 	const importHandler = async () => {
 		const url = importURL;
-		console.log('Importing', url);
 		const response = await fetch(`/api/recipes/import`, {
 			method: 'POST',
 			body: JSON.stringify({ url }),
@@ -44,6 +43,8 @@ const useImportRecipeModal = () => {
 			setStatusClasses('status failure');
 			setStatus(data.status);
 		}
+
+		setImportURL('');
 	};
 
 	const importRecipeFile = async () => {
@@ -82,8 +83,8 @@ const useImportRecipeModal = () => {
 		),
 		buttons: (closeModal) => (
 			<>
-				{!newRecipeID && <Button onClick={importHandler}>Import Recipe</Button>}
 				{!newRecipeID && <Button onClick={importRecipeFile}>Import File</Button>}
+				{!newRecipeID && <Button onClick={importHandler}>Import URL</Button>}
 				{newRecipeID && (
 					<Button color="success" onClick={viewRecipeHandler}>
 						View Recipe

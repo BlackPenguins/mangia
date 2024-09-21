@@ -1,0 +1,25 @@
+.toast-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1050;
+    width: auto;
+    max-width: 350px;
+    // background-color: #28a745!important;
+
+    .toast-header {
+        background-color: #d8f1de;
+    }
+
+    .toast-body {
+        background-color: #9ddba9;
+    }
+  }
+  
+  .toast-container .toast {
+    opacity: 0.9;
+  }
+  
+  .toast-container .toast + .toast {
+    margin-top: 0.5rem; /* Adds space between toasts */
+  }

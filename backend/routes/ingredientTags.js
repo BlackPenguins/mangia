@@ -1,13 +1,35 @@
 import express from 'express';
 import { insertIngredientTag, selectAllIngredientTags, updateIngredientTag } from '../database/ingredientTags.js';
+import { selectAllStores } from '../database/store.js';
 import { checkAdminMiddleware } from './auth.js';
+import { getPricesForStore } from './shoppingListItem.js';
 
 const getAllIngredientTagsHandler = (req, res) => {
 	const selectPromise = selectAllIngredientTags();
 
 	selectPromise.then(
-		(result) => {
-			res.status(200).json(result);
+		async (result) => {
+			const ingredientsWithPrices = [];
+
+			for (const r of result) {
+				ingredientsWithPrices.push({
+					...r,
+					prices: await getPricesForStore(r.IngredientTagID),
+				});
+			}
+
+			const storesFromDB = await selectAllStores();
+			const stores = storesFromDB.map((s) => ({
+				storeID: s.StoreID,
+				storeName: s.Name,
+			}));
+
+			const response = {
+				stores,
+				ingredientsWithPrices,
+			};
+
+			res.status(200).json(response);
 		},
 		(error) => {
 			res.status(500).json({ message: error });

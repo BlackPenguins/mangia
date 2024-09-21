@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Input, Row } from 'reactstrap';
 import LoadingText from '../Common/LoadingText';
 
@@ -27,23 +27,28 @@ const FilteredRecipes = ({ CardType, layoutClass, onClickHandler, categoryFilter
 
 	const [filteredRecipes, setFilteredRecipes] = useState(null);
 
-	const isFilteredByCategory = (recipe) => {
-		const matchesAll = !categoryFilter && recipe.IsActive;
-		const matchesCategory = categoryFilter && recipe.Category === categoryFilter && recipe.IsActive;
-		const matchesHidden = categoryFilter === HIDDEN_CATEGORY_FILTER && !recipe?.IsActive;
-		return matchesAll || matchesHidden || matchesCategory;
-	};
-	const filterRecipesHandler = (searchString) => {
-		const lowercaseSearchString = searchString.toLowerCase();
-		setFilteredRecipes(
-			allRecipes &&
-				allRecipes.filter((recipe) => {
-					const matchesName = recipe && recipe.Name.toLowerCase().indexOf(lowercaseSearchString) !== -1;
-					console.log('MATCH', { matchesName, recipe });
-					return isFilteredByCategory(recipe) && matchesName;
-				})
-		);
-	};
+	const isFilteredByCategory = useCallback(
+		(recipe) => {
+			const matchesAll = !categoryFilter && recipe.IsActive;
+			const matchesCategory = categoryFilter && recipe.Category === categoryFilter && recipe.IsActive;
+			const matchesHidden = categoryFilter === HIDDEN_CATEGORY_FILTER && !recipe?.IsActive;
+			return matchesAll || matchesHidden || matchesCategory;
+		},
+		[categoryFilter]
+	);
+	const filterRecipesHandler = useCallback(
+		(searchString) => {
+			const lowercaseSearchString = searchString.toLowerCase();
+			setFilteredRecipes(
+				allRecipes &&
+					allRecipes.filter((recipe) => {
+						const matchesName = recipe && recipe.Name.toLowerCase().indexOf(lowercaseSearchString) !== -1;
+						return isFilteredByCategory(recipe) && matchesName;
+					})
+			);
+		},
+		[allRecipes, isFilteredByCategory]
+	);
 
 	useEffect(() => {
 		setFilteredRecipes(
@@ -53,7 +58,7 @@ const FilteredRecipes = ({ CardType, layoutClass, onClickHandler, categoryFilter
 				})
 		);
 		setSearch('');
-	}, [categoryFilter, allRecipes]);
+	}, [categoryFilter, allRecipes, isFilteredByCategory]);
 
 	return (
 		<section className="hero">
