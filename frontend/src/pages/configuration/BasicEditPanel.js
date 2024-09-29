@@ -58,7 +58,7 @@ const BasicEditPanel = ({ label, apiFetch, apiInsert, apiUpdate, idColumn, Addit
 				<Col lg={7}>
 					<div className="form-floating">
 						<Input id="item-name" type="text" placeholder="Item Name" innerRef={addItemInputRef}></Input>
-						<label for="item-name">{label} Name</label>
+						<label htmlFor="item-name">{label} Name</label>
 					</div>
 				</Col>
 				<Col lg={5} className="recipe-edit-btn">
@@ -134,7 +134,7 @@ export const NameInput = ({ label, item, apiUpdate, idColumn, tokenFromStorage }
 				}}
 				value={value}
 			/>
-			<label for="edit-name">Name</label>
+			<label htmlFor="edit-name">Name</label>
 		</div>
 	);
 };

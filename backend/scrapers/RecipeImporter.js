@@ -131,6 +131,13 @@ export const createIngredients = async (recipeID, recipe) => {
 				formattedIngredient = formattedIngredient.replace('0.5', '1/2');
 				formattedIngredient = formattedIngredient.replace('0.75', '3/4');
 				formattedIngredient = formattedIngredient.replace('0.125', '1/8');
+				formattedIngredient = formattedIngredient.replace('½', '1/2');
+				formattedIngredient = formattedIngredient.replace('¼', '1/4');
+				formattedIngredient = formattedIngredient.replace('⅓', '1/3');
+				formattedIngredient = formattedIngredient.replace('⅓', '2/3');
+				formattedIngredient = formattedIngredient.replace('⅓', '2/3');
+				formattedIngredient = formattedIngredient.replace('⅓', '1/8');
+				formattedIngredient = formattedIngredient.replace('⅓', '3/4');
 
 				const ingredientToInsert = {
 					Name: formattedIngredient,

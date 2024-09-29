@@ -27,7 +27,7 @@ const Category = ({ category, setCategory }) => {
 					Dessert
 				</option>
 			</Input>
-			<label for="edit-category-dropdown">Category</label>
+			<label htmlFor="edit-category-dropdown">Category</label>
 		</div>
 		// <Input
 		// 	id="recipe-category"

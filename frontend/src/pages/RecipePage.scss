@@ -51,6 +51,11 @@
 			li {
 				list-style: square;
 				padding: 5px 0px;
+
+				&.tagged {
+					color: rgb(21, 114, 21);
+					font-weight: 600;
+				}
 			}
 
 			h4 {

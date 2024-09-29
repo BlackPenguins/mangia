@@ -76,7 +76,7 @@ const IngredientsTab = () => {
 				<Col lg={7}>
 					<div className="form-floating">
 						<Input id="item-name" type="text" placeholder="Item Name" innerRef={addItemInputRef}></Input>
-						<label for="item-name">Ingredient Name</label>
+						<label htmlFor="item-name">Ingredient Name</label>
 					</div>
 				</Col>
 				<Col lg={5} className="recipe-edit-btn">
@@ -171,7 +171,7 @@ const DepartmentDropdown = ({ item, departments }) => {
 						return <option value={department.IngredientDepartmentID}>{department.Name}</option>;
 					})}
 			</Input>
-			<label for="edit-book-dropdown">Department</label>
+			<label htmlFor="edit-book-dropdown">Department</label>
 		</span>
 	);
 };

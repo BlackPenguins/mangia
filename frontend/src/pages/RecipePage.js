@@ -150,7 +150,7 @@ const Statistics = ({ recipe, book }) => {
 					<span className="label">Prep Time:</span> <PrepTimeLabel value={recipe.PrepTime} />
 				</div>
 			)}
-			{recipe?.Preheat && (
+			{recipe?.Preheat > 0 && (
 				<div>
 					<span className="label">Preheat Temp:</span> {recipe.Preheat}&deg;
 				</div>
@@ -220,7 +220,15 @@ const Ingredients = ({ ingredients }) => {
 			<ul>
 				{ingredients &&
 					ingredients.map((ingredient, index) => {
-						return <li key={index}>{ingredient.name}</li>;
+						const classes = [];
+						if (ingredient.tagID != null) {
+							classes.push('tagged');
+						}
+						return (
+							<li className={classes.join(' ')} key={index}>
+								{ingredient.name}
+							</li>
+						);
 					})}
 			</ul>
 		</div>

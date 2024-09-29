@@ -204,13 +204,22 @@ const madeMenuItem = async (req, res) => {
 			}
 		)
 		.then(
-			(result) => {
-				console.log('RES', result[0].Day);
+			async (result) => {
+				const recipeFromDB = await selectRecipeByID(recipeID);
+
 				const madeDate = result[0].Day;
 
-				let updatedRecipe = {
-					lastMade: isMade ? madeDate : null,
-				};
+				let updatedRecipe = {};
+
+				if (isMade) {
+					// Create a backup of the last made date
+					updatedRecipe.PreviousLastMade = recipeFromDB.lastmade;
+					updatedRecipe.lastmade = madeDate;
+				} else {
+					// Restore the previous last made date
+					updatedRecipe.PreviousLastMade = null;
+					updatedRecipe.lastmade = recipeFromDB.PreviousLastMade;
+				}
 
 				// Return another promise that updates the recipe
 				// Handled by the third then

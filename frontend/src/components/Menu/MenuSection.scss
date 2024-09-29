@@ -121,7 +121,31 @@
 }
 
 
+.menu---list {
 
+    display: flex;
+    align-items: stretch; /* Makes all wrapper divs stretch to the height of the tallest child */
+	
+	.menu-card {
+	    display: flex;
+
+		.menu-container {
+			display: flex;
+			flex-direction: column; /* Arrange inner divs vertically */
+			flex: 1; /* Makes the child fill the height of the wrapper */
+
+			.v-product {
+				display: flex;
+				flex-direction: column; /* Arrange inner divs vertically */
+				flex: 1; /* This makes the second inner div stretch to fill the available space */
+
+				.text-center {
+					flex: 1;
+				}
+			}
+		}
+	}
+}
 
 
 

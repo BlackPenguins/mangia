@@ -48,7 +48,7 @@ const PositionInput = ({ element }) => {
 				}}
 				value={position}
 			/>
-			<label for="edit-book-dropdown">Position</label>
+			<label htmlFor="edit-book-dropdown">Position</label>
 		</span>
 	);
 };

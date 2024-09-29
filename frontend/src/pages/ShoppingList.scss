@@ -1,0 +1,108 @@
+.shopping-list-button {
+	text-align: center;
+	margin: {
+		bottom: 15px;
+	}
+
+	.hide-checked-items {
+		float: right;
+	
+		@media only screen and (max-width: 767px) {
+			display: block;
+			margin: 10px 0px;
+			float: none;
+		}
+	}
+}
+
+.shopping-list {
+	margin-bottom: 80px;
+	width: 100%;
+
+	&.unknown-department {
+
+		.heading {
+			background-color: #650909;
+		}
+	}
+
+	.heading {
+		background: #82ae46;
+		padding: 15px 20px;
+		color: #fff !important;
+		font-weight: rgb(29, 29, 29);
+		border-top: 1px solid #ebebeb;
+		border-left: 1px solid #ebebeb;
+		border-right: 1px solid #ebebeb;
+
+		.col {
+			display: flex;
+			align-items: center;
+		}
+	}
+
+	.list-row {
+		overflow: hidden;
+		border-right: 1px solid #ebebeb;
+		border-left: 1px solid #ebebeb;
+
+		&:last-child {
+			border-bottom: 1px solid #ebebeb;
+		}
+
+		&.checked {
+			.name-col {
+				text-decoration: line-through;
+			}
+
+			.col {
+				background-color: #e0fdb7;
+			}
+		}
+
+		.col {
+			vertical-align: middle;
+			border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+			background-color: #f9f9f9;
+			font-size: 16px;
+
+			&.stores-col {
+				padding: 15px 10px;
+				input {
+					margin: 10px 0px;
+				}
+			}
+
+			&.check-col {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				padding: 15px 0px 15px 10px;
+				input {
+					margin: 0;
+					font-size: 1.5em;
+				}
+			}
+
+			&.name-col {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: flex-start;
+				padding: 15px 0px 15px 15px;
+			}
+
+			&.count-col {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: flex-start;
+			}
+		}
+
+		.lowest-price {
+			background-color: #f0e663;
+		}
+	}
+}

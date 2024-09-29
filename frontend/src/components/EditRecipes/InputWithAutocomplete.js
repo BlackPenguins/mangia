@@ -50,6 +50,19 @@ const InputWithAutocomplete = ({ fetchAvailableResults, selectedValue, setSelect
 		}
 	};
 
+	const onKeyDownHandler = (selectionIndex) => {
+		onkeyDownHandler(filteredResults[selectionIndex]);
+
+		// Once we select something from dropodown, hide the suggestions until we type again
+		setResultSuggestionIndex(0);
+		setShowSuggestions(false);
+		fetchData();
+	};
+
+	const focusHandler = (e) => {
+		e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+	};
+
 	const fetchData = async () => {
 		// Call the supplier function passed from the parent component to get all possible suggestions
 		const newData = await fetchAvailableResults();
@@ -78,8 +91,9 @@ const InputWithAutocomplete = ({ fetchAvailableResults, selectedValue, setSelect
 				}}
 				onKeyDown={inputKeyDownHandler}
 				value={selectedValue}
+				onFocus={focusHandler}
 			></Input>
-			<label for={id}>{label}</label>
+			<label htmlFor={id}>{label}</label>
 
 			{filteredResults.length > 0 && showSuggestions && (
 				<ul className="suggestions">
@@ -92,7 +106,7 @@ const InputWithAutocomplete = ({ fetchAvailableResults, selectedValue, setSelect
 						}
 
 						return (
-							<li selectionIndex={selectionIndex} className={className}>
+							<li key={index} onClick={() => onKeyDownHandler(index)} selectionIndex={selectionIndex} className={className}>
 								{result}
 							</li>
 						);

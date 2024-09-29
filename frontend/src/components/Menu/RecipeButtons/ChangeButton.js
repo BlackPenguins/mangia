@@ -104,7 +104,7 @@ const DailyNotes = ({ menu, fetchMenu, tokenFromStorage, page }) => {
 				value={value}
 				rows={3}
 			/>
-			<label for="recipe-steps">Daily Notes</label>
+			<label htmlFor="recipe-steps">Daily Notes</label>
 		</div>
 	);
 };

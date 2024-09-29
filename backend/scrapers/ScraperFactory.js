@@ -2,10 +2,13 @@ import { scrapeGoogle } from './GoogleScraper.js';
 import { scrapeNatasha } from './NatashaScraper.js';
 
 export const scrape = async (url) => {
+	console.log('Scraping URL', url);
+
 	// Attempt the google scraper with all sites first
 	// Supported sites:
 	// - AllRecipes
 	// - SpruceEats
+	console.log('Scraping with Google first...');
 	let recipeObj = await scrapeGoogle(url);
 
 	if (!isScrapeSuccessful(recipeObj)) {
@@ -15,6 +18,7 @@ export const scrape = async (url) => {
 			recipeObj = await scrapeNatasha(url);
 		}
 
+		console.log('Recipe Object', recipeObj);
 		recipeObj.success = isScrapeSuccessful(recipeObj);
 	} else {
 		console.log('RECIPE SCRAPE WAS A SUCCESS!');

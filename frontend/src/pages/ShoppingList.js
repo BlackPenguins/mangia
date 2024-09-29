@@ -4,7 +4,7 @@ import { useCallback, useContext, useEffect, useState } from 'react';
 import { Button, Input, Row, Col, FormGroup, Label } from 'reactstrap';
 import AuthContext from '../authentication/auth-context';
 
-import './ShoppingList.css';
+import './ShoppingList.scss';
 
 const CHECKBOX_WIDTH = 1;
 const NAME_WIDTH = 5;
@@ -57,6 +57,7 @@ const ShoppingList = () => {
 
 	const [selectedStore, setSelectedStore] = useState(null);
 	const [hideCheckedItems, setHideCheckedItems] = useState(false);
+	const [hidePrices, setHidePrices] = useState(false);
 
 	return (
 		<section className="hero">
@@ -82,6 +83,16 @@ const ShoppingList = () => {
 								/>
 								<Label check>Hide Checked Items</Label>
 							</FormGroup>
+							<FormGroup switch>
+								<Input
+									type="switch"
+									checked={hidePrices}
+									onClick={() => {
+										setHidePrices(!hidePrices);
+									}}
+								/>
+								<Label check>Hide Prices</Label>
+							</FormGroup>
 						</span>
 					</div>
 				)}
@@ -93,10 +104,12 @@ const ShoppingList = () => {
 					<div class="col-lg-9">
 						<ShoppingListTable
 							hideCheckedItems={hideCheckedItems}
+							hidePrices={hidePrices}
 							shoppingListItems={shoppingListItems}
 							stores={stores}
 							tokenFromStorage={tokenFromStorage}
 							selectedStore={selectedStore}
+							fetchShoppingList={fetchShoppingList}
 						/>
 					</div>
 				</div>
@@ -132,7 +145,7 @@ const StoreFilters = ({ stores, selectedStore, setSelectedStore }) => {
 		</div>
 	);
 };
-const ShoppingListTable = ({ hideCheckedItems, shoppingListItems, stores, tokenFromStorage, selectedStore }) => {
+const ShoppingListTable = ({ hideCheckedItems, hidePrices, shoppingListItems, stores, tokenFromStorage, selectedStore, fetchShoppingList }) => {
 	return (
 		<>
 			{shoppingListItems == null && <LoadingText text="Loading shopping list" />}
@@ -141,14 +154,24 @@ const ShoppingListTable = ({ hideCheckedItems, shoppingListItems, stores, tokenF
 				shoppingListItems.map((group, index) => {
 					const hasLowestPriceInDepartment = group.ingredients.some((i) => storeHasLowestPrice(selectedStore, i));
 
+					// This isn't working as we check them off. We should move everything into states so the list can update easily without a fetch.
+					// Break this into components in a package so we can put a state in this callback
+					const hasAllChecked = group.ingredients.every((i) => i.isChecked);
+
 					const showGroup = hasLowestPriceInDepartment;
 
-					if (!showGroup) {
+					if (!showGroup || (hideCheckedItems && hasAllChecked)) {
+						// Hide the group if all items within the group are checked off
 						return null;
 					} else {
+						const classes = ['shopping-list'];
+
+						if (group.department === 'Unknown') {
+							classes.push('unknown-department');
+						}
 						return (
 							<div key={index} className="container">
-								<div class="shopping-list">
+								<div class={classes.join(' ')}>
 									<Row className="heading">
 										<Col className="col" lg={NAME_WIDTH + 1} sm={MOBILE_NAME_WIDTH} xs={MOBILE_NAME_WIDTH}>
 											{group.department}
@@ -161,10 +184,12 @@ const ShoppingListTable = ({ hideCheckedItems, shoppingListItems, stores, tokenF
 										<ShoppingListTableRow
 											key={i}
 											hideCheckedItems={hideCheckedItems}
+											hidePrices={hidePrices}
 											ingredient={ingredient}
 											tokenFromStorage={tokenFromStorage}
 											stores={stores}
 											selectedStore={selectedStore}
+											fetchShoppingList={fetchShoppingList}
 										/>
 									))}
 								</div>
@@ -189,7 +214,7 @@ const updateShoppingList = async (shoppingListItemID, isChecked, tokenFromStorag
 	});
 };
 
-const ShoppingListTableRow = ({ ingredient, hideCheckedItems, tokenFromStorage, stores, selectedStore }) => {
+const ShoppingListTableRow = ({ ingredient, hideCheckedItems, hidePrices, tokenFromStorage, stores, selectedStore, fetchShoppingList }) => {
 	const [isChecked, setIsChecked] = useState(ingredient.isChecked);
 	const [prices, setPrices] = useState([]);
 
@@ -200,6 +225,7 @@ const ShoppingListTableRow = ({ ingredient, hideCheckedItems, tokenFromStorage, 
 	const setValue = (isChecked) => {
 		setIsChecked(isChecked);
 		updateShoppingList(ingredient.shoppingListItemID, isChecked, tokenFromStorage);
+		fetchShoppingList();
 	};
 
 	if (!storeHasLowestPrice(selectedStore, ingredient)) {
@@ -217,6 +243,15 @@ const ShoppingListTableRow = ({ ingredient, hideCheckedItems, tokenFromStorage, 
 		}
 	}
 
+	let countWidth;
+	let mobileCountWidth;
+	if (hidePrices) {
+		countWidth = RECIPE_COUNT_WIDTH + STORE_PRICES_SECTION_WIDTH;
+		mobileCountWidth = MOBILE_RECIPE_COUNT_WIDTH + MOBILE_STORE_PRICES_SECTION_WIDTH;
+	} else {
+		countWidth = RECIPE_COUNT_WIDTH;
+		mobileCountWidth = MOBILE_RECIPE_COUNT_WIDTH;
+	}
 	return (
 		<Row className={classes.join(' ')}>
 			<Col className="check-col col" lg={CHECKBOX_WIDTH} sm={MOBILE_CHECKBOX_WIDTH} xs={MOBILE_CHECKBOX_WIDTH}>
@@ -231,17 +266,19 @@ const ShoppingListTableRow = ({ ingredient, hideCheckedItems, tokenFromStorage, 
 			<Col className="name-col col" lg={NAME_WIDTH} sm={MOBILE_NAME_WIDTH} xs={MOBILE_NAME_WIDTH}>
 				{ingredient.amount} {ingredient.name}
 			</Col>
-			<Col className="count-col col" lg={RECIPE_COUNT_WIDTH} sm={MOBILE_RECIPE_COUNT_WIDTH} xs={MOBILE_RECIPE_COUNT_WIDTH}>
+			<Col className="count-col col" lg={countWidth} sm={mobileCountWidth} xs={mobileCountWidth}>
 				{ingredient.recipeCount}
 			</Col>
-			<Col className="stores-col col" lg={STORE_PRICES_SECTION_WIDTH} sm={MOBILE_STORE_PRICES_SECTION_WIDTH} xs={MOBILE_STORE_PRICES_SECTION_WIDTH}>
-				<Row>
-					{stores &&
-						stores.map((store) => {
-							return <PriceInput ingredientTagID={ingredient.ingredientTagID} store={store} prices={prices} tokenFromStorage={tokenFromStorage} />;
-						})}
-				</Row>
-			</Col>
+			{!hidePrices && (
+				<Col className="stores-col col" lg={STORE_PRICES_SECTION_WIDTH} sm={MOBILE_STORE_PRICES_SECTION_WIDTH} xs={MOBILE_STORE_PRICES_SECTION_WIDTH}>
+					<Row>
+						{stores &&
+							stores.map((store) => {
+								return <PriceInput ingredientTagID={ingredient.ingredientTagID} store={store} prices={prices} tokenFromStorage={tokenFromStorage} />;
+							})}
+					</Row>
+				</Col>
+			)}
 		</Row>
 	);
 };
@@ -343,7 +380,7 @@ export const PriceInput = ({ ingredientTagID, prices, store, tokenFromStorage })
 						priceHandler(e.target.value);
 					}}
 				/>
-				<label for="store-name">{store.storeName}</label>
+				<label htmlFor="store-name">{store.storeName}</label>
 			</div>
 		</Col>
 	);

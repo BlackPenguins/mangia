@@ -15,7 +15,7 @@ import InputWithAutocomplete from '../components/EditRecipes/InputWithAutocomple
 import ImportRecipeModal from '../components/Settings/ImportRecipeModal';
 import { useToast } from 'context/toast-context';
 
-const RecipeDetailsPage = () => {
+const RecipeEditPage = () => {
 	const navigate = useNavigate();
 	const authContext = useContext(AuthContext);
 	const tokenFromStorage = authContext.token;
@@ -82,15 +82,15 @@ const RecipeDetailsPage = () => {
 			setDescription(recipe.Description);
 			setBookID(recipe.BookID === null ? 0 : recipe.BookID);
 			setPage(recipe.Page);
-			setCategory(recipe.Category);
-			setProtein(recipe.Protein);
-			setPreheat(recipe.Preheat);
-			setPrepTime(recipe.PrepTime);
-			setDefrost(recipe.Defrost);
-			setNotes(recipe.Notes);
-			setDayPrep(recipe.DayPrep);
-			setRating(recipe.Rating);
-			setURL(recipe.URL);
+			setCategory(recipe.Category || '');
+			setProtein(recipe.Protein || '');
+			setPreheat(recipe.Preheat || '');
+			setPrepTime(recipe.PrepTime || '');
+			setDefrost(recipe.Defrost || '');
+			setNotes(recipe.Notes || '');
+			setDayPrep(recipe.DayPrep || '');
+			setRating(recipe.Rating || 1);
+			setURL(recipe.URL || '');
 			setIsActive(recipe.IsActive === 1);
 			setAttachments(recipe.attachments);
 
@@ -350,7 +350,7 @@ const ActiveCheckbox = ({ value, setValue }) => {
 			<FormGroup check inline>
 				<Input
 					checked={value}
-					onClick={() => {
+					onChange={() => {
 						setValue(!value);
 					}}
 					type="checkbox"
@@ -376,7 +376,7 @@ const NameInput = ({ value, setValue, filteredRecipes, filterRecipesHandler }) =
 				}}
 				value={value}
 			></Input>
-			<label for="recipe-name">Name</label>
+			<label htmlFor="recipe-name">Name</label>
 			{filteredRecipes.length > 0 && (
 				<div className="recipe-name-results">
 					{filteredRecipes.map((recipe, index) => {
@@ -405,7 +405,7 @@ const DescriptionInput = ({ value, setValue }) => {
 				}}
 				value={value}
 			/>
-			<label for="recipe-description">Description</label>
+			<label htmlFor="recipe-description">Description</label>
 		</div>
 	);
 };
@@ -426,7 +426,7 @@ const ProteinDropdown = ({ value, setValue }) => {
 				<option value="Fish">Fish</option>
 				<option value="Steak">Steak</option>
 			</Input>
-			<label for="protein-dropdown">Protein</label>
+			<label htmlFor="protein-dropdown">Protein</label>
 		</div>
 	);
 };
@@ -465,7 +465,7 @@ const PrepTimeDropdown = ({ value, setValue }) => {
 				<option value="FewHours">Few Hours</option>
 				<option value="AllDay">All Day</option>
 			</Input>
-			<label for="prep-time-dropdown">Prep Time</label>
+			<label htmlFor="prep-time-dropdown">Prep Time</label>
 		</div>
 	);
 };
@@ -499,6 +499,7 @@ const IngredientsLines = ({ ingredients }) => {
 				ingredients.map((singleIngredient, index) => {
 					return (
 						<IngredientLine
+							key={index}
 							index={index}
 							singleIngredient={singleIngredient}
 							debounceEditFunction={debounceEditFunction}
@@ -539,7 +540,7 @@ const IngredientLine = ({ index, singleIngredient, debounceEditFunction, updateI
 						value={value}
 						tabIndex={-1}
 					/>
-					<label for="recipe-ingredients">{`Ingredient ${index + 1}`}</label>
+					<label htmlFor="recipe-ingredients">{`Ingredient ${index + 1}`}</label>
 				</div>
 			</Col>
 			<Col lg={3} className="tag-container">
@@ -598,7 +599,7 @@ const IngredientsTextarea = ({ value, setValue }) => {
 				value={value}
 				rows={15}
 			/>
-			<label for="recipe-ingredients">Bulk Ingredients</label>
+			<label htmlFor="recipe-ingredients">Bulk Ingredients</label>
 		</div>
 	);
 };
@@ -617,7 +618,7 @@ const StepsTextarea = ({ value, setValue }) => {
 				value={value}
 				rows={15}
 			/>
-			<label for="recipe-steps">Steps</label>
+			<label htmlFor="recipe-steps">Steps</label>
 		</div>
 	);
 };
@@ -636,7 +637,7 @@ const NotesTextarea = ({ value, setValue }) => {
 				}}
 				value={value}
 			/>
-			<label for="recipe-notes">Notes</label>
+			<label htmlFor="recipe-notes">Notes</label>
 		</div>
 	);
 };
@@ -655,7 +656,7 @@ const DayPrepTextarea = ({ value, setValue }) => {
 				}}
 				value={value}
 			/>
-			<label for="recipe-day-prep">Day Earlier Preparation</label>
+			<label htmlFor="recipe-day-prep">Day Earlier Preparation</label>
 		</div>
 	);
 };
@@ -674,7 +675,7 @@ const PreheatInput = ({ value, setValue }) => {
 				}}
 				value={value}
 			/>
-			<label for="preheat">Preheat Temp.</label>
+			<label htmlFor="preheat">Preheat Temp.</label>
 		</div>
 	);
 };
@@ -693,7 +694,7 @@ const DefrostInput = ({ value, setValue }) => {
 				}}
 				value={value}
 			/>
-			<label for="defrost">Defrost</label>
+			<label htmlFor="defrost">Defrost</label>
 		</div>
 	);
 };
@@ -711,7 +712,7 @@ const URLInput = ({ value, setValue }) => {
 				}}
 				value={value}
 			></Input>
-			<label for="recipe-url">URL</label>
+			<label htmlFor="recipe-url">URL</label>
 		</div>
 	);
 };
@@ -760,7 +761,7 @@ const BooksSection = ({ bookID, setBookID, page, setPage, fetchRecipe, attachmen
 						<option value={0}>None</option>
 						{bookOptions}
 					</Input>
-					<label for="edit-book-dropdown">Book</label>
+					<label htmlFor="edit-book-dropdown">Book</label>
 				</div>
 			</Col>
 			<Col lg={2}>
@@ -774,7 +775,7 @@ const BooksSection = ({ bookID, setBookID, page, setPage, fetchRecipe, attachmen
 						}}
 						value={page}
 					></Input>
-					<label for="page">Page</label>
+					<label htmlFor="page">Page</label>
 				</div>
 			</Col>
 			<Col lg={6} className="recipe-edit-btn">
@@ -785,4 +786,4 @@ const BooksSection = ({ bookID, setBookID, page, setPage, fetchRecipe, attachmen
 		</Row>
 	);
 };
-export default RecipeDetailsPage;
+export default RecipeEditPage;

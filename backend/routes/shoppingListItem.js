@@ -206,7 +206,7 @@ const sumIngredients = (ingredients) => {
 			let leftOverCups = '';
 			let teaspoonAmount = finalIngredient.value;
 			if (teaspoonAmount >= 48) {
-				totalCups = Math.round(teaspoonAmount / 48);
+				totalCups = Math.floor(teaspoonAmount / 48);
 				leftOverCups = teaspoonAmount % 48;
 				convertedValue = totalCups;
 			} else {
@@ -266,8 +266,6 @@ const convertToTeaspoons = (value) => {
 	const amount = matches[1]?.trim();
 	const measurement = matches[2]?.trim();
 
-	console.log(`Amount [${amount}] Measurement [${measurement}]`);
-
 	let baseTeaspoons = 0;
 	let baseMultiplier = 0;
 
@@ -299,33 +297,45 @@ const convertToTeaspoons = (value) => {
 			unit = '';
 	}
 
-	switch (amount) {
-		case '1/2':
-			baseMultiplier = 0.5;
-			break;
-		case '1/4':
-			baseMultiplier = 0.25;
-			break;
-		case '1/3':
-			baseMultiplier = 0.33333333;
-			break;
-		case '2/3':
-			baseMultiplier = 0.66666666;
-			break;
-		case '1/8':
-			baseMultiplier = 0.125;
-			break;
-		case '3/4':
-			baseMultiplier = 0.75;
-			break;
-		default:
-			baseMultiplier = amount;
+	let totalBaseMultiplier = 0;
+	const splitAmounts = amount.split(' ');
+
+	// If we have 1/4 - then  our multiplier is 0.25
+	// If we have 1 1/4, then our multiplier is 1.25 (1 + 0.25)
+	// If we have 2 1/4, then our multiplier is 2.25 (2 + 0.25)
+	// We need to traverse each piece of the amount
+	for (const splitAmount of splitAmounts) {
+		totalBaseMultiplier += getMultiplier(splitAmount);
 	}
 
+	let convert;
 	if (isWholeUnit) {
-		return { wholeUnits: true, unit, amount: parseFloat(baseMultiplier) };
+		convert = { wholeUnits: true, unit, amount: parseFloat(totalBaseMultiplier) };
 	} else {
-		return { wholeUnits: false, amount: parseFloat(baseTeaspoons * baseMultiplier) };
+		convert = { wholeUnits: false, amount: parseFloat(baseTeaspoons * totalBaseMultiplier) };
+	}
+
+	console.log(`Amount [${amount}] Measurement [${measurement}] TotalMultipler[${totalBaseMultiplier}] Final [${convert.amount}]`);
+
+	return convert;
+};
+
+const getMultiplier = (amount) => {
+	switch (amount) {
+		case '1/2':
+			return 0.5;
+		case '1/4':
+			return 0.25;
+		case '1/3':
+			return 0.33333333;
+		case '2/3':
+			return 0.66666666;
+		case '1/8':
+			return 0.125;
+		case '3/4':
+			return 0.75;
+		default:
+			return parseInt(amount);
 	}
 };
 

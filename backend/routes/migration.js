@@ -77,6 +77,9 @@ const migrationHandler = async (req, res) => {
 		case 'setWeekIDForAllMenuDays':
 			await setWeekIDForAllMenuDays(pool);
 			break;
+		case 'addPreviousLastMade':
+			await simpleDBQuery('Add Column', 'ALTER TABLE RECIPE ADD COLUMN PreviousLastMade Date', res);
+			break;
 		default:
 			console.error('Migration not found!');
 			res.status(200).json({ success: false });

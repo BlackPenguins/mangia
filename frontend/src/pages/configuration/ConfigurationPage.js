@@ -1,12 +1,10 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 
-import '../ShoppingList.css';
 import './ConfigurationPage.scss';
 
 const ConfigurationPage = () => {
 	const location = useLocation();
 
-	console.log('WRONG', location);
 	return (
 		<section className="hero">
 			<div className="container">

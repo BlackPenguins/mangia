@@ -334,23 +334,23 @@ const updateRecipeProcessor = async (req, res) => {
 		updatedRecipe.IsActive = req.body.isActive ? 1 : 0;
 	}
 
-	if (req.body.protein) {
+	if (req.body.protein != undefined) {
 		updatedRecipe.protein = req.body.protein;
 	}
 
-	if (req.body.preheat) {
-		updatedRecipe.preheat = req.body.preheat;
+	if (req.body.preheat != undefined) {
+		updatedRecipe.preheat = req.body.preheat || 0;
 	}
 
-	if (req.body.prepTime) {
+	if (req.body.prepTime != undefined) {
 		updatedRecipe.prepTime = req.body.prepTime;
 	}
 
-	if (req.body.defrost) {
+	if (req.body.defrost != undefined) {
 		updatedRecipe.defrost = req.body.defrost;
 	}
 
-	if (req.body.description) {
+	if (req.body.description != undefined) {
 		updatedRecipe.description = req.body.description;
 	}
 
@@ -370,7 +370,7 @@ const updateRecipeProcessor = async (req, res) => {
 		updatedRecipe.notes = req.body.notes;
 	}
 
-	if (req.body.dayPrep) {
+	if (req.body.dayPrep != undefined) {
 		updatedRecipe.dayPrep = req.body.dayPrep;
 	}
 
@@ -378,7 +378,7 @@ const updateRecipeProcessor = async (req, res) => {
 		updatedRecipe.rating = req.body.rating;
 	}
 
-	if (req.body.url) {
+	if (req.body.url != undefined) {
 		updatedRecipe.url = req.body.url;
 	}
 

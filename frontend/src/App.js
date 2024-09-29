@@ -3,7 +3,7 @@ import './App.css';
 import Header from './components/Common/Header';
 import NotFoundPage from './pages/NotFound.Page';
 import HomePage from './pages/HomePage';
-import RecipeDetailsPage from './pages/RecipeEditPage';
+import RecipeEditPage from './pages/RecipeEditPage';
 import RecipePage from './pages/RecipePage';
 import Footer from './components/Common/Footer.js';
 import MenuPage from './pages/MenuPage';
@@ -36,9 +36,9 @@ function App() {
 							<Route path="migration" element={<MigrationTab />} />
 							<Route path="import-failures" element={<ImportFailuresTab />} />
 						</Route>
-						<Route path="recipe" element={<RecipeDetailsPage />} />
+						<Route path="recipe" element={<RecipeEditPage />} />
 						<Route path="recipe/:recipeID" element={<RecipePage />} />
-						<Route path="recipe/:recipeID/edit" element={<RecipeDetailsPage />} />
+						<Route path="recipe/:recipeID/edit" element={<RecipeEditPage />} />
 						<Route path="*" element={<NotFoundPage />} />
 					</Routes>
 				</div>

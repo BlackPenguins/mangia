@@ -64,8 +64,9 @@ const MenuSection = () => {
 };
 
 const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, availableSwapDays }) => {
+	console.log('MENUSS', menus);
 	return (
-		<Row>
+		<Row className="menu---list">
 			{menus?.map((menu, index) => {
 				const tomorrowsRecipe = menus[index + 1]?.recipe;
 				return (

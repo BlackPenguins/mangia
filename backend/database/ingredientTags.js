@@ -4,7 +4,7 @@ const pool = getPool();
 
 export const selectAllIngredientTags = () => {
 	return new Promise((resolve, reject) => {
-		pool.query('SELECT * FROM INGREDIENT_TAG ORDER BY Name ASC', (error, result) => {
+		pool.query('SELECT * FROM INGREDIENT_TAG ORDER BY CASE WHEN IngredientDepartmentID IS NULL THEN 0 ELSE 1 END, Name ASC', (error, result) => {
 			if (error) {
 				return reject(error.sqlMessage);
 			} else {
