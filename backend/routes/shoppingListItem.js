@@ -58,7 +58,8 @@ export const getPricesForStore = async (ingredientTagID) => {
 	let pricesForStores = [];
 
 	for (const priceFromDB of pricesForStoresFromDB) {
-		if (lowestPriceStoreID == null || priceFromDB.Price < lowestPrice) {
+		// No lowest yet, or a non-zero number less than the lowest
+		if (priceFromDB.Price && (lowestPriceStoreID == null || priceFromDB.Price < lowestPrice)) {
 			lowestPrice = priceFromDB.Price;
 			lowestPriceStoreID = priceFromDB.StoreID;
 		}

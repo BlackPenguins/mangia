@@ -118,7 +118,7 @@ export const breakdownIngredient = (ingredient) => {
 
 	return { extractedAmount, extractedName };
 };
-export const createIngredients = async (recipeID, recipe) => {
+export const createIngredients = async (recipeID, recipe, tagCache) => {
 	try {
 		for (const ingredient of recipe.ingredients) {
 			if (ingredient) {
@@ -143,6 +143,13 @@ export const createIngredients = async (recipeID, recipe) => {
 					Name: formattedIngredient,
 					recipeID,
 				};
+
+				if (tagCache) {
+					const cachedTagID = tagCache[formattedIngredient];
+					if (cachedTagID) {
+						ingredientToInsert.IngredientTagID = cachedTagID;
+					}
+				}
 
 				await insertIngredient(ingredientToInsert);
 

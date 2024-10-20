@@ -2,7 +2,7 @@ import express from 'express';
 import { addTag, deleteRecipe, deleteTag, insertRecipe, selectAllRecipes, selectimportFailureURLs, selectRecipeByID, selectTags, updateRecipe } from '../database/recipes.js';
 import { breakdownIngredient, createIngredients, createSteps, importRecipe } from '../scrapers/RecipeImporter.js';
 import { deleteStepsByRecipeID, selectStepsByRecipeID } from '../database/step.js';
-import { deleteIngredientsByRecipeID, selectIngredientsByRecipeID, updateIngredient } from '../database/ingredient.js';
+import { deleteIngredient, deleteIngredientsByRecipeID, insertIngredient, selectIngredientsByRecipeID, updateIngredient } from '../database/ingredient.js';
 
 import Tesseract, { createWorker } from 'tesseract.js';
 import multer from 'multer';
@@ -429,14 +429,49 @@ const updateIngredientProcessor = async (req, res) => {
 	res.status(200).json({ success: true, updatedIngredient });
 };
 
+const addIngredientProcessor = async (req, res) => {
+	const name = req.body.name;
+	const recipeID = req.params.recipeID;
+
+	const newIngredient = {
+		Name: name,
+		RecipeID: recipeID,
+	};
+	console.log(`Incoming Insert Ingredient for`, newIngredient);
+
+	await insertIngredient(newIngredient);
+	res.status(200).json({ success: true });
+};
+
+const removeIngredientProcessor = async (req, res) => {
+	const ingredientID = req.params.ingredientID;
+
+	console.log(`Incoming Delete Ingredient for`, ingredientID);
+
+	await deleteIngredient(ingredientID);
+	res.status(200).json({ success: true });
+};
+
 const updateStepsAndIngredients = async (body, recipeID) => {
 	const updatedRecipe = {};
 
 	// Now that we updated the recipe we can add in the data that is joined with the RECIPE table
 	if (body.ingredients) {
 		updatedRecipe.ingredients = body.ingredients;
+
+		// Cache the tags for the ingredients so we can re-add them after we delete the ingredients
+		const ingredients = await selectIngredientsByRecipeID(recipeID);
+		const tagCache = {};
+
+		for (const ingredient of ingredients) {
+			const tagID = ingredient.IngredientTagID;
+			if (tagID) {
+				tagCache[ingredient.Name] = tagID;
+			}
+		}
+
 		await deleteIngredientsByRecipeID(recipeID);
-		await createIngredients(recipeID, updatedRecipe);
+		await createIngredients(recipeID, updatedRecipe, tagCache);
 	}
 
 	if (body.steps) {
@@ -520,6 +555,8 @@ router.post('/api/recipes/:recipeID/addTag', [checkAdminMiddleware], addTagToRec
 router.post('/api/recipes/:recipeID/removeTag', [checkAdminMiddleware], removeTagFromRecipe);
 router.patch('/api/recipes/:recipeID', [checkAdminMiddleware], updateRecipeProcessor);
 router.patch('/api/recipes/:recipeID/ingredient/:ingredientID', [checkAdminMiddleware], updateIngredientProcessor);
+router.delete('/api/recipes/:recipeID/ingredient/:ingredientID', [checkAdminMiddleware], removeIngredientProcessor);
+router.put('/api/recipes/:recipeID/ingredient', [checkAdminMiddleware], addIngredientProcessor);
 router.post('/api/recipeOCR', [checkAdminMiddleware], uploadImportFile.single('importFile'), uploadOCR);
 router.post('/api/recipes/:recipeID/parseText', [checkAdminMiddleware], parseText);
 router.delete('/api/recipes/:recipeID', [checkAdminMiddleware], deleteRecipeProcessor);

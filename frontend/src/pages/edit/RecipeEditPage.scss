@@ -141,3 +141,33 @@ body {
 	flex: auto;
 	margin: 0;
 }
+
+.add-ingredient-button {
+	padding: 1rem 0px;
+	button {
+		width: 100%;
+		height: 100%;
+	}
+}
+
+.ingredient-section {
+	margin: 50px 0px;
+
+	.ingredient-row {
+
+		div {
+			display: flex;
+			align-items: center;
+
+			.delete-ingredient-btn,
+			.add-ingredient-btn {
+				margin-right: 15px;
+			}
+		
+			.ingredient-input {
+				width: 100%;
+				display: inline-block;
+			}
+		}
+	}
+}

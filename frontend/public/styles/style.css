@@ -3374,6 +3374,15 @@ ol {
 	.humberger__menu__nav {
 		display: none;
 	}
+
+	.mobile-menu .nav-link span {
+		font-size: 1.3em;
+	}
+
+	.humberger__menu__nav.mobile-menu.slicknav_nav .nav-link {
+		padding: 20px 8px;
+	}
+
 	.humberger__menu__wrapper .header__top__right__social {
 		display: block;
 		margin-right: 0;

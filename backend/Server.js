@@ -10,6 +10,7 @@ import tagRoutes from './routes/tags.js';
 import ingredientTagRoutes from './routes/ingredientTags.js';
 import ingredientDepartmentRoutes from './routes/ingredientDepartment.js';
 import shoppingListItemRoutes from './routes/shoppingListItem.js';
+import shoppingListExtraRoutes from './routes/shoppingListExtra.js';
 import storeRoutes from './routes/store.js';
 import migrationRoutes from './routes/migration.js';
 
@@ -58,6 +59,7 @@ app.use(tagRoutes);
 app.use(ingredientTagRoutes);
 app.use(ingredientDepartmentRoutes);
 app.use(shoppingListItemRoutes);
+app.use(shoppingListExtraRoutes);
 app.use(storeRoutes);
 app.use(migrationRoutes);
 

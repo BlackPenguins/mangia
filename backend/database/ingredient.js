@@ -18,6 +18,22 @@ export const insertIngredient = (newIngredient) => {
 	});
 };
 
+export const deleteIngredient = (ingredientID) => {
+	return new Promise((resolve, reject) => {
+		pool.query('DELETE FROM INGREDIENT WHERE IngredientID = ?', ingredientID, (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				const responseObject = {
+					id: result.insertId,
+				};
+
+				return resolve(responseObject);
+			}
+		});
+	});
+};
+
 export const selectIngredientsByRecipeID = (recipeID) => {
 	return new Promise((resolve, reject) => {
 		pool.query(

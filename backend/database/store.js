@@ -58,7 +58,7 @@ export const insertPrices = (newPrice) => {
 
 export const updatePrices = (ingredientTagPriceID, newPrice) => {
 	const update = {
-		Price: newPrice,
+		Price: !newPrice ? 0.0 : newPrice,
 	};
 
 	return new Promise((resolve, reject) => {

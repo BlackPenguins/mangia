@@ -10,7 +10,7 @@ import { Edit, Trash2 } from 'react-feather';
 import AuthContext from '../authentication/auth-context';
 import LoadingText from '../components/Common/LoadingText';
 import useBetterModal from 'components/Common/useBetterModal';
-import { PrepTimeLabel } from './RecipeEditPage';
+import { PrepTimeLabel } from './edit/RecipeEditPage';
 
 const RecipePage = () => {
 	const params = useParams();

@@ -6,7 +6,7 @@ const Footer = () => {
 			<div className="container">
 				<div className="footer__copyright">
 					<div className="footer__copyright__text">
-						<p>Last Updated: Sep 29, 2024 (v1.4)</p>
+						<p>Last Updated: Oct 20, 2024 (v1.5)</p>
 						<p>
 							Copyright &copy;{new Date().getFullYear()} All rights reserved | This template is made with <Heart /> by{' '}
 							<a href="https://colorlib.com" target="_blank" rel="noreferrer">

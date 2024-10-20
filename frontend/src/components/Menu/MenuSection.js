@@ -12,7 +12,7 @@ import ChangeButton from './RecipeButtons/ChangeButton';
 import AuthContext from '../../authentication/auth-context';
 import LoadingText from 'components/Common/LoadingText';
 import MenuContainer from './MenuContainer';
-import { PrepTimeLabel } from 'pages/RecipeEditPage';
+import { PrepTimeLabel } from 'pages/edit/RecipeEditPage';
 import { Clock, Thermometer } from 'react-feather';
 
 const MenuSection = () => {

@@ -5,6 +5,10 @@
 	align-items: center;
 	justify-content: flex-start;
 
+	&.ingredient-tag {
+		height: 100%;
+	}
+
 	.tag {
 		font-family: Cairo, sans-serif;
 		font-weight: 800;

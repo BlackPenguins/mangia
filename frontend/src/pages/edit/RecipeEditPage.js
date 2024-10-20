@@ -5,15 +5,16 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, FormGroup, FormText, Input, Label, Row } from 'reactstrap';
 
 import './RecipeEditPage.scss';
-import Rating from '../components/Settings/Rating';
-import Category from '../components/Recipes/Category';
-import Tag, { TagBox } from '../components/EditRecipes/Tag';
-import { ArrowUpCircle, Eye, Printer } from 'react-feather';
-import useScanModal from '../components/Settings/useScanModal';
-import AuthContext from '../authentication/auth-context';
-import InputWithAutocomplete from '../components/EditRecipes/InputWithAutocomplete';
-import ImportRecipeModal from '../components/Settings/ImportRecipeModal';
+import Rating from '../../components/Settings/Rating';
+import Category from '../../components/Recipes/Category';
+import Tag, { TagBox } from '../../components/EditRecipes/Tag';
+import { ArrowUpCircle, Eye, Printer, Trash2 } from 'react-feather';
+import useScanModal from '../../components/Settings/useScanModal';
+import AuthContext from '../../authentication/auth-context';
+import InputWithAutocomplete from '../../components/EditRecipes/InputWithAutocomplete';
+import ImportRecipeModal from '../../components/Settings/ImportRecipeModal';
 import { useToast } from 'context/toast-context';
+import NewIngredientInput from './NewIngredientInput';
 
 const RecipeEditPage = () => {
 	const navigate = useNavigate();
@@ -310,7 +311,7 @@ const RecipeEditPage = () => {
 
 					<Row>
 						<Col lg={12}>
-							<IngredientsLines ingredients={ingredients} />
+							<IngredientsLines ingredients={ingredients} recipeID={recipeID} fetchRecipe={fetchRecipe} />
 						</Col>
 					</Row>
 
@@ -470,12 +471,12 @@ const PrepTimeDropdown = ({ value, setValue }) => {
 	);
 };
 
-const IngredientsLines = ({ ingredients }) => {
+const IngredientsLines = ({ ingredients, recipeID, fetchRecipe }) => {
 	const authContext = useContext(AuthContext);
 	const tokenFromStorage = authContext.token;
 
 	const updateIngredientHandler = async (ingredientID, value) => {
-		const response = await fetch(`/api/recipes/123/ingredient/${ingredientID}`, {
+		const response = await fetch(`/api/recipes/${recipeID}/ingredient/${ingredientID}`, {
 			method: 'PATCH',
 			body: JSON.stringify(value),
 			headers: {
@@ -494,24 +495,29 @@ const IngredientsLines = ({ ingredients }) => {
 	const debounceEditFunction = useCallback(debounce(updateIngredientHandler, 1500), [tokenFromStorage]);
 
 	return (
-		<div>
+		<div className="ingredient-section">
 			{ingredients &&
 				ingredients.map((singleIngredient, index) => {
 					return (
 						<IngredientLine
-							key={index}
+							key={singleIngredient.ingredientID}
 							index={index}
 							singleIngredient={singleIngredient}
 							debounceEditFunction={debounceEditFunction}
 							updateIngredientHandler={updateIngredientHandler}
+							recipeID={recipeID}
+							fetchRecipe={fetchRecipe}
+							tokenFromStorage={tokenFromStorage}
 						/>
 					);
 				})}
+
+			<NewIngredientInput tokenFromStorage={tokenFromStorage} recipeID={recipeID} fetchRecipe={fetchRecipe} />
 		</div>
 	);
 };
 
-const IngredientLine = ({ index, singleIngredient, debounceEditFunction, updateIngredientHandler }) => {
+const IngredientLine = ({ index, singleIngredient, debounceEditFunction, updateIngredientHandler, recipeID, fetchRecipe, tokenFromStorage }) => {
 	const [value, setValue] = useState(singleIngredient.name);
 	const [tagName, setTagName] = useState(singleIngredient?.tagName);
 
@@ -525,10 +531,26 @@ const IngredientLine = ({ index, singleIngredient, debounceEditFunction, updateI
 		updateIngredientHandler(singleIngredient.ingredientID, { tagName: null });
 	};
 
+	const removeHandler = async () => {
+		await fetch(`/api/recipes/${recipeID}/ingredient/${singleIngredient.ingredientID}`, {
+			method: 'DELETE',
+			headers: {
+				// This is required. NodeJS server won't know how to read it without it.
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
+			},
+		});
+
+		fetchRecipe();
+	};
+
 	return (
-		<Row>
-			<Col lg={7}>
-				<div className="form-floating ingredients">
+		<Row className="ingredient-row">
+			<Col lg={9}>
+				<Button className="delete-ingredient-btn" size="small" color="danger" onClick={removeHandler}>
+					<Trash2 />
+				</Button>
+				<div className="ingredient-input form-floating">
 					<Input
 						className="editInput form-control"
 						id="recipe-ingredients"
@@ -543,21 +565,24 @@ const IngredientLine = ({ index, singleIngredient, debounceEditFunction, updateI
 					<label htmlFor="recipe-ingredients">{`Ingredient ${index + 1}`}</label>
 				</div>
 			</Col>
-			<Col lg={3} className="tag-container">
-				<TagBox type="ingredient" tag={{ Name: tagName, TagID: singleIngredient?.tagID }} removeTagHandler={removeTagHandler} />
-			</Col>
-			<Col lg={2}>
-				<IngredientTagDropdown ingredientID={singleIngredient.ingredientID} updateIngredientHandler={updateIngredientHandler} setTagName={setTagName} />
+			<Col lg={3}>
+				<IngredientTagDropdown
+					singleIngredient={singleIngredient}
+					tagName={tagName}
+					removeTagHandler={removeTagHandler}
+					updateIngredientHandler={updateIngredientHandler}
+					setTagName={setTagName}
+				/>
 			</Col>
 		</Row>
 	);
 };
-const IngredientTagDropdown = ({ ingredientID, updateIngredientHandler, setTagName }) => {
+const IngredientTagDropdown = ({ singleIngredient, tagName, updateIngredientHandler, removeTagHandler, setTagName }) => {
 	const [selectedValue, setSelectedValue] = useState('');
 
 	const setTagHandler = (value) => {
 		setTagName(value);
-		updateIngredientHandler(ingredientID, { tagName: value });
+		updateIngredientHandler(singleIngredient.ingredientID, { tagName: value });
 		setSelectedValue('');
 	};
 
@@ -574,16 +599,24 @@ const IngredientTagDropdown = ({ ingredientID, updateIngredientHandler, setTagNa
 		return ingredients.map((d) => d.Name);
 	};
 
-	return (
-		<InputWithAutocomplete
-			id="ingredient-tag"
-			label="Search Tag"
-			fetchAvailableResults={fetchAllTags}
-			selectedValue={selectedValue}
-			setSelectedValue={setSelectedValue}
-			onkeyDownHandler={(value) => setTagHandler(value)}
-		/>
-	);
+	if (tagName) {
+		return (
+			<span className="tag-container ingredient-tag">
+				<TagBox type="ingredient" tag={{ Name: tagName, TagID: singleIngredient?.tagID }} removeTagHandler={removeTagHandler} />
+			</span>
+		);
+	} else {
+		return (
+			<InputWithAutocomplete
+				id="ingredient-tag"
+				label="Search Tag"
+				fetchAvailableResults={fetchAllTags}
+				selectedValue={selectedValue}
+				setSelectedValue={setSelectedValue}
+				onkeyDownHandler={(value) => setTagHandler(value)}
+			/>
+		);
+	}
 };
 const IngredientsTextarea = ({ value, setValue }) => {
 	return (

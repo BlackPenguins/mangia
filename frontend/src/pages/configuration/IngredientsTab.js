@@ -4,8 +4,8 @@ import LoadingText from '../../components/Common/LoadingText';
 
 import AuthContext from '../../authentication/auth-context';
 import { NameInput } from './BasicEditPanel';
-import { PriceInput } from 'pages/ShoppingList';
 import { useToast } from 'context/toast-context';
+import PriceInput from 'pages/shoppingList/PriceInput';
 
 const IngredientsTab = () => {
 	const [items, setItems] = useState(null);

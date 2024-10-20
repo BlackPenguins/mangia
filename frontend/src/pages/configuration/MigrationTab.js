@@ -34,6 +34,7 @@ const MigrationTab = () => {
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="updateWeek" label="v1.3: Update Week" />
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="setWeekIDForAllMenuDays" label="v1.3: Set WeekID for all MENU_DAY" />
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addPreviousLastMade" label="v1.4: Add PreviousLastMade" />
+			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addShoppingListExtra" label="v1.5: Add ShoppingListExtra Table" />
 		</div>
 	);
 };

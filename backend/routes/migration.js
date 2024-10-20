@@ -80,6 +80,13 @@ const migrationHandler = async (req, res) => {
 		case 'addPreviousLastMade':
 			await simpleDBQuery('Add Column', 'ALTER TABLE RECIPE ADD COLUMN PreviousLastMade Date', res);
 			break;
+		case 'addShoppingListExtra':
+			await simpleDBQuery(
+				'Create SHOPPING_LIST_EXTRA',
+				'CREATE TABLE SHOPPING_LIST_EXTRA (ShoppingListExtraID INT AUTO_INCREMENT PRIMARY KEY, WeekID INT NOT NULL, Name VARCHAR(500), IsChecked TINYINT, FOREIGN KEY (WeekID) REFERENCES WEEK(WeekID))',
+				res
+			);
+			break;
 		default:
 			console.error('Migration not found!');
 			res.status(200).json({ success: false });
