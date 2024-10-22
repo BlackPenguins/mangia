@@ -87,6 +87,10 @@ const migrationHandler = async (req, res) => {
 				res
 			);
 			break;
+		case 'nullDayForMenus':
+			await simpleDBQuery('Null Day', 'alter table menu_day modify column Day date null;', res);
+			break;
+
 		default:
 			console.error('Migration not found!');
 			res.status(200).json({ success: false });

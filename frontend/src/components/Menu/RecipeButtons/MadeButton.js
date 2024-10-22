@@ -12,7 +12,7 @@ const MadeButton = ({ fetchMenu, menu, page, recipe }) => {
 	const made = useCallback(async () => {
 		await fetch(`/api/menu/made/${menu?.menuID}`, {
 			method: 'POST',
-			body: JSON.stringify({ isMade: !isMade, recipeID: recipe?.RecipeID }),
+			body: JSON.stringify({ isMade: !isMade, recipeID: recipe?.RecipeID, isUseToday: menu.hasNoDate }),
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
 				'Content-Type': 'application/json',

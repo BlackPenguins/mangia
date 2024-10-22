@@ -26,11 +26,11 @@ export const selectMenuByMenuID = (menuID) => {
 	});
 };
 
-export const insertMenu = (day, recipeID, newWeekID) => {
+export const insertMenu = (day, recipeID, weekID) => {
 	return new Promise((resolve, reject) => {
 		pool.query(
 			'INSERT INTO MENU_DAY (Day, RecipeID, IsMade, IsSkipped, IsLeftovers, WeekID) VALUES (?, ?, ?, ?, ?, ?)',
-			[day, recipeID, 0, 0, 0, newWeekID],
+			[day, recipeID, 0, 0, 0, weekID],
 			(error, result) => {
 				if (error) {
 					return reject(error.sqlMessage);
@@ -49,6 +49,18 @@ export const insertMenu = (day, recipeID, newWeekID) => {
 export const updateMenu = (updatedMenu, menuID) => {
 	return new Promise((resolve, reject) => {
 		pool.query('UPDATE MENU_DAY SET ? WHERE MenuID = ?', [updatedMenu, menuID], (error) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve();
+			}
+		});
+	});
+};
+
+export const deleteMenu = (menuID) => {
+	return new Promise((resolve, reject) => {
+		pool.query('DELETE FROM MENU_DAY WHERE MenuID = ?', [menuID], (error) => {
 			if (error) {
 				return reject(error.sqlMessage);
 			} else {
@@ -107,7 +119,7 @@ export const selectAllMenuDay = (day) => {
 
 export const selectByWeekID = (weekID) => {
 	return new Promise((resolve, reject) => {
-		pool.query('SELECT * FROM MENU_DAY WHERE WeekID = ? ORDER BY Day', [weekID], (error, result) => {
+		pool.query('SELECT * FROM MENU_DAY WHERE WeekID = ? ORDER BY Day IS NULL, Day ASC', [weekID], (error, result) => {
 			if (error) {
 				return reject(error.sqlMessage);
 			} else {

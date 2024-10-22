@@ -10,6 +10,12 @@
 			background-color: goldenrod;
 		}
 
+
+		&.extra {
+			background-color: #4f8fcb;
+		}
+
+
 		.day-settings {
 			cursor: pointer;
 			position: absolute;
@@ -100,6 +106,24 @@
 
 		.prep-notes {
 			margin: 10px 0px;
+		}
+	}
+}
+
+.new-menu-card {
+	min-height: 250px;
+
+	.menu-container {
+		background-color: rgb(238, 255, 255);
+		border: 2px dashed #c9c9c9;
+
+		// Vertical and horizontal align
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		
+		button {
+			padding: 20px;
 		}
 	}
 }

@@ -1,6 +1,6 @@
 import express from 'express';
 import { selectAllRecipes, selectRecipeByID, updateRecipe } from '../database/recipes.js';
-import { insertMenu, selectByWeekID, selectMenuByDay, selectMenuByMenuID, swapMenu, updateMenu } from '../database/menu.js';
+import { deleteMenu, insertMenu, selectByWeekID, selectMenuByDay, selectMenuByMenuID, swapMenu, updateMenu } from '../database/menu.js';
 import { checkAdminMiddleware } from './auth.js';
 import { addIngredientsToRecipe } from './recipes.js';
 import { getOrInsertWeek } from '../database/week.js';
@@ -63,6 +63,13 @@ export const getMenuForWeekOffset = async (weekID, startDate) => {
 };
 
 export const withDateDetails = (day, data) => {
+	if (day.getFullYear() <= 1970) {
+		return {
+			hasNoDate: true,
+			...data,
+		};
+	}
+
 	const todaysDate = new Date();
 	const isToday = todaysDate.getDate() === day.getDate() && todaysDate.getMonth() === day.getMonth() && todaysDate.getFullYear() === day.getFullYear();
 	const dayOfWeek = DAYS_OF_WEEK[day.getDay()];
@@ -83,6 +90,22 @@ const moveMenuItem = async (req, res) => {
 	const dayTwo = req.body.swapMenuID;
 
 	await swapMenu(dayOne, dayTwo);
+
+	res.status(200).json({ success: true });
+};
+const addMenuItem = async (req, res) => {
+	const weekID = req.body.weekID;
+	const recipeID = req.body.recipeID;
+
+	await insertMenu(null, recipeID, weekID);
+
+	res.status(200).json({ success: true });
+};
+
+const removeMenuItem = async (req, res) => {
+	const menuID = req.params.menuID;
+
+	await deleteMenu(menuID);
 
 	res.status(200).json({ success: true });
 };
@@ -185,6 +208,7 @@ const madeMenuItem = async (req, res) => {
 	const menuID = req.params.menuID;
 	const isMade = req.body.isMade;
 	const recipeID = req.body.recipeID;
+	const isUseToday = req.body.isUseToday;
 
 	const updatedMenu = {
 		isMade,
@@ -207,7 +231,7 @@ const madeMenuItem = async (req, res) => {
 			async (result) => {
 				const recipeFromDB = await selectRecipeByID(recipeID);
 
-				const madeDate = result[0].Day;
+				const madeDate = isUseToday ? new Date() : result[0].Day;
 
 				let updatedRecipe = {};
 
@@ -420,7 +444,9 @@ const router = express.Router();
  */
 router.get('/api/menu/:weekOffset', getMenuForWeek);
 router.post('/api/menu/move/:menuID', [checkAdminMiddleware], moveMenuItem);
+router.delete('/api/menu/:menuID', [checkAdminMiddleware], removeMenuItem);
 router.post('/api/menu/change/:menuID', [checkAdminMiddleware], changeMenuItem);
+router.put('/api/menu', [checkAdminMiddleware], addMenuItem);
 router.post('/api/menu/notes/:menuID', [checkAdminMiddleware], changeMenuNotes);
 router.post('/api/menu/generate/:weekOffset', [checkAdminMiddleware], generateMenu);
 router.post('/api/menu/reroll/:menuID', [checkAdminMiddleware], rerollMenuItem);

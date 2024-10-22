@@ -1,5 +1,5 @@
 import useBetterModal from 'components/Common/useBetterModal';
-import { Settings } from 'react-feather';
+import { Settings, Trash } from 'react-feather';
 import { useContext, useState } from 'react';
 import { Button, Col, Input, Row } from 'reactstrap';
 import AuthContext from 'authentication/auth-context';
@@ -30,11 +30,31 @@ const ChangeButton = ({ fetchMenu, menu, page, availableSwapDays }) => {
 		}
 	};
 
+	const removeItemHandler = async (closeModal) => {
+		await fetch(`/api/menu/${menu.menuID}`, {
+			method: 'DELETE',
+			headers: {
+				// This is required. NodeJS server won't know how to read it without it.
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
+			},
+		});
+		fetchMenu(page);
+		closeModal();
+	};
+
 	const { modal, openModal } = useBetterModal({
 		title: 'Edit Menu',
 		size: 'lg',
 		content: (closeModal) => (
 			<>
+				{menu.hasNoDate && (
+					<div className="remove-item-container">
+						<Button color="danger" onClick={() => removeItemHandler(closeModal)}>
+							<Trash /> Remove Item
+						</Button>
+					</div>
+				)}
 				<DailyNotes menu={menu} fetchMenu={fetchMenu} tokenFromStorage={tokenFromStorage} page={page} />
 
 				<h3>Swap Days</h3>

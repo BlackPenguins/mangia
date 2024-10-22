@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { Row } from 'reactstrap';
+import { Button, Row } from 'reactstrap';
 import './MenuSection.scss';
 import RecipeCard from '../Recipes/RecipeCard';
 import MenuNav from './MenuNav';
@@ -13,7 +13,10 @@ import AuthContext from '../../authentication/auth-context';
 import LoadingText from 'components/Common/LoadingText';
 import MenuContainer from './MenuContainer';
 import { PrepTimeLabel } from 'pages/edit/RecipeEditPage';
-import { Clock, Thermometer } from 'react-feather';
+import { Clock, PlusCircle, Thermometer } from 'react-feather';
+import useBetterModal from 'components/Common/useBetterModal';
+import FilteredRecipes from 'components/Recipes/FilteredRecipes';
+import RecipeRow from 'components/Recipes/RecipeRow';
 
 const MenuSection = () => {
 	const [page, setPage] = useState(0);
@@ -64,7 +67,40 @@ const MenuSection = () => {
 };
 
 const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, availableSwapDays }) => {
-	console.log('MENUSS', menus);
+	const authContext = useContext(AuthContext);
+	const tokenFromStorage = authContext.token;
+
+	const weekID = menus[0].weekID;
+
+	const addItemHandler = async (recipe, closeModal) => {
+		const recipeID = recipe.RecipeID;
+
+		await fetch(`/api/menu`, {
+			method: 'PUT',
+			body: JSON.stringify({ recipeID, weekID }),
+			headers: {
+				// This is required. NodeJS server won't know how to read it without it.
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
+			},
+		});
+		fetchMenu(page);
+		closeModal();
+	};
+
+	const { modal: extraModal, openModal: openAddExtraModal } = useBetterModal({
+		title: 'Add Menu Item',
+		size: 'md',
+		content: (closeModal) => (
+			<>
+				<h3>Add Recipe</h3>
+				<div className="change-recipe-container">
+					<FilteredRecipes CardType={RecipeRow} onClickHandler={(recipe) => addItemHandler(recipe, closeModal)} layoutClass="lg-12" />
+				</div>
+			</>
+		),
+	});
+
 	return (
 		<Row className="menu---list">
 			{menus?.map((menu, index) => {
@@ -81,7 +117,21 @@ const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, availableSwapDays }
 					/>
 				);
 			})}
+			{extraModal}
+			<NewMenuButton openAddExtraModal={openAddExtraModal} />
 		</Row>
+	);
+};
+
+const NewMenuButton = ({ openAddExtraModal }) => {
+	return (
+		<div className="col-md-6 col-lg-3 new-menu-card menu-card">
+			<div class="menu-container">
+				<Button color="success" className="site-btn" onClick={openAddExtraModal}>
+					<PlusCircle />
+				</Button>
+			</div>
+		</div>
 	);
 };
 
@@ -90,7 +140,9 @@ const MenuCard = ({ menu, fetchMenu, page, currentRecipeIDs, tomorrowsRecipe, av
 
 	const cardClasses = ['day-header'];
 
-	if (menu.isToday) {
+	if (menu.hasNoDate) {
+		cardClasses.push('extra');
+	} else if (menu.isToday) {
 		cardClasses.push('today');
 	}
 
@@ -109,8 +161,18 @@ const MenuCard = ({ menu, fetchMenu, page, currentRecipeIDs, tomorrowsRecipe, av
 			<MenuContainer>
 				<div className={cardClasses.join(' ')}>
 					{authContext.isAdmin && <ChangeButton fetchMenu={fetchMenu} menu={menu} page={page} availableSwapDays={availableSwapDays} />}
-					<div>{menu.week}</div>
-					<div>{menu.date}</div>
+					{menu.hasNoDate && (
+						<>
+							<div>EXTRA ITEM</div>
+							<div>&nbsp;</div>
+						</>
+					)}
+					{!menu.hasNoDate && (
+						<>
+							<div>{menu.week}</div>
+							<div>{menu.date}</div>
+						</>
+					)}
 				</div>
 				<RecipeCard
 					key={menu.id}
@@ -130,12 +192,9 @@ const MenuCard = ({ menu, fetchMenu, page, currentRecipeIDs, tomorrowsRecipe, av
 };
 
 const DailyNotes = ({ menu }) => {
-	console.log('MEN', menu);
 	const notes = menu.dailyNotes;
 	const prepTime = menu.recipe?.PrepTime;
 	const preheat = menu.recipe?.Preheat;
-
-	console.log('GUN', prepTime);
 
 	if (!notes && !prepTime && !preheat) {
 		return null;
