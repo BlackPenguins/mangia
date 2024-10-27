@@ -44,6 +44,7 @@ export const removeIngredientTagFromIngredient = (ingredientTagID) => {
 			}
 		});
 	});
+};
 
 export const selectIngredientsByRecipeID = (recipeID) => {
 	return new Promise((resolve, reject) => {
