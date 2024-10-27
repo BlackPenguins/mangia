@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Button, Input } from 'reactstrap';
 import { useNavigate } from 'react-router-dom';
 import './ImportRecipeModal.scss';
@@ -62,7 +62,7 @@ const useImportRecipeModal = () => {
 		setImportFile(event.target.files[0]);
 	};
 
-	const { modal, openModal, closeModal } = useBetterModal({
+	const { modal, openModal, closeModal, isOpen } = useBetterModal({
 		title: 'Import Recipe',
 		content: (closeModal) => (
 			<>
@@ -93,6 +93,12 @@ const useImportRecipeModal = () => {
 			</>
 		),
 	});
+
+	useEffect(() => {
+		if (isOpen) {
+			setStatus(null);
+		}
+	}, [isOpen]);
 
 	return { modal, openModal };
 };

@@ -21,8 +21,7 @@ export const NewIngredientInput = ({ tokenFromStorage, fetchRecipe, recipeID }) 
 	};
 
 	const onKeyDownHandler = (e) => {
-		if (e.keyCode === 13) {
-			// ENTER KEY
+		if (e.key === 'Enter') {
 			onAddHandler();
 		}
 	};

@@ -41,6 +41,30 @@ export const insertIngredientTag = (newTag) => {
 	});
 };
 
+export const deleteIngredientTag = (ingredientTagID) => {
+	return new Promise((resolve, reject) => {
+		pool.query('DELETE FROM INGREDIENT_TAG WHERE IngredientTagID =  ?', [ingredientTagID], (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve(result);
+			}
+		});
+	});
+};
+
+export const deleteIngredientTagPrice = (ingredientTagID) => {
+	return new Promise((resolve, reject) => {
+		pool.query('DELETE FROM INGREDIENT_TAG_PRICE WHERE IngredientTagID =  ?', [ingredientTagID], (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve(result);
+			}
+		});
+	});
+};
+
 export const updateIngredientTag = (tagID, update) => {
 	return new Promise((resolve, reject) => {
 		pool.query('UPDATE INGREDIENT_TAG SET ? WHERE IngredientTagID = ?', [update, tagID], (error) => {

@@ -10,7 +10,8 @@ import { Edit, Trash2 } from 'react-feather';
 import AuthContext from '../authentication/auth-context';
 import LoadingText from '../components/Common/LoadingText';
 import useBetterModal from 'components/Common/useBetterModal';
-import { PrepTimeLabel } from './edit/RecipeEditPage';
+import { PrepTimeLabel, ThumbnailPreview } from './edit/RecipeEditPage';
+import { getThumbnailImage } from 'components/Recipes/RecipeCard';
 
 const RecipePage = () => {
 	const params = useParams();
@@ -71,6 +72,15 @@ const RecipePage = () => {
 						</Col>
 						<Col lg={8}>
 							<Steps steps={recipe?.steps} />
+							{recipe.thumbnails &&
+								recipe.thumbnails.map((thumbnail, index) => {
+									if (index == 0) {
+										// We already show it in the main thumbnail
+										return null;
+									} else {
+										return <ThumbnailPreview key={thumbnail.ThumbnailID} thumbnail={thumbnail} canEdit={false} />;
+									}
+								})}
 						</Col>
 					</Row>
 					<Notes title="Notes" notes={recipe?.Notes} />
@@ -191,7 +201,7 @@ const Controls = ({ recipe }) => {
 	);
 };
 const HeaderImage = ({ recipe }) => {
-	const thumbnailImage = (recipe?.Image && `http://${process.env.REACT_APP_HOST_NAME}:6200/thumbs/${recipe?.Image}`) || '/images/no-thumb.png';
+	const thumbnailImage = getThumbnailImage(recipe, false);
 
 	const thumbnailStyle = {
 		backgroundImage: `url(${thumbnailImage})`,

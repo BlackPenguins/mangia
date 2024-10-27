@@ -2,7 +2,7 @@ import express from 'express';
 import { selectAllRecipes, selectRecipeByID, updateRecipe } from '../database/recipes.js';
 import { deleteMenu, insertMenu, selectByWeekID, selectMenuByDay, selectMenuByMenuID, swapMenu, updateMenu } from '../database/menu.js';
 import { checkAdminMiddleware } from './auth.js';
-import { addIngredientsToRecipe } from './recipes.js';
+import { addIngredientsToRecipe, addThumbnails } from './recipes.js';
 import { getOrInsertWeek } from '../database/week.js';
 
 const DAYS_OF_WEEK = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
@@ -39,7 +39,8 @@ export const getMenuForWeekOffset = async (weekID, startDate) => {
 		for (const menuDay of menuDays) {
 			if (menuDay?.RecipeID) {
 				const recipeFromDB = await selectRecipeByID(menuDay.RecipeID);
-				await addIngredientsToRecipe(recipeFromDB);
+				const recipeWithThumbnails = await addThumbnails(recipeFromDB);
+				await addIngredientsToRecipe(recipeWithThumbnails);
 				formattedDaysArray.push(
 					withDateDetails(new Date(menuDay.Day), {
 						menuID: menuDay.MenuID,
@@ -49,7 +50,7 @@ export const getMenuForWeekOffset = async (weekID, startDate) => {
 						skipReason: menuDay.skipReason,
 						weekID: menuDay.WeekID,
 						dailyNotes: menuDay.DailyNotes,
-						recipe: recipeFromDB,
+						recipe: recipeWithThumbnails,
 					})
 				);
 			}

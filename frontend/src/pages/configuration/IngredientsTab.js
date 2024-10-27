@@ -6,6 +6,8 @@ import AuthContext from '../../authentication/auth-context';
 import { NameInput } from './BasicEditPanel';
 import { useToast } from 'context/toast-context';
 import PriceInput from 'pages/shoppingList/PriceInput';
+import useBetterModal from 'components/Common/useBetterModal';
+import { Trash2 } from 'react-feather';
 
 const IngredientsTab = () => {
 	const [items, setItems] = useState(null);
@@ -92,35 +94,7 @@ const IngredientsTab = () => {
 					<tbody>
 						{items &&
 							items.map((item) => (
-								<tr key={item['IngredientTagID']}>
-									<td className="shoping__cart__item">
-										<Row>
-											<Col lg={6} sm={12}>
-												<NameInput
-													label={'Ingredient'}
-													item={item}
-													apiUpdate={'/api/ingredientTags'}
-													idColumn={'IngredientTagID'}
-													tokenFromStorage={tokenFromStorage}
-												/>
-											</Col>
-											<Col lg={6} sm={12}>
-												<DepartmentDropdown item={item} departments={departments} />
-											</Col>
-											{stores &&
-												stores.map((store) => {
-													return (
-														<PriceInput
-															ingredientTagID={item.IngredientTagID}
-															store={store}
-															prices={item.prices}
-															tokenFromStorage={tokenFromStorage}
-														/>
-													);
-												})}
-										</Row>
-									</td>
-								</tr>
+								<IngredientRow fetchItems={fetchItems} item={item} tokenFromStorage={tokenFromStorage} stores={stores} departments={departments} />
 							))}
 					</tbody>
 				</table>
@@ -129,6 +103,64 @@ const IngredientsTab = () => {
 	);
 };
 
+const IngredientRow = ({ fetchItems, item, tokenFromStorage, stores, departments }) => {
+	const removeHandler = async (closeModal) => {
+		await fetch(`/api/ingredientTags/${item.IngredientTagID}`, {
+			method: 'DELETE',
+			headers: {
+				// This is required. NodeJS server won't know how to read it without it.
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
+			},
+		});
+
+		fetchItems();
+		closeModal();
+	};
+
+	const { modal, openModal } = useBetterModal({
+		title: 'Delete Ingredient',
+		size: 'md',
+		buttons: (closeModal) => (
+			<>
+				<Button
+					color="danger"
+					onClick={() => {
+						removeHandler(closeModal);
+					}}
+				>
+					Delete
+				</Button>
+			</>
+		),
+		content: (closeModal) => <div>Are you sure you want to delete this ingredient tag from all recipes?</div>,
+	});
+
+	return (
+		<tr key={item['IngredientTagID']}>
+			<td className="shoping__cart__item">
+				{modal}
+				<Row>
+					<Col lg={6} sm={12}>
+						<NameInput label={'Ingredient'} item={item} apiUpdate={'/api/ingredientTags'} idColumn={'IngredientTagID'} tokenFromStorage={tokenFromStorage} />
+					</Col>
+					<Col lg={4} sm={12}>
+						<DepartmentDropdown item={item} departments={departments} />
+					</Col>
+					<Col lg={2}>
+						<Button className="site-btn danger" color="danger" onClick={() => openModal()}>
+							<Trash2 />
+						</Button>
+					</Col>
+					{stores &&
+						stores.map((store) => {
+							return <PriceInput ingredientTagID={item.IngredientTagID} store={store} prices={item.prices} tokenFromStorage={tokenFromStorage} />;
+						})}
+				</Row>
+			</td>
+		</tr>
+	);
+};
 const DepartmentDropdown = ({ item, departments }) => {
 	const authContext = useContext(AuthContext);
 	const tokenFromStorage = authContext.token;

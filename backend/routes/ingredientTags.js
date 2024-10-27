@@ -1,5 +1,6 @@
 import express from 'express';
-import { insertIngredientTag, selectAllIngredientTags, updateIngredientTag } from '../database/ingredientTags.js';
+import { removeIngredientTagFromIngredient } from '../database/ingredient.js';
+import { deleteIngredientTag, deleteIngredientTagPrice, insertIngredientTag, selectAllIngredientTags, updateIngredientTag } from '../database/ingredientTags.js';
 import { selectAllStores } from '../database/store.js';
 import { checkAdminMiddleware } from './auth.js';
 import { getPricesForStore } from './shoppingListItem.js';
@@ -56,6 +57,16 @@ const addIngredientTagHandler = (req, res) => {
 	);
 };
 
+const removeIngredientTagHandler = async (req, res) => {
+	const ingredientTagID = req.params.ingredientTagID;
+
+	await removeIngredientTagFromIngredient(ingredientTagID);
+	await deleteIngredientTagPrice(ingredientTagID);
+	await deleteIngredientTag(ingredientTagID);
+
+	res.status(200).json({ success: true });
+};
+
 const updateIngredientHandler = (req, res) => {
 	const ingredientTagID = req.body.id;
 	const ingredientDepartmentID = req.body.departmentID;
@@ -91,5 +102,6 @@ const router = express.Router();
 router.get('/api/ingredientTags', getAllIngredientTagsHandler);
 router.patch('/api/ingredientTags', checkAdminMiddleware, updateIngredientHandler);
 router.put('/api/ingredientTags', checkAdminMiddleware, addIngredientTagHandler);
+router.delete('/api/ingredientTags/:ingredientTagID', checkAdminMiddleware, removeIngredientTagHandler);
 
 export default router;

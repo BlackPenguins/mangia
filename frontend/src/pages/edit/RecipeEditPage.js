@@ -72,6 +72,7 @@ const RecipeEditPage = () => {
 	const [rating, setRating] = useState(1);
 	const [url, setURL] = useState('');
 	const [attachments, setAttachments] = useState([]);
+	const [thumbnails, setThumbnails] = useState([]);
 
 	const fetchRecipe = useCallback(async () => {
 		if (recipeID) {
@@ -94,6 +95,7 @@ const RecipeEditPage = () => {
 			setURL(recipe.URL || '');
 			setIsActive(recipe.IsActive === 1);
 			setAttachments(recipe.attachments);
+			setThumbnails(recipe.thumbnails);
 
 			const finalSteps = recipe.steps.map((step) => step.instruction).join('\n\n');
 			setSteps(finalSteps);
@@ -143,6 +145,7 @@ const RecipeEditPage = () => {
 			});
 
 			showToast('Recipe Edited', 'Thumbnail has been uploaded');
+			fetchRecipe();
 		}
 	};
 
@@ -303,7 +306,7 @@ const RecipeEditPage = () => {
 					</Row>
 					<Row>
 						<Col>
-							<ThumbnailSection setValue={thumbnailHandler} />
+							<ThumbnailSection tokenFromStorage={tokenFromStorage} fetchRecipe={fetchRecipe} thumbnails={thumbnails} setValue={thumbnailHandler} />
 						</Col>
 					</Row>
 
@@ -331,7 +334,7 @@ const RecipeEditPage = () => {
 	);
 };
 
-const ThumbnailSection = ({ setValue }) => {
+const ThumbnailSection = ({ tokenFromStorage, fetchRecipe, thumbnails, setValue }) => {
 	const fileChangeHandler = (event) => {
 		setValue(event.target.files[0]);
 	};
@@ -341,10 +344,53 @@ const ThumbnailSection = ({ setValue }) => {
 			<Col sm={12}>
 				<Input id="recipe-image" name="file" type="file" onChange={fileChangeHandler} />
 				<FormText>The preview image for the recipe.</FormText>
+				{thumbnails &&
+					thumbnails.map((thumbnail) => {
+						return (
+							<ThumbnailPreview key={thumbnail.ThumbnailID} thumbnail={thumbnail} tokenFromStorage={tokenFromStorage} fetchRecipe={fetchRecipe} canEdit={true} />
+						);
+					})}
 			</Col>
 		</FormGroup>
 	);
 };
+
+export const ThumbnailPreview = ({ tokenFromStorage, fetchRecipe, thumbnail, canEdit }) => {
+	const imageSource = `http://${process.env.REACT_APP_HOST_NAME}:6200/thumbs/${thumbnail.FileName}`;
+
+	const removeHandler = async () => {
+		await fetch(`/api/recipes/image/${thumbnail.ThumbnailID}`, {
+			method: 'DELETE',
+			headers: {
+				// This is required. NodeJS server won't know how to read it without it.
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
+			},
+		});
+
+		fetchRecipe();
+	};
+
+	const openImage = () => {
+		window.open(imageSource, '_blank');
+	};
+
+	return (
+		<span className="thumbnail-preview" onClick={canEdit ? removeHandler : openImage}>
+			{canEdit && (
+				<span className="over">
+					<span className="black-cover" />
+					<span className="trash-icon">
+						<Trash2 />
+					</span>
+				</span>
+			)}
+
+			<img src={imageSource} />
+		</span>
+	);
+};
+
 const ActiveCheckbox = ({ value, setValue }) => {
 	return (
 		<div>
@@ -547,7 +593,7 @@ const IngredientLine = ({ index, singleIngredient, debounceEditFunction, updateI
 	return (
 		<Row className="ingredient-row">
 			<Col lg={9}>
-				<Button className="delete-ingredient-btn" size="small" color="danger" onClick={removeHandler}>
+				<Button tabIndex={-1} className="delete-ingredient-btn" size="small" color="danger" onClick={removeHandler}>
 					<Trash2 />
 				</Button>
 				<div className="ingredient-input form-floating">

@@ -25,7 +25,7 @@ const useBetterModal = ({ title, content, buttons, inputRef, size }) => {
 		</Modal>
 	);
 
-	return { modal, openModal, closeModal };
+	return { modal, openModal, closeModal, isOpen };
 };
 
 export default useBetterModal;

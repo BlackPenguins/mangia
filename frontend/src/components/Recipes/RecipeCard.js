@@ -13,7 +13,7 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 
 	const hideInformation = isSkipped || isLeftovers;
 
-	const thumbnailImage = (recipe?.Image && !hideInformation && `http://${process.env.REACT_APP_HOST_NAME}:6200/thumbs/${recipe?.Image}`) || 'images/no-thumb.png';
+	const thumbnailImage = getThumbnailImage(recipe, hideInformation);
 
 	const thumbnailStyle = {
 		backgroundImage: `url(${thumbnailImage})`,
@@ -68,6 +68,14 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 				</div>
 			</div>
 		</div>
+	);
+};
+
+export const getThumbnailImage = (recipe, hideInformation) => {
+	const thumbnails = recipe?.thumbnails;
+
+	return (
+		(thumbnails && thumbnails.length > 0 && !hideInformation && `http://${process.env.REACT_APP_HOST_NAME}:6200/thumbs/${thumbnails[0].FileName}`) || 'images/no-thumb.png'
 	);
 };
 

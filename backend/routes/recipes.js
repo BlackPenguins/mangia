@@ -14,6 +14,7 @@ import fs from 'fs';
 import { checkAdminMiddleware } from './auth.js';
 import { insertIngredientTag, selectIngredientTagByName } from '../database/ingredientTags.js';
 import { withDateDetails } from './menu.js';
+import { deleteThumbnail, insertThumbnail, selectAllThumbnails } from '../database/thumbnails.js';
 
 export const THUMBNAIL_DIRECTORY = './images/thumbnails';
 const LARGE_PREFIX = 'large_';
@@ -24,10 +25,10 @@ const thumbnailStorageEngine = multer.diskStorage({
 	},
 	filename: (req, file, callback) => {
 		const recipeID = req.params.recipeID;
-		console.log(file);
 		const originalFileName = file.originalname;
+		const randomSuffix = Math.floor(Math.random() * 10000);
 		const originalFileExt = originalFileName.substring(originalFileName.lastIndexOf('.'));
-		callback(null, `${LARGE_PREFIX}recipe_${recipeID}${originalFileExt}`);
+		callback(null, `${LARGE_PREFIX}recipe_${recipeID}_${randomSuffix}${originalFileExt}`);
 	},
 });
 
@@ -75,11 +76,12 @@ const getRecipe = async (req, res) => {
 	if (!recipe) {
 		res.status(500).json({ message: "Recipe doesn't exist!" });
 	} else {
+		const recipeWithThumbnails = await addThumbnails(recipe);
 		const steps = await selectStepsByRecipeID(req.params.recipeID);
 
-		recipe.steps = [];
+		recipeWithThumbnails.steps = [];
 		for (const step of steps) {
-			recipe.steps.push({
+			recipeWithThumbnails.steps.push({
 				stepNumber: step.StepNumber,
 				instruction: step.Instruction,
 			});
@@ -87,21 +89,19 @@ const getRecipe = async (req, res) => {
 
 		const history = await selectByRecipeID(req.params.recipeID);
 
-		recipe.history = [];
+		recipeWithThumbnails.history = [];
 		for (const historyItem of history) {
 			if (!historyItem.IsSkipped && !historyItem.IsLeftovers) {
-				recipe.history.push(withDateDetails(historyItem.Day, historyItem));
+				recipeWithThumbnails.history.push(withDateDetails(historyItem.Day, historyItem));
 			}
 		}
 
 		const attachmentDirectory = `./images/attachments/${req.params.recipeID}`;
-		recipe.attachments = (fs.existsSync(attachmentDirectory) && fs.readdirSync(attachmentDirectory)) || [];
+		recipeWithThumbnails.attachments = (fs.existsSync(attachmentDirectory) && fs.readdirSync(attachmentDirectory)) || [];
 
-		console.log(recipe.attachments);
+		await addIngredientsToRecipe(recipeWithThumbnails);
 
-		await addIngredientsToRecipe(recipe);
-
-		res.status(200).json(recipe);
+		res.status(200).json(recipeWithThumbnails);
 	}
 };
 
@@ -124,12 +124,24 @@ export const addIngredientsToRecipe = async (recipe) => {
 		});
 	}
 };
+
+export const addThumbnails = async (recipe) => {
+	const recipeID = recipe.RecipeID;
+
+	const thumbnails = await selectAllThumbnails(recipeID);
+
+	return {
+		thumbnails,
+		...recipe,
+	};
+};
 const getAllRecipes = (req, res) => {
 	const selectPromise = selectAllRecipes();
 
 	selectPromise.then(
-		(result) => {
-			res.status(200).json(result);
+		async (result) => {
+			const recipeWithThumbnails = await Promise.all(result.map((r) => addThumbnails(r)));
+			res.status(200).json(recipeWithThumbnails);
 		},
 		(error) => {
 			res.status(500).json({ message: error });
@@ -139,9 +151,8 @@ const getAllRecipes = (req, res) => {
 
 const importRecipeProcessor = async (req, res) => {
 	let url = req.body.url;
-	let currentRecipeID = req.body.currentRecipeID;
 	try {
-		const importResponse = await importRecipe(url, currentRecipeID);
+		const importResponse = await importRecipe(url);
 		res.status(200).json(importResponse);
 	} catch (e) {
 		res.status(200).json({ success: false });
@@ -156,7 +167,7 @@ const uploadImage = async (req, res) => {
 		const beforeImageFileName = req.file.filename;
 		const afterImageFileName = beforeImageFileName.replace(LARGE_PREFIX, '');
 
-		resizeThumbnail(recipeID, THUMBNAIL_DIRECTORY, beforeImageFileName, afterImageFileName);
+		await resizeThumbnail(recipeID, THUMBNAIL_DIRECTORY, beforeImageFileName, afterImageFileName);
 	}
 
 	res.status(200).json({});
@@ -198,22 +209,17 @@ export const resizeThumbnail = async (recipeID, sourceDirectory, beforeImageFile
 
 	await image.toFile(afterImageFile);
 
-	console.log('Deleting thumbnail: ' + beforeImageFile);
 	fs.unlink(beforeImageFile, (err) => {
 		if (err) {
 			console.error('Error deleting the file:', err);
 		}
 	});
 
-	const updatedRecipe = {};
-	updatedRecipe.image = afterImageFileName;
-
-	await updateRecipe(updatedRecipe, recipeID);
+	await insertThumbnail(recipeID, afterImageFileName);
 };
 
 const uploadAttachment = async (req, res) => {
 	const recipeID = req.params.recipeID;
-	console.log(req.file, recipeID);
 
 	console.log(` Update Attachment for ${recipeID}`);
 
@@ -271,14 +277,10 @@ const addTagToRecipe = (req, res) => {
 	foundTagPromise.then(
 		async (result) => {
 			let tagID;
-			console.log('RES', result);
 			if (result.length === 0) {
-				console.log('NO TAG, creating');
 				const createdTag = await insertTag({ Name: tagName });
-				console.log('CREated', createdTag);
 				tagID = createdTag.id;
 			} else {
-				console.log('TAG found');
 				tagID = result[0].TagID;
 			}
 
@@ -290,6 +292,22 @@ const addTagToRecipe = (req, res) => {
 			} else {
 				await addTag(recipeID, tagID);
 			}
+			res.status(200).json(result);
+		},
+		(error) => {
+			res.status(500).json({ message: error });
+		}
+	);
+};
+
+const deleteThumbnailHandler = (req, res) => {
+	const thumbnailID = req.params.thumbnailID;
+	console.log(`Incoming Delete Thumbnail for ${thumbnailID}`);
+
+	const deleteThumbnailPromise = deleteThumbnail(thumbnailID);
+
+	deleteThumbnailPromise.then(
+		(result) => {
 			res.status(200).json(result);
 		},
 		(error) => {
@@ -486,7 +504,6 @@ const referenceStorageEngine = multer.diskStorage({
 		callback(null, './images');
 	},
 	filename: (req, file, callback) => {
-		console.log(file);
 		callback(null, file.originalname);
 	},
 });
@@ -510,8 +527,6 @@ const parseText = async (req, res) => {
 	const imageFile = `./images/attachments/${recipeID}/${file}`;
 
 	progress = 0;
-
-	console.log('PARSING FILE'.imageFile);
 
 	const worker = await createWorker('eng', 1, {
 		logger: (m) => {
@@ -548,6 +563,7 @@ router.get('/api/recipes/:recipeID', getRecipe);
 router.get('/api/recipe/importFailureURLs', getImportFailureURLs);
 router.get('/api/recipes', getAllRecipes);
 router.post('/api/recipes/import', [checkAdminMiddleware], importRecipeProcessor);
+router.delete('/api/recipes/image/:thumbnailID', [checkAdminMiddleware], deleteThumbnailHandler);
 router.post('/api/recipes/image/:recipeID', [checkAdminMiddleware, upload.single('imageFile')], uploadImage);
 router.post('/api/recipes/attachments/:recipeID', [checkAdminMiddleware, uploadAttachments.single('imageFile')], uploadAttachment);
 router.put('/api/recipes', [checkAdminMiddleware], addRecipe);

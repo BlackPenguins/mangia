@@ -16,7 +16,6 @@ export const scrapeGoogle = async (url) => {
 		const googleSchema = $('script[type=application/ld+json]').text();
 
 		console.log('Schema:', googleSchema);
-		console.log('\n\nAFTER');
 
 		const json = JSON.parse(googleSchema)[0];
 

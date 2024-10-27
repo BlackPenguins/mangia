@@ -260,7 +260,7 @@ const convertToTeaspoons = (value) => {
 		return `UNCONVERTED`;
 	}
 
-	const smarterRe = /([\d\/\s]+)\s*(cup|teaspoon|tsp|tb|tablespoon|pound|ounce)?(?:s)?/;
+	const smarterRe = /([\d\/\s]+)\s*(cup|teaspoon|tsp|tb|tablespoon|pound|ounce|oz|lb)?(?:s)?/;
 
 	const matches = value.match(smarterRe);
 
@@ -286,10 +286,12 @@ const convertToTeaspoons = (value) => {
 			baseTeaspoons = 1;
 			break;
 		case 'ounce':
+		case 'oz':
 			isWholeUnit = true;
 			unit = 'ounce';
 			break;
 		case 'pound':
+		case 'lb':
 			isWholeUnit = true;
 			unit = 'pound';
 			break;

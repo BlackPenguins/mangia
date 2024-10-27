@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { PlusCircle } from 'react-feather';
 import { Button, Col, Input, Row } from 'reactstrap';
 
 export const NewItemInput = ({ tokenFromStorage, fetchShoppingListExtras }) => {
 	const [value, setValue] = useState('');
+	const inputRef = useRef(null);
 
 	const onAddHandler = async () => {
 		await fetch(`/api/shoppingListExtra`, {
@@ -17,6 +18,7 @@ export const NewItemInput = ({ tokenFromStorage, fetchShoppingListExtras }) => {
 		});
 
 		setValue('');
+		inputRef.current.focus();
 		fetchShoppingListExtras();
 	};
 
@@ -30,12 +32,19 @@ export const NewItemInput = ({ tokenFromStorage, fetchShoppingListExtras }) => {
 			<Col lg={10}>
 				<div className="form-floating notes">
 					<Input
+						innerRef={inputRef}
 						className="editInput"
 						id="edit-name"
 						type="text"
 						placeholder="Name"
 						onChange={(e) => {
 							setValue(e.target.value);
+						}}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter') {
+								e.preventDefault();
+								onAddHandler();
+							}
 						}}
 						value={value}
 					/>

@@ -7,6 +7,7 @@ import { simpleDBQuery } from './setup.js';
 import { selectAllMenuDay } from '../database/menu.js';
 import { getWeekRange } from './menu.js';
 import { getPool } from '../database/utils.js';
+import { insertThumbnail } from '../database/thumbnails.js';
 
 const router = express.Router();
 
@@ -90,7 +91,26 @@ const migrationHandler = async (req, res) => {
 		case 'nullDayForMenus':
 			await simpleDBQuery('Null Day', 'alter table menu_day modify column Day date null;', res);
 			break;
+		case 'addThumbnails':
+			await simpleDBQuery(
+				'Create THUMBNAILS',
+				'CREATE TABLE THUMBNAILS (ThumbnailID INT AUTO_INCREMENT PRIMARY KEY, RecipeID INT NOT NULL, FileName VARCHAR(200), FOREIGN KEY (RecipeID) REFERENCES RECIPE(RecipeID))',
+				res
+			);
+			break;
+		case 'moveThumbnails':
+			const allRecipes = await selectAllRecipes();
 
+			for (const recipe of allRecipes) {
+				const image = recipe.Image;
+				const id = recipe.RecipeID;
+
+				if (image) {
+					await insertThumbnail(id, image);
+					console.log('Moving thumbnail', { id, image });
+				}
+			}
+			break;
 		default:
 			console.error('Migration not found!');
 			res.status(200).json({ success: false });

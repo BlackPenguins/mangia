@@ -34,6 +34,17 @@ export const deleteIngredient = (ingredientID) => {
 	});
 };
 
+export const removeIngredientTagFromIngredient = (ingredientTagID) => {
+	return new Promise((resolve, reject) => {
+		pool.query('UPDATE INGREDIENT SET IngredientTagID = null WHERE IngredientTagID = ?', ingredientTagID, (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve(result);
+			}
+		});
+	});
+
 export const selectIngredientsByRecipeID = (recipeID) => {
 	return new Promise((resolve, reject) => {
 		pool.query(

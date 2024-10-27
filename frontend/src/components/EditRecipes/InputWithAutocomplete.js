@@ -19,8 +19,7 @@ const InputWithAutocomplete = ({ fetchAvailableResults, selectedValue, setSelect
 	};
 
 	const inputKeyDownHandler = (e) => {
-		if (e.keyCode === 13) {
-			// ENTER KEY
+		if (e.key === 'Enter') {
 			if (showSuggestions && filteredResults.length && resultSuggestionIndex > 0) {
 				// Use the selected suggestion
 				onkeyDownHandler(filteredResults[resultSuggestionIndex - 1]);
@@ -33,20 +32,21 @@ const InputWithAutocomplete = ({ fetchAvailableResults, selectedValue, setSelect
 			setResultSuggestionIndex(0);
 			setShowSuggestions(false);
 			fetchData();
-		} else if (e.keyCode === 38) {
-			// UP ARROW KEY
+		} else if (e.key === 'ArrowUp') {
 			if (resultSuggestionIndex === 0) {
 				// You cannot go above the first suggestion
 				return;
 			}
 			setResultSuggestionIndex((prev) => prev - 1);
-		} else if (e.keyCode === 40) {
-			// DOWN ARROW KEY
+		} else if (e.key === 'ArrowDown') {
 			if (resultSuggestionIndex === filteredResults.length) {
 				// You can not go below the last suggestion
 				return;
 			}
 			setResultSuggestionIndex((prev) => prev + 1);
+		} else if (e.key === 'Escape') {
+			setResultSuggestionIndex(0);
+			setShowSuggestions(false);
 		}
 	};
 
