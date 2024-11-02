@@ -3,6 +3,7 @@ import Rating from '../Settings/Rating';
 import './RecipeCard.scss';
 import { utcToZonedTime } from 'date-fns-tz';
 import { differenceInDays, formatDistance } from 'date-fns';
+import NewArrivalTag from './NewArrivalTag';
 
 const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottomButtons, isMenu }) => {
 	let recipeName = '';
@@ -42,6 +43,7 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 	}
 	return (
 		<div className={classes.join(' ')}>
+			<NewArrivalTag recipe={recipe} />
 			<CardStatus isSkipped={isSkipped} skipReason={skipReason} recipe={recipe} isMade={isMade} isLeftovers={isLeftovers} />
 			<a href="#" className="img-prod">
 				{thumbnail}
@@ -75,7 +77,8 @@ export const getThumbnailImage = (recipe, hideInformation) => {
 	const thumbnails = recipe?.thumbnails;
 
 	return (
-		(thumbnails && thumbnails.length > 0 && !hideInformation && `http://${process.env.REACT_APP_HOST_NAME}:6200/thumbs/${thumbnails[0].FileName}`) || 'images/no-thumb.png'
+		(thumbnails && thumbnails.length > 0 && !hideInformation && `http://${process.env.REACT_APP_HOST_NAME}:6200/thumbs/${thumbnails[0].FileName}`) ||
+		'/images/no-thumb.png'
 	);
 };
 

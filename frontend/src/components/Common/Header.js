@@ -77,6 +77,14 @@ const Header = () => {
 		</ul>
 	);
 
+	const headerClasses = ['header__top'];
+	let title = 'Mangia!';
+
+	if (window.location.host.indexOf('localhost') !== -1) {
+		headerClasses.push('test-server');
+		title = 'Mangia Test Server!';
+	}
+
 	return (
 		<>
 			{importModal}
@@ -95,11 +103,11 @@ const Header = () => {
 				<div id="mobile-menu-wrap"></div>
 			</div>
 			<header className="header">
-				<div className="header__top">
+				<div className={headerClasses.join(' ')}>
 					<div className="container">
 						<div className="row">
 							<div className="col-lg-12 col-md-12">
-								<span className="header__top__left">MANGIA!</span>
+								<span className="header__top__left">{title}</span>
 								<span className="header__top__right">
 									<Users size={15} /> <LoginDisplay />
 								</span>

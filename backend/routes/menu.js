@@ -1,5 +1,5 @@
 import express from 'express';
-import { selectAllRecipes, selectRecipeByID, updateRecipe } from '../database/recipes.js';
+import { selectAllRecipes, selectAllRecipesByLastMadeOrder, selectRecipeByID, updateRecipe } from '../database/recipes.js';
 import { deleteMenu, insertMenu, selectByWeekID, selectMenuByDay, selectMenuByMenuID, swapMenu, updateMenu } from '../database/menu.js';
 import { checkAdminMiddleware } from './auth.js';
 import { addIngredientsToRecipe, addThumbnails } from './recipes.js';
@@ -50,6 +50,13 @@ export const getMenuForWeekOffset = async (weekID, startDate) => {
 						skipReason: menuDay.skipReason,
 						weekID: menuDay.WeekID,
 						dailyNotes: menuDay.DailyNotes,
+						originalRanking: menuDay.OriginalRanking,
+						adjustedRanking: menuDay.AdjustedRanking,
+						originalWeight: menuDay.OriginalWeight,
+						adjustedWeight: menuDay.AdjustedWeight,
+						totalRankings: menuDay.TotalRankings,
+						isAged: menuDay.IsAged,
+						isNewArrival: menuDay.IsNewArrival,
 						recipe: recipeWithThumbnails,
 					})
 				);
@@ -98,7 +105,7 @@ const addMenuItem = async (req, res) => {
 	const weekID = req.body.weekID;
 	const recipeID = req.body.recipeID;
 
-	await insertMenu(null, recipeID, weekID);
+	await insertMenu(null, recipeID, weekID, null, null, null, null, null, null, null);
 
 	res.status(200).json({ success: true });
 };
@@ -121,6 +128,13 @@ const changeMenuItem = async (req, res) => {
 		isLeftovers: 0,
 		isMade: 0,
 		skipReason: '',
+		originalWeight: null,
+		adjustedWeight: null,
+		originalRanking: null,
+		totalRankings: null,
+		adjustedRanking: null,
+		isAged: null,
+		isNewArrival: null,
 	};
 	await updateMenu(newMenuDay, menuID);
 
@@ -150,7 +164,7 @@ const generateMenu = async (req, res) => {
 	// When you VIEWED the week it already made a WEEK for you, so this will never be an insert
 	const { weekID, startDate } = await getOrInsertWeek(weekOffset);
 
-	let recipes = await selectAllRecipes();
+	let recipes = await selectAllRecipesByLastMadeOrder();
 
 	const pickedRecipes = getRandomWeightedRecipe(recipes, 7);
 
@@ -164,11 +178,29 @@ const generateMenu = async (req, res) => {
 		const existingMenu = await selectMenuByDay(formattedDateForDB);
 
 		if (existingMenu.length === 0) {
-			await insertMenu(day, pickedRecipe.RecipeID, weekID);
-			console.log(`Day inserted into Menu - ${pickedRecipe.RecipeID}, ${pickedRecipe.Name}, ${pickedRecipe.weight}`);
+			await insertMenu(
+				day,
+				pickedRecipe.RecipeID,
+				weekID,
+				pickedRecipe.originalRanking,
+				pickedRecipe.adjustedRanking,
+				pickedRecipe.originalRanking,
+				pickedRecipe.adjustedRanking,
+				pickedRecipe.isAged,
+				pickedRecipe.IsNewArrival,
+				pickedRecipe.totalRankings
+			);
+			console.log(`Day inserted into Menu - ${pickedRecipe.RecipeID}, ${pickedRecipe.Name}, ${pickedRecipe.adjustedWeight}`);
 		} else {
 			const updatedMenu = {
 				recipeID: pickedRecipe.RecipeID,
+				originalWeight: pickedRecipe.originalWeight,
+				adjustedWeight: pickedRecipe.adjustedWeight,
+				originalRanking: pickedRecipe.originalRanking,
+				adjustedRanking: pickedRecipe.adjustedRanking,
+				isAged: pickedRecipe.isAged,
+				isNewArrival: pickedRecipe.IsNewArrival,
+				totalRankings: pickedRecipe.totalRankings,
 			};
 			await updateMenu(updatedMenu, existingMenu[0].MenuID);
 			console.log('Day already exists in Menu', existingMenu);
@@ -182,7 +214,7 @@ const rerollMenuItem = async (req, res) => {
 	let menuID = req.params.menuID;
 	let excludedRecipeIDs = req.body.excludedRecipeIDs;
 
-	let recipes = await selectAllRecipes(excludedRecipeIDs);
+	let recipes = await selectAllRecipesByLastMadeOrder(excludedRecipeIDs);
 
 	const pickedRecipes = getRandomWeightedRecipe(recipes, 1);
 
@@ -191,6 +223,13 @@ const rerollMenuItem = async (req, res) => {
 		isSkipped: 0,
 		isMade: 0,
 		skipReason: '',
+		originalWeight: pickedRecipes[0].originalWeight,
+		adjustedWeight: pickedRecipes[0].adjustedWeight,
+		originalRanking: pickedRecipes[0].originalRanking,
+		adjustedRanking: pickedRecipes[0].adjustedRanking,
+		isAged: pickedRecipes[0].isAged,
+		isNewArrival: pickedRecipes[0].IsNewArrival,
+		totalRankings: pickedRecipes[0].totalRankings,
 	};
 
 	const updatedPromise = updateMenu(updatedMenu, menuID);
@@ -240,6 +279,7 @@ const madeMenuItem = async (req, res) => {
 					// Create a backup of the last made date
 					updatedRecipe.PreviousLastMade = recipeFromDB.lastmade;
 					updatedRecipe.lastmade = madeDate;
+					updatedRecipe.IsNewArrival = 0;
 				} else {
 					// Restore the previous last made date
 					updatedRecipe.PreviousLastMade = null;
@@ -315,29 +355,58 @@ const getRandomWeightedRecipe = (recipes, amountToPick) => {
 	for (let itemIndex = 0; itemIndex < filteredRecipes.length; itemIndex++) {
 		let recipe = filteredRecipes[itemIndex];
 		let originalWeight = itemIndex + 1;
-		let desiredWeight = originalWeight;
+		let adjustedWeight = originalWeight;
+		let isAged = false;
 
 		// Once we reach the back half of the recipes, skew the weight even more so they are more likely
 		if (itemIndex > filteredRecipes.length / 2) {
 			// Extra weight for the back half
-			desiredWeight = desiredWeight * 1.1;
+			adjustedWeight = adjustedWeight * 1.1;
+			isAged = true;
 		}
 
+		if (recipe.IsNewArrival) {
+			// New arrivals are heavy weighted
+			adjustedWeight = adjustedWeight * 1.6;
+		}
+
+		console.log(`ADD WEIGHT : RecipeID ${recipe.RecipeID}, ${recipe.Name}, ${recipe.lastmade}, Original Weight ${originalWeight} Weight ${adjustedWeight}`);
+
 		recipe = {
-			weight: desiredWeight,
+			originalRanking: filteredRecipes.length - itemIndex,
+			originalWeight,
+			adjustedWeight: adjustedWeight.toFixed(2),
+			isAged,
+			totalRankings: filteredRecipes.length,
 			...recipe,
 		};
-		console.log(`ADD WEIGHT : RecipeID ${recipe.RecipeID}, ${recipe.Name}, ${recipe.lastmade}, Original Weight ${originalWeight} Weight ${recipe.weight}`);
 		filteredRecipes[itemIndex] = recipe;
-		totalWeight += desiredWeight;
+		totalWeight += adjustedWeight;
 	}
 
+	// The weights have changed, we need to sort the array again
+	// Step 1: Sort objects by weight in descending order.
+	const sortedRecipes = filteredRecipes.slice().sort((a, b) => a.adjustedWeight - b.adjustedWeight);
+
+	sortedRecipes.forEach((recipe, index) => {
+		recipe.adjustedRanking = sortedRecipes.length - index;
+	});
+
+	sortedRecipes.forEach((recipe, index) => {
+		console.log(
+			`ADJUSTED WEIGHT : RecipeID ${recipe.RecipeID}, ${recipe.Name}, ${recipe.lastmade} | WEIGHTS ${recipe.originalWeight}, ${recipe.adjustedWeight} | RANKS ${recipe.originalRanking}, ${recipe.adjustedRanking}`
+		);
+	});
+
 	let pickedRecipes = [];
+
+	console.log('TOTAL WEIGHT', totalWeight);
 
 	// Pick x randoms with a weighted distribution
 	for (let itemNumber = 0; itemNumber < amountToPick; itemNumber++) {
 		// How this works: pick a random number between 0 and the SUM of all the weights
 		let randomWeight = Math.floor(Math.random() * totalWeight);
+		console.log('RANDOM WEIGHT', randomWeight);
 
 		// Then loop through every item, subtracting the weight of each item from the random number
 		// Once the random number is less than 0, pick that item
@@ -345,19 +414,25 @@ const getRandomWeightedRecipe = (recipes, amountToPick) => {
 		// The items with a weight of 1 are less likely to get that number below 0, but it is possible
 		// All depends on the random number that was chosen - if it's low, the lower weights have a chance, if it's very high, the higher weighted items
 		// have more of a chance to chip away at that number
-		for (let recipe of filteredRecipes) {
+
+		// The order of the filteredRecipesis important - the low weights need to be first so they are less likely to decrement that total and win
+		// Our highest weights are at the end so they are survivors, the early ones get killed first
+		for (let recipe of sortedRecipes) {
 			// Don't count weights of already picked items
 			if (!recipe.picked) {
 				// The number would be less than zero - chosen
-				if (randomWeight < recipe.weight) {
+				if (randomWeight < recipe.adjustedWeight) {
 					recipe.picked = true;
 					// Removing that item from the array will also remove its weight from the total
-					totalWeight -= recipe.weight;
-					console.log(`PICKED : ${recipe.RecipeID}, ${recipe.Name}, ${recipe.lastmade}, ${recipe.weight}`);
+					totalWeight -= recipe.adjustedWeight;
+					console.log(
+						`PICKED : ${recipe.RecipeID}, ${recipe.Name}, ${recipe.lastmade} | WEIGHTS ${recipe.originalWeight}, ${recipe.adjustedWeight} | RANKS ${recipe.originalRanking}, ${recipe.adjustedRanking}`
+					);
 					pickedRecipes.push(recipe);
 					break;
 				} else {
-					randomWeight = randomWeight - recipe.weight;
+					// console.log('SUB', { randomWeight, adj: recipe.adjustedWeight });
+					randomWeight = randomWeight - recipe.adjustedWeight;
 				}
 			}
 		}

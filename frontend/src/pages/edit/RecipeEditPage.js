@@ -91,7 +91,7 @@ const RecipeEditPage = () => {
 			setDefrost(recipe.Defrost || '');
 			setNotes(recipe.Notes || '');
 			setDayPrep(recipe.DayPrep || '');
-			setRating(recipe.Rating || 1);
+			setRating(recipe.Rating || 0);
 			setURL(recipe.URL || '');
 			setIsActive(recipe.IsActive === 1);
 			setAttachments(recipe.attachments);

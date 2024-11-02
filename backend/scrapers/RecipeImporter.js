@@ -77,6 +77,7 @@ const createRecipe = async (recipe, url) => {
 		description: recipe.description,
 		url,
 		IsActive: 1,
+		IsNewArrival: 1,
 	};
 
 	const newRecipe = await insertRecipe(recipeToInsert);

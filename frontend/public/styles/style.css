@@ -262,6 +262,15 @@ ol {
 	background: #f5f5f5;
 }
 
+.header__top.test-server {
+	background: #fcff3f;
+}
+
+.test-server .header__top__left,
+.test-server .login-name {
+	color: black;
+}
+
 .header__top__left,
 .humberger__menu__logo {
 	font-weight: bold;

@@ -18,6 +18,18 @@ export const selectAllShoppingListItem = (weekID) => {
 	});
 };
 
+export const deleteIngredientTagFromShoppingList = (ingredientTagID) => {
+	return new Promise((resolve, reject) => {
+		pool.query('DELETE FROM SHOPPING_LIST_ITEM WHERE IngredientTagID =  ?', [ingredientTagID], (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve(result);
+			}
+		});
+	});
+};
+
 export const deleteShoppingListItems = (weekID) => {
 	console.log('DELETETING FROM WEEK ' + weekID);
 	return new Promise((resolve, reject) => {

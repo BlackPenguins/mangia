@@ -1,6 +1,7 @@
 import express from 'express';
 import { removeIngredientTagFromIngredient } from '../database/ingredient.js';
 import { deleteIngredientTag, deleteIngredientTagPrice, insertIngredientTag, selectAllIngredientTags, updateIngredientTag } from '../database/ingredientTags.js';
+import { deleteIngredientTagFromShoppingList } from '../database/shoppingListItem.js';
 import { selectAllStores } from '../database/store.js';
 import { checkAdminMiddleware } from './auth.js';
 import { getPricesForStore } from './shoppingListItem.js';
@@ -60,8 +61,13 @@ const addIngredientTagHandler = (req, res) => {
 const removeIngredientTagHandler = async (req, res) => {
 	const ingredientTagID = req.params.ingredientTagID;
 
+	console.log('1');
+	await deleteIngredientTagFromShoppingList(ingredientTagID);
+	console.log('1a');
 	await removeIngredientTagFromIngredient(ingredientTagID);
+	console.log('2');
 	await deleteIngredientTagPrice(ingredientTagID);
+	console.log('3');
 	await deleteIngredientTag(ingredientTagID);
 
 	res.status(200).json({ success: true });

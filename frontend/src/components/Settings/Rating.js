@@ -2,6 +2,12 @@ import { Star } from 'react-feather';
 import './Rating.scss';
 
 const Rating = ({ rating, setRating, size }) => {
+	if (!rating && !setRating) {
+		// No rating yet, hide the stars
+		// But don't hide if it's the edit rating control or there would be no way to edit it
+		return null;
+	}
+
 	let ratingRemaining = rating;
 	const stars = [];
 

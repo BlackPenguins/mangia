@@ -14,6 +14,18 @@ export const selectAllRecipes = (excludedRecipeIDs = [0]) => {
 	});
 };
 
+export const selectAllRecipesByLastMadeOrder = (excludedRecipeIDs = [0]) => {
+	return new Promise((resolve, reject) => {
+		pool.query('SELECT * FROM recipe WHERE RecipeID NOT IN (?) ORDER BY LastMade DESC', [excludedRecipeIDs], (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve(result);
+			}
+		});
+	});
+};
+
 export const selectRecipeByID = (recipeID) => {
 	return new Promise((resolve, reject) => {
 		pool.query('SELECT * FROM RECIPE WHERE RecipeID = ?', [recipeID], (error, result) => {

@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { Button, Row } from 'reactstrap';
+import { Button, FormGroup, Input, Label, Row } from 'reactstrap';
 import './MenuSection.scss';
 import RecipeCard from '../Recipes/RecipeCard';
 import MenuNav from './MenuNav';
@@ -18,7 +18,7 @@ import useBetterModal from 'components/Common/useBetterModal';
 import FilteredRecipes from 'components/Recipes/FilteredRecipes';
 import RecipeRow from 'components/Recipes/RecipeRow';
 
-const MenuSection = () => {
+const MenuSection = ({ showAuditInformation }) => {
 	const [page, setPage] = useState(0);
 	const [currentRecipeIDs, setCurrentRecipeIDs] = useState([]);
 
@@ -67,6 +67,8 @@ const MenuSection = () => {
 };
 
 const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, availableSwapDays }) => {
+	const [showAuditInformation, setShowAuditInformation] = useState(false);
+
 	const authContext = useContext(AuthContext);
 	const tokenFromStorage = authContext.token;
 
@@ -102,24 +104,39 @@ const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, availableSwapDays }
 	});
 
 	return (
-		<Row className="menu---list">
-			{menus?.map((menu, index) => {
-				const tomorrowsRecipe = menus[index + 1]?.recipe;
-				return (
-					<MenuCard
-						key={index}
-						availableSwapDays={availableSwapDays}
-						fetchMenu={fetchMenu}
-						menu={menu}
-						page={page}
-						currentRecipeIDs={currentRecipeIDs}
-						tomorrowsRecipe={tomorrowsRecipe}
+		<>
+			<Row className="menu---list">
+				{menus?.map((menu, index) => {
+					const tomorrowsRecipe = menus[index + 1]?.recipe;
+					return (
+						<MenuCard
+							key={index}
+							availableSwapDays={availableSwapDays}
+							fetchMenu={fetchMenu}
+							menu={menu}
+							page={page}
+							currentRecipeIDs={currentRecipeIDs}
+							tomorrowsRecipe={tomorrowsRecipe}
+							showAuditInformation={showAuditInformation}
+						/>
+					);
+				})}
+				{extraModal}
+				<NewMenuButton openAddExtraModal={openAddExtraModal} />
+			</Row>
+			<span class="hide-checked-items">
+				<FormGroup switch>
+					<Input
+						type="switch"
+						checked={showAuditInformation}
+						onClick={() => {
+							setShowAuditInformation(!showAuditInformation);
+						}}
 					/>
-				);
-			})}
-			{extraModal}
-			<NewMenuButton openAddExtraModal={openAddExtraModal} />
-		</Row>
+					<Label check>Show Audit Information</Label>
+				</FormGroup>
+			</span>
+		</>
 	);
 };
 
@@ -135,7 +152,7 @@ const NewMenuButton = ({ openAddExtraModal }) => {
 	);
 };
 
-const MenuCard = ({ menu, fetchMenu, page, currentRecipeIDs, tomorrowsRecipe, availableSwapDays }) => {
+const MenuCard = ({ menu, fetchMenu, page, currentRecipeIDs, tomorrowsRecipe, availableSwapDays, showAuditInformation }) => {
 	const authContext = useContext(AuthContext);
 
 	const cardClasses = ['day-header'];
@@ -186,10 +203,15 @@ const MenuCard = ({ menu, fetchMenu, page, currentRecipeIDs, tomorrowsRecipe, av
 				/>
 				<DailyNotes menu={menu} />
 				<DayPreparation tomorrowsRecipe={tomorrowsRecipe} />
+				<AuditInformation menu={menu} showAuditInformation={showAuditInformation} />
 			</MenuContainer>
 		</div>
 	);
 };
+
+// [UnhandledPromiseRejection: This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). The promise rejected with the reason "Cannot delete or update a parent row: a foreign key constraint fails (`mangia`.`shopping_list_item`, CONSTRAINT `shopping_list_item_ibfk_2` FOREIGN KEY (`IngredientTagID`) REFERENCES `ingredient_tag` (`IngredientTagID`))".] {
+// 	code: 'ERR_UNHANDLED_REJECTION'
+//   }
 
 const DailyNotes = ({ menu }) => {
 	const notes = menu.dailyNotes;
@@ -261,6 +283,55 @@ const DayPreparation = ({ tomorrowsRecipe }) => {
 				})}
 			</div>
 		</div>
+	);
+};
+
+const AuditInformation = ({ menu, showAuditInformation }) => {
+	if (!showAuditInformation || !menu.originalRanking) {
+		return null;
+	}
+
+	console.log('MENU', menu);
+	return (
+		<div className="menu-footer audit">
+			<div className="menu-footer-title">Audit</div>
+			<table>
+				<BeforeAfter label="Rank" before={menu.originalRanking} after={menu.adjustedRanking} extra={` / ${menu.totalRankings}`} />
+				<BeforeAfter label="Weight" before={menu.originalWeight} after={menu.adjustedWeight} />
+				<tr>
+					<td className="aged">{menu.isAged === 1 ? 'Aged' : ''}</td>
+					<td>&nbsp;</td>
+					<td className="new">{menu.isNewArrival === 1 ? 'New' : ''}</td>
+				</tr>
+			</table>
+		</div>
+	);
+};
+
+const BeforeAfter = ({ label, before, after, extra }) => {
+	const difference = Math.round(after - before);
+
+	let differenceClass;
+	let differenceLabel;
+
+	if (difference > 0) {
+		differenceLabel = `+${difference}`;
+		differenceClass = 'positive';
+	} else {
+		differenceLabel = difference;
+		differenceClass = 'negative';
+	}
+
+	return (
+		<tr className="before-after">
+			<td className="label">{label}</td>
+			<td className="value">
+				{after}
+				{extra}
+			</td>
+			{difference !== 0 && <td className={differenceClass}>({differenceLabel})</td>}
+			{difference === 0 && <td>&nbsp;</td>}
+		</tr>
 	);
 };
 

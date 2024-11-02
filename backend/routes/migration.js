@@ -111,6 +111,18 @@ const migrationHandler = async (req, res) => {
 				}
 			}
 			break;
+		case 'addNewArrival':
+			await simpleDBQuery('Add Column', 'ALTER TABLE RECIPE ADD COLUMN IsNewArrival TINYINT', res);
+			break;
+		case 'addAuditColumns':
+			await simpleDBQuery('Add Audit Column', 'ALTER TABLE MENU_DAY ADD COLUMN OriginalWeight DOUBLE', res);
+			await simpleDBQuery('Add Audit Column', 'ALTER TABLE MENU_DAY ADD COLUMN AdjustedWeight DOUBLE', res);
+			await simpleDBQuery('Add Audit Column', 'ALTER TABLE MENU_DAY ADD COLUMN OriginalRanking INT', res);
+			await simpleDBQuery('Add Audit Column', 'ALTER TABLE MENU_DAY ADD COLUMN AdjustedRanking INT', res);
+			await simpleDBQuery('Add Audit Column', 'ALTER TABLE MENU_DAY ADD COLUMN IsAged TINYINT', res);
+			await simpleDBQuery('Add Audit Column', 'ALTER TABLE MENU_DAY ADD COLUMN IsNewArrival TINYINT', res);
+			await simpleDBQuery('Add Audit Column', 'ALTER TABLE MENU_DAY ADD COLUMN TotalRankings INT', res);
+			break;
 		default:
 			console.error('Migration not found!');
 			res.status(200).json({ success: false });

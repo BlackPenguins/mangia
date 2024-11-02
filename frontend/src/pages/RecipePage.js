@@ -12,6 +12,7 @@ import LoadingText from '../components/Common/LoadingText';
 import useBetterModal from 'components/Common/useBetterModal';
 import { PrepTimeLabel, ThumbnailPreview } from './edit/RecipeEditPage';
 import { getThumbnailImage } from 'components/Recipes/RecipeCard';
+import NewArrivalTag from 'components/Recipes/NewArrivalTag';
 
 const RecipePage = () => {
 	const params = useParams();
@@ -211,6 +212,7 @@ const HeaderImage = ({ recipe }) => {
 
 	return (
 		<div style={thumbnailStyle} className="thumbnail-container">
+			<NewArrivalTag recipe={recipe} />
 			<Rating rating={recipe?.Rating} size="20" />
 		</div>
 	);

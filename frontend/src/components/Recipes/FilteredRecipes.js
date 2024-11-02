@@ -3,6 +3,8 @@ import { Input, Row } from 'reactstrap';
 import LoadingText from '../Common/LoadingText';
 
 export const HIDDEN_CATEGORY_FILTER = 'Hidden';
+export const NEW_ARRIVAL_CATEGORY_FILTER = 'NewArrival';
+
 const FilteredRecipes = ({ CardType, layoutClass, onClickHandler, categoryFilter }) => {
 	const fetchRecipes = async () => {
 		const response = await fetch('/api/recipes');
@@ -32,7 +34,8 @@ const FilteredRecipes = ({ CardType, layoutClass, onClickHandler, categoryFilter
 			const matchesAll = !categoryFilter && recipe.IsActive;
 			const matchesCategory = categoryFilter && recipe.Category === categoryFilter && recipe.IsActive;
 			const matchesHidden = categoryFilter === HIDDEN_CATEGORY_FILTER && !recipe?.IsActive;
-			return matchesAll || matchesHidden || matchesCategory;
+			const matchesNewArrival = categoryFilter === NEW_ARRIVAL_CATEGORY_FILTER && recipe?.IsNewArrival;
+			return matchesAll || matchesHidden || matchesCategory || matchesNewArrival;
 		},
 		[categoryFilter]
 	);

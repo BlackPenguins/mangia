@@ -1,6 +1,6 @@
 import RecipeContainer from 'components/Recipes/RecipeContainer';
 import { useState } from 'react';
-import FilteredRecipes, { HIDDEN_CATEGORY_FILTER } from '../components/Recipes/FilteredRecipes';
+import FilteredRecipes, { HIDDEN_CATEGORY_FILTER, NEW_ARRIVAL_CATEGORY_FILTER } from '../components/Recipes/FilteredRecipes';
 
 const HomePage = () => {
 	const [categoryFilter, setCategoryFilter] = useState('Dinner');
@@ -29,6 +29,13 @@ const HomePage = () => {
 									</li>
 									<li class={categoryFilter === 'Dessert' ? 'active' : ''} data-filter=".fastfood" onClick={() => setCategoryFilter('Dessert')}>
 										Dessert
+									</li>
+									<li
+										class={categoryFilter === NEW_ARRIVAL_CATEGORY_FILTER ? 'active' : ''}
+										data-filter=".fastfood"
+										onClick={() => setCategoryFilter(NEW_ARRIVAL_CATEGORY_FILTER)}
+									>
+										New Arrivals
 									</li>
 									<li
 										class={categoryFilter === HIDDEN_CATEGORY_FILTER ? 'active' : ''}

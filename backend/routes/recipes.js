@@ -243,6 +243,7 @@ const addRecipe = (req, res) => {
 		rating: req.body.rating,
 		url: req.body.url,
 		isActive: true,
+		IsNewArrival: true,
 	};
 
 	const bookID = req.body.bookID;
