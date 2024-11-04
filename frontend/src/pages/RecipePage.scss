@@ -7,6 +7,17 @@
 	.section-title.hidden h2:after {
 		background: #ad3939;
 	}
+
+	.section-title {
+		button {
+			margin: 0px 25px;
+		}
+		
+		h2 {
+			display: inline-block;
+		}
+	}
+
 }
 
 .recipe-details-container {

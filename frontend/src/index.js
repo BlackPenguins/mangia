@@ -5,12 +5,15 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthContextProvider } from './authentication/auth-context';
+import { MenuContextProvider } from './authentication/menu-context.js';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
 	<BrowserRouter>
 		<AuthContextProvider>
-			<App />
+			<MenuContextProvider>
+				<App />
+			</MenuContextProvider>
 		</AuthContextProvider>
 	</BrowserRouter>
 );

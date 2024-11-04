@@ -17,10 +17,12 @@ import { Clock, PlusCircle, Thermometer } from 'react-feather';
 import useBetterModal from 'components/Common/useBetterModal';
 import FilteredRecipes from 'components/Recipes/FilteredRecipes';
 import RecipeRow from 'components/Recipes/RecipeRow';
+import MenuContext from 'authentication/menu-context';
 
 const MenuSection = ({ showAuditInformation }) => {
 	const [page, setPage] = useState(0);
 	const [currentRecipeIDs, setCurrentRecipeIDs] = useState([]);
+	const menuContext = useContext(MenuContext);
 
 	const fetchMenu = useCallback(async (page) => {
 		const response = await fetch(`/api/menu/${page}`);
@@ -29,7 +31,9 @@ const MenuSection = ({ showAuditInformation }) => {
 		console.log('Retrieved Menu from Server', menu);
 		setWeekOfYear(data.weekOfYear);
 		setMenus(menu);
-		setCurrentRecipeIDs(menu.map((m) => m.recipe?.RecipeID));
+		const recipeIDs = menu.map((m) => m.recipe?.RecipeID);
+		setCurrentRecipeIDs(recipeIDs);
+		menuContext.setMenuRecipeIDsHandler(recipeIDs);
 	}, []);
 
 	useEffect(() => {
@@ -208,10 +212,6 @@ const MenuCard = ({ menu, fetchMenu, page, currentRecipeIDs, tomorrowsRecipe, av
 		</div>
 	);
 };
-
-// [UnhandledPromiseRejection: This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). The promise rejected with the reason "Cannot delete or update a parent row: a foreign key constraint fails (`mangia`.`shopping_list_item`, CONSTRAINT `shopping_list_item_ibfk_2` FOREIGN KEY (`IngredientTagID`) REFERENCES `ingredient_tag` (`IngredientTagID`))".] {
-// 	code: 'ERR_UNHANDLED_REJECTION'
-//   }
 
 const DailyNotes = ({ menu }) => {
 	const notes = menu.dailyNotes;

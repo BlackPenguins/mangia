@@ -61,13 +61,9 @@ const addIngredientTagHandler = (req, res) => {
 const removeIngredientTagHandler = async (req, res) => {
 	const ingredientTagID = req.params.ingredientTagID;
 
-	console.log('1');
 	await deleteIngredientTagFromShoppingList(ingredientTagID);
-	console.log('1a');
 	await removeIngredientTagFromIngredient(ingredientTagID);
-	console.log('2');
 	await deleteIngredientTagPrice(ingredientTagID);
-	console.log('3');
 	await deleteIngredientTag(ingredientTagID);
 
 	res.status(200).json({ success: true });

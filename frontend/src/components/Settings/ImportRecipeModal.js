@@ -97,6 +97,7 @@ const useImportRecipeModal = () => {
 	useEffect(() => {
 		if (isOpen) {
 			setStatus(null);
+			setNewRecipeID(null);
 		}
 	}, [isOpen]);
 

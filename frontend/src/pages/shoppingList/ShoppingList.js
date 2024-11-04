@@ -1,3 +1,4 @@
+import { useToast } from 'context/toast-context';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { Button } from 'reactstrap';
 import AuthContext from '../../authentication/auth-context';
@@ -51,6 +52,8 @@ const ShoppingList = () => {
 		fetchShoppingListExtras();
 	}, [fetchShoppingList, fetchShoppingListExtras]);
 
+	const showToast = useToast();
+
 	const buildShoppingList = useCallback(async () => {
 		await fetch(`/api/shoppingListItem/build`, {
 			method: 'POST',
@@ -61,6 +64,7 @@ const ShoppingList = () => {
 			},
 		});
 		fetchShoppingList();
+		showToast('Shopping List', 'Shopping list has been rebuilt.');
 	}, [fetchShoppingList, tokenFromStorage]);
 
 	const [selectedStore, setSelectedStore] = useState(null);

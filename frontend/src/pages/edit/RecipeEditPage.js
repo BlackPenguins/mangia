@@ -129,6 +129,8 @@ const RecipeEditPage = () => {
 		});
 
 		showToast('Recipe Edited', `${label} has been saved`);
+
+		fetchRecipe();
 	};
 
 	const updateImage = async (imageFile) => {

@@ -13,8 +13,11 @@ import useBetterModal from 'components/Common/useBetterModal';
 import { PrepTimeLabel, ThumbnailPreview } from './edit/RecipeEditPage';
 import { getThumbnailImage } from 'components/Recipes/RecipeCard';
 import NewArrivalTag from 'components/Recipes/NewArrivalTag';
+import MenuContext from 'authentication/menu-context';
 
 const RecipePage = () => {
+	const menuContext = useContext(MenuContext);
+
 	const params = useParams();
 	const recipeID = params.recipeID;
 	const [recipe, setRecipe] = useState(null);
@@ -51,11 +54,22 @@ const RecipePage = () => {
 			</div>
 		);
 	} else {
+		const isMenuRecipe = menuContext.isMenuRecipeHandler(recipe.RecipeID);
 		return (
 			<section className="hero">
 				<div className="container recipe-details-container">
 					<div className={nameClasses.join(' ')}>
+						{isMenuRecipe && (
+							<Button className="site-btn week-button" onClick={() => menuContext.redirectToPreviousRecipeHandler(recipe.RecipeID)}>
+								<span className="page-button-label">Prev</span>
+							</Button>
+						)}
 						<h2>{recipe.Name}</h2>
+						{isMenuRecipe && (
+							<Button className="site-btn week-button" onClick={() => menuContext.redirectToNextRecipeHandler(recipe.RecipeID)}>
+								<span className="page-button-label">Next</span>
+							</Button>
+						)}
 					</div>
 
 					{/* <Title recipe={recipe} /> */}
