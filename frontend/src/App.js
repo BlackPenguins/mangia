@@ -16,6 +16,7 @@ import MigrationTab from 'pages/configuration/MigrationTab';
 import ImportFailuresTab from 'pages/configuration/ImportFailuresTab';
 import StoreTab from 'pages/configuration/StoreTab';
 import { ToastProvider } from 'context/toast-context';
+import SuggestionsTab from 'pages/configuration/SuggestionsTab';
 
 function App() {
 	return (
@@ -29,12 +30,14 @@ function App() {
 						<Route path="menu" element={<MenuPage />} />
 						<Route path="shoppingList" element={<ShoppingList />} />
 						<Route path="configuration" element={<ConfigurationPage />}>
+							<Route path="suggestions" element={<SuggestionsTab />} />
 							<Route path="books" element={<BooksTab />} />
 							<Route path="ingredients" element={<IngredientsTab />} />
 							<Route path="departments" element={<DepartmentTab />} />
 							<Route path="stores" element={<StoreTab />} />
 							<Route path="migration" element={<MigrationTab />} />
 							<Route path="import-failures" element={<ImportFailuresTab />} />
+							<Route path="*" element={<SuggestionsTab />} />
 						</Route>
 						<Route path="recipe" element={<RecipeEditPage />} />
 						<Route path="recipe/:recipeID" element={<RecipePage />} />

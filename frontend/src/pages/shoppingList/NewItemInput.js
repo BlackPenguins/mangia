@@ -25,7 +25,7 @@ export const NewItemInput = ({ tokenFromStorage, fetchShoppingListExtras }) => {
 	return (
 		<Row className="add-config-button">
 			<Col lg={2}>
-				<Button color="success" onClick={onAddHandler} className="site-btn add-item-button">
+				<Button onClick={onAddHandler} className="mangia-btn success add-item-button">
 					<PlusCircle />
 				</Button>
 			</Col>

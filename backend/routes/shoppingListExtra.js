@@ -6,9 +6,7 @@ import { getOrInsertWeek } from '../database/week.js';
 const router = express.Router();
 
 const getShoppingListItemsHandler = async (req, res) => {
-	const { weekID } = await getOrInsertWeek(0);
-
-	const selectPromise = selectAllShoppingListExtra(weekID);
+	const selectPromise = selectAllShoppingListExtra();
 
 	selectPromise.then(
 		(result) => {

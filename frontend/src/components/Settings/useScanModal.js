@@ -99,7 +99,7 @@ const useScanModal = (fetchRecipe, attachments, recipeID) => {
 			</div>
 		),
 		buttons: (closeModal) => (
-			<Button size="sm" color="success" className="site-btn" onClick={importFile}>
+			<Button size="sm" className="mangia-btn success" onClick={importFile}>
 				Add Attachment
 			</Button>
 		),

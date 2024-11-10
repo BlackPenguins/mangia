@@ -77,7 +77,7 @@ const Tag = ({ recipeID }) => {
 				/>
 			</Col>
 			<Col lg={2} className="recipe-edit-btn">
-				<Button size="sm" color="success" onClick={addTag} className="site-btn muted">
+				<Button size="sm" onClick={addTag} className="mangia-btn muted">
 					<TagIcon /> Add Tag
 				</Button>
 			</Col>

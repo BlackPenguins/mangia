@@ -6,7 +6,7 @@ const PageNumberButton = ({ page, setPage, mobileLabel, label }) => {
 	};
 
 	return (
-		<Button className="site-btn week-button" onClick={setPageHandler}>
+		<Button className="mangia-btn muted week-button" onClick={setPageHandler}>
 			<span className="page-button-label">{label}</span>
 			<span className="page-button-mobile-label">{mobileLabel}</span>
 		</Button>

@@ -56,7 +56,9 @@ const useLoginModal = (openSignUpModal) => {
 		),
 		buttons: (closeModal) => (
 			<div className="login-button">
-				<Button onClick={() => loginHandler(closeModal)}>Login</Button>
+				<Button className="mangia-btn muted" onClick={() => loginHandler(closeModal)}>
+					Login
+				</Button>
 			</div>
 		),
 	});

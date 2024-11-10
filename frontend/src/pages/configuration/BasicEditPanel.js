@@ -53,7 +53,7 @@ const BasicEditPanel = ({ label, apiFetch, apiInsert, apiUpdate, idColumn, Addit
 
 	return (
 		<div className="container book-list">
-			<h3>{label} List</h3>
+			<h3>{label}</h3>
 			<Row className="add-config-button">
 				<Col lg={7}>
 					<div className="form-floating">
@@ -62,7 +62,7 @@ const BasicEditPanel = ({ label, apiFetch, apiInsert, apiUpdate, idColumn, Addit
 					</div>
 				</Col>
 				<Col lg={5} className="recipe-edit-btn">
-					<Button size="sm" color="success" onClick={onAddItemHandler} className="site-btn">
+					<Button size="sm" onClick={onAddItemHandler} className="mangia-btn success">
 						Add {label}
 					</Button>
 				</Col>

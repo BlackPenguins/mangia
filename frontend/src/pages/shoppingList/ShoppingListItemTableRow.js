@@ -12,7 +12,17 @@ const MOBILE_NAME_WIDTH = 9;
 const MOBILE_RECIPE_COUNT_WIDTH = 2;
 const MOBILE_STORE_PRICES_SECTION_WIDTH = 12;
 
-const ShoppingListTableRow = ({ ingredient, hideCheckedItems, hidePrices, tokenFromStorage, stores, selectedStore, fetchShoppingList, storeHasLowestPrice }) => {
+const ShoppingListTableRow = ({
+	ingredient,
+	hideCheckedItems,
+	hidePrices,
+	tokenFromStorage,
+	stores,
+	selectedStore,
+	fetchShoppingList,
+	storeHasLowestPrice,
+	updateShoppingListWithServerData,
+}) => {
 	const [isChecked, setIsChecked] = useState(ingredient.isChecked);
 	const [prices, setPrices] = useState([]);
 
@@ -22,8 +32,7 @@ const ShoppingListTableRow = ({ ingredient, hideCheckedItems, hidePrices, tokenF
 
 	const setValue = (isChecked) => {
 		setIsChecked(isChecked);
-		updateShoppingList(ingredient.shoppingListItemID, isChecked, tokenFromStorage);
-		fetchShoppingList();
+		updateShoppingList(ingredient.shoppingListItemID, isChecked, tokenFromStorage, updateShoppingListWithServerData);
 	};
 
 	if (!storeHasLowestPrice(selectedStore, ingredient)) {
@@ -50,6 +59,7 @@ const ShoppingListTableRow = ({ ingredient, hideCheckedItems, hidePrices, tokenF
 		countWidth = RECIPE_COUNT_WIDTH;
 		mobileCountWidth = MOBILE_RECIPE_COUNT_WIDTH;
 	}
+
 	return (
 		<Row className={classes.join(' ')}>
 			<Col className="check-col col" lg={CHECKBOX_WIDTH} sm={MOBILE_CHECKBOX_WIDTH} xs={MOBILE_CHECKBOX_WIDTH}>
@@ -81,8 +91,8 @@ const ShoppingListTableRow = ({ ingredient, hideCheckedItems, hidePrices, tokenF
 	);
 };
 
-const updateShoppingList = async (shoppingListItemID, isChecked, tokenFromStorage) => {
-	await fetch(`/api/shoppingListItem/checked`, {
+const updateShoppingList = async (shoppingListItemID, isChecked, tokenFromStorage, updateShoppingListWithServerData) => {
+	const response = await fetch(`/api/shoppingListItem/checked`, {
 		method: 'PATCH',
 
 		body: JSON.stringify({ shoppingListItemID, isChecked }),
@@ -92,6 +102,9 @@ const updateShoppingList = async (shoppingListItemID, isChecked, tokenFromStorag
 			Authorization: `Bearer ${tokenFromStorage}`,
 		},
 	});
+
+	const data = await response.json();
+	updateShoppingListWithServerData(data.shoppingList);
 };
 
 export default ShoppingListTableRow;

@@ -50,7 +50,7 @@ const ChangeButton = ({ fetchMenu, menu, page, availableSwapDays }) => {
 			<>
 				{menu.hasNoDate && (
 					<div className="remove-item-container">
-						<Button color="danger" onClick={() => removeItemHandler(closeModal)}>
+						<Button className="mangia-btn danger" onClick={() => removeItemHandler(closeModal)}>
 							<Trash /> Remove Item
 						</Button>
 					</div>
@@ -160,13 +160,13 @@ const SwapDaysButtons = ({ week, availableSwapDays, menuID, fetchMenu, closeModa
 
 const SwapButton = ({ dayID, dayOfWeek, recipeName, currentDay, swapHandler }) => {
 	const isToday = dayOfWeek === currentDay;
-	const classes = ['site-btn'];
+	const classes = ['mangia-btn', 'success'];
 	if (isToday) {
 		classes.push('today');
 	}
 	return (
 		<Col lg={3}>
-			<Button type="danger" className={classes.join(' ')} onClick={() => swapHandler(dayID)}>
+			<Button className={classes.join(' ')} onClick={() => swapHandler(dayID)}>
 				<div>{dayOfWeek}</div>
 				<div className="recipe-name">{recipeName}</div>
 			</Button>

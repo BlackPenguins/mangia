@@ -3,8 +3,6 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import './ConfigurationPage.scss';
 
 const ConfigurationPage = () => {
-	const location = useLocation();
-
 	return (
 		<section className="hero">
 			<div className="container">
@@ -16,14 +14,32 @@ const ConfigurationPage = () => {
 					<div class="col-lg-3">
 						<div class="hero__categories">
 							<div class="hero__categories__all">
-								<span>Edit</span>
+								<span>Manage</span>
 							</div>
 							<ul>
 								<li>
-									<NavLink to="books" activeClassName="active">
-										Books
+									<NavLink to="suggestions" activeClassName="active">
+										Suggestions
 									</NavLink>
 								</li>
+								<li>
+									<NavLink to="import-failures" activeClassName="active">
+										Import Failures
+									</NavLink>
+								</li>
+								<li>
+									<NavLink to="migration" activeClassName="active">
+										Migration
+									</NavLink>
+								</li>
+							</ul>
+						</div>
+
+						<div class="hero__categories">
+							<div class="hero__categories__all">
+								<span>Edit</span>
+							</div>
+							<ul>
 								<li>
 									<NavLink to="ingredients" activeClassName="active">
 										Ingredients
@@ -40,13 +56,8 @@ const ConfigurationPage = () => {
 									</NavLink>
 								</li>
 								<li>
-									<NavLink to="import-failures" activeClassName="active">
-										Import Failures
-									</NavLink>
-								</li>
-								<li>
-									<NavLink to="migration" activeClassName="active">
-										Migration
+									<NavLink to="books" activeClassName="active">
+										Books
 									</NavLink>
 								</li>
 							</ul>

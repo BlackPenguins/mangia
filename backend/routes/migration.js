@@ -123,6 +123,13 @@ const migrationHandler = async (req, res) => {
 			await simpleDBQuery('Add Audit Column', 'ALTER TABLE MENU_DAY ADD COLUMN IsNewArrival TINYINT', res);
 			await simpleDBQuery('Add Audit Column', 'ALTER TABLE MENU_DAY ADD COLUMN TotalRankings INT', res);
 			break;
+		case 'addSuggestions':
+			await simpleDBQuery(
+				'Create SUGGESTIONS',
+				'CREATE TABLE SUGGESTIONS (SuggestionID INT AUTO_INCREMENT PRIMARY KEY, Name VARCHAR(500), ExpirationDate DATE, ExtensionCount INT, IsMade TINYINT )',
+				res
+			);
+			break;
 		default:
 			console.error('Migration not found!');
 			res.status(200).json({ success: false });

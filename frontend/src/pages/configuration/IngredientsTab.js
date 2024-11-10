@@ -73,7 +73,7 @@ const IngredientsTab = () => {
 
 	return (
 		<div className="container book-list ingredient-list">
-			<h3>Ingredient List</h3>
+			<h3>Ingredients</h3>
 			<Row className="add-config-button">
 				<Col lg={7}>
 					<div className="form-floating">
@@ -82,7 +82,7 @@ const IngredientsTab = () => {
 					</div>
 				</Col>
 				<Col lg={5} className="recipe-edit-btn">
-					<Button size="sm" color="success" onClick={onAddItemHandler} className="site-btn">
+					<Button size="sm" onClick={onAddItemHandler} className="mangia-btn success">
 						Add Ingredient
 					</Button>
 				</Col>
@@ -124,7 +124,7 @@ const IngredientRow = ({ fetchItems, item, tokenFromStorage, stores, departments
 		buttons: (closeModal) => (
 			<>
 				<Button
-					color="danger"
+					className="mangia-btn danger"
 					onClick={() => {
 						removeHandler(closeModal);
 					}}
@@ -148,7 +148,7 @@ const IngredientRow = ({ fetchItems, item, tokenFromStorage, stores, departments
 						<DepartmentDropdown item={item} departments={departments} />
 					</Col>
 					<Col lg={2}>
-						<Button className="site-btn danger" color="danger" onClick={() => openModal()}>
+						<Button className="mangia-btn danger" onClick={() => openModal()}>
 							<Trash2 />
 						</Button>
 					</Col>

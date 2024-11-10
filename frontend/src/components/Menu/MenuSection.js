@@ -1,12 +1,12 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { Button, FormGroup, Input, Label, Row } from 'reactstrap';
+import { Button, Col, FormGroup, Input, Label, Row } from 'reactstrap';
 import './MenuSection.scss';
-import RecipeCard from '../Recipes/RecipeCard';
+import RecipeCard, { DaysAgo } from '../Recipes/RecipeCard';
 import MenuNav from './MenuNav';
 import RerollButton from './RecipeButtons/RerollButton';
 import SkipButton from './RecipeButtons/SkipButton';
 import MadeButton from './RecipeButtons/MadeButton';
-import { AcUnit } from '@mui/icons-material';
+import { AcUnit, Lightbulb } from '@mui/icons-material';
 import LeftoversButton from './RecipeButtons/LeftoversButton';
 import ChangeButton from './RecipeButtons/ChangeButton';
 import AuthContext from '../../authentication/auth-context';
@@ -24,6 +24,9 @@ const MenuSection = ({ showAuditInformation }) => {
 	const [currentRecipeIDs, setCurrentRecipeIDs] = useState([]);
 	const menuContext = useContext(MenuContext);
 
+	const [menus, setMenus] = useState(null);
+	const [suggestions, setSuggestions] = useState([]);
+
 	const fetchMenu = useCallback(async (page) => {
 		const response = await fetch(`/api/menu/${page}`);
 		const data = await response.json();
@@ -31,16 +34,17 @@ const MenuSection = ({ showAuditInformation }) => {
 		console.log('Retrieved Menu from Server', menu);
 		setWeekOfYear(data.weekOfYear);
 		setMenus(menu);
+		setSuggestions(data?.suggestions);
 		const recipeIDs = menu.map((m) => m.recipe?.RecipeID);
+		const menuRecipeIDs = menu.filter((m) => m.isSkipped !== 1 && m.isLeftovers !== 1).map((m) => m.recipe?.RecipeID);
 		setCurrentRecipeIDs(recipeIDs);
-		menuContext.setMenuRecipeIDsHandler(recipeIDs);
+		menuContext.setMenuRecipeIDsHandler(menuRecipeIDs);
 	}, []);
 
 	useEffect(() => {
 		fetchMenu(page);
 	}, [fetchMenu, page]);
 
-	const [menus, setMenus] = useState(null);
 	const [weekOfYear, setWeekOfYear] = useState(null);
 
 	if (menus === null) {
@@ -63,11 +67,39 @@ const MenuSection = ({ showAuditInformation }) => {
 				<div className="container">
 					<MenuNav menus={menus} weekOfYear={weekOfYear} page={page} setPage={setPage} fetchMenu={fetchMenu} />
 					{menus?.length === 0 && <span>No menu found. This should not happen!</span>}
+					<SuggestionRow suggestions={suggestions} />
 					<MenuRow menus={menus} fetchMenu={fetchMenu} page={page} currentRecipeIDs={currentRecipeIDs} size={5} availableSwapDays={availableSwapDays} />
 				</div>
 			</section>
 		);
 	}
+};
+
+const SuggestionRow = ({ suggestions }) => {
+	return (
+		<Row className="menu---suggestion-list">
+			{suggestions &&
+				suggestions?.map((suggestion) => {
+					return (
+						<Col md={6}>
+							<SuggestionCard suggestion={suggestion} />
+						</Col>
+					);
+				})}
+		</Row>
+	);
+};
+
+const SuggestionCard = ({ suggestion }) => {
+	return (
+		<div class="suggestion-card">
+			<Lightbulb />
+			<span className="name">{suggestion.Name}</span>
+			<span className="suggestion-expires">
+				<DaysAgo label="Expires" lastMade={suggestion.ExpirationDate} recentDayThreshold={14} />
+			</span>
+		</div>
+	);
 };
 
 const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, availableSwapDays }) => {
@@ -148,7 +180,7 @@ const NewMenuButton = ({ openAddExtraModal }) => {
 	return (
 		<div className="col-md-6 col-lg-3 new-menu-card menu-card">
 			<div class="menu-container">
-				<Button color="success" className="site-btn" onClick={openAddExtraModal}>
+				<Button className="mangia-btn success" onClick={openAddExtraModal}>
 					<PlusCircle />
 				</Button>
 			</div>
@@ -291,7 +323,6 @@ const AuditInformation = ({ menu, showAuditInformation }) => {
 		return null;
 	}
 
-	console.log('MENU', menu);
 	return (
 		<div className="menu-footer audit">
 			<div className="menu-footer-title">Audit</div>

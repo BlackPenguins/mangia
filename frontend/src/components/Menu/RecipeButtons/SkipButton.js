@@ -30,7 +30,11 @@ const SkipButton = ({ fetchMenu, menu, page }) => {
 	const { modal, openModal, closeModal } = useBetterModal({
 		title: 'Skip Day',
 		size: 'sm',
-		buttons: (closeModal) => <Button onClick={() => setSkipHandler(closeModal)}>Skip Day</Button>,
+		buttons: (closeModal) => (
+			<Button className="mangia-btn muted" onClick={() => setSkipHandler(closeModal)}>
+				Skip Day
+			</Button>
+		),
 		content: (closeModal) => (
 			<Input
 				innerRef={inputRef}

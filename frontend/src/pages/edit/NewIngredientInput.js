@@ -29,7 +29,7 @@ export const NewIngredientInput = ({ tokenFromStorage, fetchRecipe, recipeID }) 
 	return (
 		<Row className="ingredient-row">
 			<Col lg={12}>
-				<Button className="add-ingredient-btn" size="small" color="success" onClick={onAddHandler}>
+				<Button className="add-ingredient-btn mangia-btn success" size="small" onClick={onAddHandler}>
 					<PlusCircle />
 				</Button>
 				<div className="ingredient-input form-floating">

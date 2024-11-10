@@ -83,10 +83,18 @@ const useImportRecipeModal = () => {
 		),
 		buttons: (closeModal) => (
 			<>
-				{!newRecipeID && <Button onClick={importRecipeFile}>Import File</Button>}
-				{!newRecipeID && <Button onClick={importHandler}>Import URL</Button>}
+				{!newRecipeID && (
+					<Button className="mangia-btn muted" onClick={importRecipeFile}>
+						Import File
+					</Button>
+				)}
+				{!newRecipeID && (
+					<Button className="mangia-btn muted" onClick={importHandler}>
+						Import URL
+					</Button>
+				)}
 				{newRecipeID && (
-					<Button color="success" onClick={viewRecipeHandler}>
+					<Button className="mangia-btn success" onClick={viewRecipeHandler}>
 						View Recipe
 					</Button>
 				)}

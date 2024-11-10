@@ -185,6 +185,46 @@
 	}
 }
 
+.menu---suggestion-list {
+	margin-bottom: 30px;
+
+	.suggestion-card {
+		margin: {
+			bottom: 10px;
+		}
+		width: 100%;
+		background-color: #4171c9;
+		color: white;
+		padding: 15px;
+
+		svg {
+			color: yellow;
+		}
+		.name {
+			margin: {
+				left: 15px;
+			}
+		}
+	}
+}
+
+.suggestion-expires {
+	position: absolute;
+	bottom: 15px;
+	right: 20px;
+    z-index: 10;
+    background-color: #222222;
+    color: #7fe398;
+    font-size: 0.8em;
+    font-weight: bold;
+    padding: 2px 5px;
+    border: 1px solid #363636;
+
+	.recent {
+		color: rgb(255, 147, 147);
+	}
+}
+
 
 .menu---list {
 

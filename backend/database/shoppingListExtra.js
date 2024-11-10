@@ -2,9 +2,9 @@ import { getPool } from './utils.js';
 
 const pool = getPool();
 
-export const selectAllShoppingListExtra = (weekID) => {
+export const selectAllShoppingListExtra = () => {
 	return new Promise((resolve, reject) => {
-		pool.query('SELECT * FROM SHOPPING_LIST_EXTRA WHERE WeekID = ?', [weekID], (error, result) => {
+		pool.query('SELECT * FROM SHOPPING_LIST_EXTRA ORDER BY IsChecked ASC, ShoppingListExtraID DESC', (error, result) => {
 			if (error) {
 				return reject(error.sqlMessage);
 			} else {

@@ -118,7 +118,8 @@ const RecipeEditPage = () => {
 
 	const updateRecipe = async (recipe, label) => {
 		console.log('Updating recipe', recipe);
-		await fetch(`/api/recipes/${recipeID}`, {
+
+		const response = await fetch(`/api/recipes/${recipeID}`, {
 			method: 'PATCH',
 			body: JSON.stringify(recipe),
 			headers: {
@@ -128,8 +129,9 @@ const RecipeEditPage = () => {
 			},
 		});
 
-		showToast('Recipe Edited', `${label} has been saved`);
+		const data = await response.json();
 
+		showToast('Recipe Edited', `${label} has been saved`);
 		fetchRecipe();
 	};
 
@@ -323,10 +325,10 @@ const RecipeEditPage = () => {
 					<IngredientsTextarea value={ingredientsBulk} setValue={ingredientsHandler} />
 
 					<div className="bottom-buttons">
-						<Button className="site-btn muted" onClick={previewAction}>
+						<Button className="mangia-btn muted" onClick={previewAction}>
 							<Eye /> Preview
 						</Button>
-						<Button className="site-btn muted" onClick={() => setShowImportModal(true)}>
+						<Button className="mangia-btn muted" onClick={() => setShowImportModal(true)}>
 							<ArrowUpCircle /> Import
 						</Button>
 					</div>
@@ -595,7 +597,7 @@ const IngredientLine = ({ index, singleIngredient, debounceEditFunction, updateI
 	return (
 		<Row className="ingredient-row">
 			<Col lg={9}>
-				<Button tabIndex={-1} className="delete-ingredient-btn" size="small" color="danger" onClick={removeHandler}>
+				<Button tabIndex={-1} className="mangia-btn danger delete-ingredient-btn" size="small" onClick={removeHandler}>
 					<Trash2 />
 				</Button>
 				<div className="ingredient-input form-floating">
@@ -860,7 +862,7 @@ const BooksSection = ({ bookID, setBookID, page, setPage, fetchRecipe, attachmen
 				</div>
 			</Col>
 			<Col lg={6} className="recipe-edit-btn">
-				<Button className="site-btn muted" onClick={openModal}>
+				<Button className="mangia-btn muted" onClick={openModal}>
 					<Printer /> Scan
 				</Button>
 			</Col>

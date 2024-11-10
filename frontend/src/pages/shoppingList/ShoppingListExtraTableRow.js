@@ -5,7 +5,6 @@ const ShoppingListExtraTableRow = ({ item, hideCheckedItems, tokenFromStorage })
 	const [isChecked, setIsChecked] = useState(item.IsChecked);
 
 	const setValue = (isChecked) => {
-		console.log('ITEM', item);
 		setIsChecked(isChecked);
 		updateShoppingList(item.ShoppingListExtraID, isChecked, tokenFromStorage);
 	};

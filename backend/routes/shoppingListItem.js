@@ -7,47 +7,50 @@ import { checkAdminMiddleware } from './auth.js';
 import { getMenuForWeekOffset } from './menu.js';
 
 const getShoppingListItemsHandler = async (req, res) => {
+	const shoppingList = await getCurrentShoppingList();
+
+	if (shoppingList) {
+		res.status(200).json(shoppingList);
+	} else {
+		res.status(500).json({ message: 'Could not find shopping list.' });
+	}
+};
+
+const getCurrentShoppingList = async () => {
 	const { weekID } = await getOrInsertWeek(0);
 
-	const shoppingListItems = selectAllShoppingListItem(weekID);
+	const shoppingListItems = await selectAllShoppingListItem(weekID);
 
-	shoppingListItems.then(
-		async (result) => {
-			const ingredientsWithPrices = [];
+	const ingredientsWithPrices = [];
 
-			for (const r of result) {
-				ingredientsWithPrices.push({
-					amount: r.Amount,
-					name: r.TagName,
-					isChecked: r.IsChecked,
-					recipeCount: r.RecipeCount,
-					shoppingListItemID: r.ShoppingListItemID,
-					ingredientTagID: r.IngredientTagID,
-					department: r.Department,
-					departmentPosition: r.DepartmentPosition,
-					prices: await getPricesForStore(r.IngredientTagID),
-				});
-			}
+	for (const shoppingListItem of shoppingListItems) {
+		ingredientsWithPrices.push({
+			amount: shoppingListItem.Amount,
+			name: shoppingListItem.TagName,
+			isChecked: shoppingListItem.IsChecked,
+			recipeCount: shoppingListItem.RecipeCount,
+			shoppingListItemID: shoppingListItem.ShoppingListItemID,
+			ingredientTagID: shoppingListItem.IngredientTagID,
+			department: shoppingListItem.Department,
+			departmentPosition: shoppingListItem.DepartmentPosition,
+			prices: await getPricesForStore(shoppingListItem.IngredientTagID),
+		});
+	}
 
-			const storesFromDB = await selectAllStores();
-			const stores = storesFromDB.map((s) => ({
-				storeID: s.StoreID,
-				storeName: s.Name,
-			}));
+	const storesFromDB = await selectAllStores();
+	const stores = storesFromDB.map((s) => ({
+		storeID: s.StoreID,
+		storeName: s.Name,
+	}));
 
-			const departmentsWithIngredients = groupByDepartment(ingredientsWithPrices);
+	const departmentsWithIngredients = groupByDepartment(ingredientsWithPrices);
 
-			const response = {
-				stores,
-				departments: departmentsWithIngredients,
-			};
+	const response = {
+		stores,
+		departments: departmentsWithIngredients,
+	};
 
-			res.status(200).json(response);
-		},
-		(error) => {
-			res.status(500).json({ message: error });
-		}
-	);
+	return response;
 };
 
 export const getPricesForStore = async (ingredientTagID) => {
@@ -116,8 +119,9 @@ const updateCheckedHandler = (req, res) => {
 	const insertPromise = updateShoppingListItemAsChecked(shoppingListItemID, isChecked);
 
 	insertPromise.then(
-		(result) => {
-			res.status(200).json({ success: true, result });
+		async (result) => {
+			const shoppingList = await getCurrentShoppingList();
+			res.status(200).json({ success: true, shoppingList });
 		},
 		(error) => {
 			res.status(500).json({ message: error });
@@ -165,29 +169,25 @@ const sumIngredients = (ingredients) => {
 
 	for (const ingredient of ingredients) {
 		if (ingredient.tagID != null) {
-			// It can be tracked
-			if (ingredient.calculatedAmount) {
-				const converted = convertToTeaspoons(ingredient.calculatedAmount);
+			const converted = convertToTeaspoons(ingredient.calculatedAmount);
 
-				const foundTotalIndex = finalIngredients.findIndex((i) => i.name === ingredient.tagName && i.wholeUnits === converted.wholeUnits);
+			const foundTotalIndex = finalIngredients.findIndex((i) => i.name === ingredient.tagName && i.wholeUnits === converted.wholeUnits);
 
-				if (foundTotalIndex === -1) {
-					finalIngredients.push({
-						name: ingredient.tagName,
-						tagID: ingredient.tagID,
-						value: converted.amount,
-						wholeUnits: converted.wholeUnits,
-						unit: converted.unit,
-						recipeCount: 1,
-						ingredientDepartment: ingredient.ingredientDepartment,
-						ingredientDepartmentPosition: ingredient.ingredientDepartmentPosition,
-					});
-				} else {
-					finalIngredients[foundTotalIndex].value += converted.amount;
-					finalIngredients[foundTotalIndex].recipeCount++;
-				}
+			if (foundTotalIndex === -1) {
+				finalIngredients.push({
+					name: ingredient.tagName,
+					tagID: ingredient.tagID,
+					value: converted.amount,
+					wholeUnits: converted.wholeUnits,
+					invalidAmount: converted.invalidAmount,
+					unit: converted.unit,
+					recipeCount: 1,
+					ingredientDepartment: ingredient.ingredientDepartment,
+					ingredientDepartmentPosition: ingredient.ingredientDepartmentPosition,
+				});
 			} else {
-				console.log('NOT FOUND ', ingredient);
+				finalIngredients[foundTotalIndex].value += converted.amount;
+				finalIngredients[foundTotalIndex].recipeCount++;
 			}
 		}
 	}
@@ -257,7 +257,11 @@ const sumIngredients = (ingredients) => {
 
 const convertToTeaspoons = (value) => {
 	if (!value) {
-		return `UNCONVERTED`;
+		return {
+			unit: 'MISSING AMOUNT',
+			amount: 1,
+			wholeUnits: true,
+		};
 	}
 
 	const smarterRe = /([\d\/\s]+)\s*(cup|teaspoon|tsp|tb|tablespoon|pound|ounce|oz|lb)?(?:s)?/;

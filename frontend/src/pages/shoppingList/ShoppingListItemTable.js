@@ -8,7 +8,16 @@ const RECIPE_COUNT_WIDTH = 1;
 const MOBILE_NAME_WIDTH = 9;
 const MOBILE_RECIPE_COUNT_WIDTH = 2;
 
-const ShoppingListTable = ({ hideCheckedItems, hidePrices, shoppingListItems, stores, tokenFromStorage, selectedStore, fetchShoppingList }) => {
+const ShoppingListTable = ({
+	hideCheckedItems,
+	hidePrices,
+	shoppingListItems,
+	stores,
+	tokenFromStorage,
+	selectedStore,
+	fetchShoppingList,
+	updateShoppingListWithServerData,
+}) => {
 	return (
 		<>
 			{shoppingListItems == null && <LoadingText text="Loading shopping list" />}
@@ -54,6 +63,7 @@ const ShoppingListTable = ({ hideCheckedItems, hidePrices, shoppingListItems, st
 											selectedStore={selectedStore}
 											fetchShoppingList={fetchShoppingList}
 											storeHasLowestPrice={storeHasLowestPrice}
+											updateShoppingListWithServerData={updateShoppingListWithServerData}
 										/>
 									))}
 								</div>

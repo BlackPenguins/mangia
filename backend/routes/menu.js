@@ -4,6 +4,7 @@ import { deleteMenu, insertMenu, selectByWeekID, selectMenuByDay, selectMenuByMe
 import { checkAdminMiddleware } from './auth.js';
 import { addIngredientsToRecipe, addThumbnails } from './recipes.js';
 import { getOrInsertWeek } from '../database/week.js';
+import { selectAllSuggestions, selectTwoSuggestions } from '../database/suggestions.js';
 
 const DAYS_OF_WEEK = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
 const MONTHS_OF_YEAR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -64,9 +65,12 @@ export const getMenuForWeekOffset = async (weekID, startDate) => {
 		}
 	}
 
+	const suggestions = await selectTwoSuggestions();
+
 	return {
 		weekOfYear,
 		days: formattedDaysArray,
+		suggestions,
 	};
 };
 

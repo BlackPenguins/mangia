@@ -29,7 +29,7 @@ const MenuNav = ({ menus, weekOfYear, page, setPage, fetchMenu }) => {
 		buttons: (closeModal) => (
 			<>
 				<Button
-					color="danger"
+					className="mangia-btn danger"
 					onClick={() => {
 						generateMenu();
 						closeModal();
@@ -55,7 +55,7 @@ const MenuNav = ({ menus, weekOfYear, page, setPage, fetchMenu }) => {
 			{modal}
 			{authContext.isAdmin && (
 				<div className="generate-button">
-					<Button color="success" onClick={generateButtonHandler} className="site-btn">
+					<Button onClick={generateButtonHandler} className="mangia-btn success">
 						Build Menu
 					</Button>
 				</div>

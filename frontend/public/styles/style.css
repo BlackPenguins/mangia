@@ -171,22 +171,26 @@ ol {
 	letter-spacing: 2px;
 }
 
-.site-btn {
+.mangia-btn {
 	font-size: 14px;
 	color: #ffffff;
 	font-weight: 800;
 	text-transform: uppercase;
 	display: inline-block;
 	padding: 13px 30px 12px;
-	background: #7fad39;
+	background: #3944ad;
 	border: none;
 }
 
-.site-btn.danger {
+.mangia-btn.success {
+	background: #7fad39;
+}
+
+.mangia-btn.danger {
 	background: #ad3939;
 }
 
-.site-btn.muted {
+.mangia-btn.muted {
 	background: #666666;
 }
 
@@ -2971,6 +2975,10 @@ ol {
 	.shoping__discount form input {
 		width: 240px;
 	}
+}
+
+.hero__categories {
+	margin-bottom: 30px;
 }
 
 /* Tablet Device = 768px */

@@ -6,7 +6,7 @@ import BasicEditPanel from './BasicEditPanel';
 const DepartmentTab = () => {
 	return (
 		<BasicEditPanel
-			label="Department"
+			label="Departments"
 			apiFetch="/api/ingredientDepartments"
 			apiInsert="/api/ingredientDepartments"
 			apiUpdate="/api/ingredientDepartments"

@@ -85,7 +85,11 @@ const useSignUpModal = () => {
 				<div>{errorMessage}</div>
 			</>
 		),
-		buttons: (closeModal) => <Button onClick={() => signUpHandler(closeModal)}>Register!</Button>,
+		buttons: (closeModal) => (
+			<Button className="mangia-btn muted" onClick={() => signUpHandler(closeModal)}>
+				Register!
+			</Button>
+		),
 	});
 
 	return { modal, openModal };

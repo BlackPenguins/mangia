@@ -54,7 +54,7 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 						<h3 className={`category-label ${categoryClass}`}>
 							<span>{recipeName}</span>
 						</h3>
-						<DaysAgo lastMade={recipe?.lastmade} />
+						<DaysAgo label="Last Made:" lastMade={recipe?.lastmade} recentDayThreshold={21} />
 						<div className="d-flex">
 							<div className="pricing">
 								<p className="price">
@@ -82,7 +82,7 @@ export const getThumbnailImage = (recipe, hideInformation) => {
 	);
 };
 
-const DaysAgo = ({ lastMade }) => {
+export const DaysAgo = ({ label, lastMade, recentDayThreshold }) => {
 	if (!lastMade) {
 		return null;
 	}
@@ -94,12 +94,16 @@ const DaysAgo = ({ lastMade }) => {
 	const dayCount = differenceInDays(lastMadeDate, new Date());
 	const classes = ['last-made'];
 
-	if (dayCount > -21) {
+	if (Math.abs(dayCount) <= recentDayThreshold) {
 		// Warn with red if in last 3 weeks
 		classes.push('recent');
 	}
 
-	return <div className={classes.join(' ')}>Last Made: {days}</div>;
+	return (
+		<div className={classes.join(' ')}>
+			{label} {days}
+		</div>
+	);
 };
 
 const CardStatus = ({ isSkipped, skipReason, recipe, isMade, isLeftovers }) => {

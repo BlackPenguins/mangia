@@ -37,7 +37,11 @@ const useAddRecipeModal = () => {
 
 	const { modal, openModal, closeModal } = useBetterModal({
 		title: 'Add Recipe',
-		buttons: (closeModal) => <Button onClick={() => addRecipeHandler(closeModal)}>Add Recipe</Button>,
+		buttons: (closeModal) => (
+			<Button className="mangia-btn muted" onClick={() => addRecipeHandler(closeModal)}>
+				Add Recipe
+			</Button>
+		),
 		content: (closeModal) => (
 			<Input
 				innerRef={inputRef}

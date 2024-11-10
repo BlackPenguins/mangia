@@ -70,14 +70,24 @@ const getImportFailureURLs = async (req, res) => {
 	res.status(200).json(urls);
 };
 
-const getRecipe = async (req, res) => {
-	const recipe = await selectRecipeByID(req.params.recipeID);
+const getRecipeHandler = async (req, res) => {
+	const recipe = await buildFullRecipe(req.params.recipeID);
 
 	if (!recipe) {
 		res.status(500).json({ message: "Recipe doesn't exist!" });
 	} else {
+		res.status(200).json(recipe);
+	}
+};
+
+const buildFullRecipe = async (recipeID) => {
+	const recipe = await selectRecipeByID(recipeID);
+
+	if (!recipe) {
+		return null;
+	} else {
 		const recipeWithThumbnails = await addThumbnails(recipe);
-		const steps = await selectStepsByRecipeID(req.params.recipeID);
+		const steps = await selectStepsByRecipeID(recipeID);
 
 		recipeWithThumbnails.steps = [];
 		for (const step of steps) {
@@ -87,7 +97,7 @@ const getRecipe = async (req, res) => {
 			});
 		}
 
-		const history = await selectByRecipeID(req.params.recipeID);
+		const history = await selectByRecipeID(recipeID);
 
 		recipeWithThumbnails.history = [];
 		for (const historyItem of history) {
@@ -96,12 +106,12 @@ const getRecipe = async (req, res) => {
 			}
 		}
 
-		const attachmentDirectory = `./images/attachments/${req.params.recipeID}`;
+		const attachmentDirectory = `./images/attachments/${recipeID}`;
 		recipeWithThumbnails.attachments = (fs.existsSync(attachmentDirectory) && fs.readdirSync(attachmentDirectory)) || [];
 
 		await addIngredientsToRecipe(recipeWithThumbnails);
 
-		res.status(200).json(recipeWithThumbnails);
+		return recipeWithThumbnails;
 	}
 };
 
@@ -408,8 +418,10 @@ const updateRecipeProcessor = async (req, res) => {
 		recipe = await updateRecipe(updatedRecipe, recipeID);
 	}
 
-	updateStepsAndIngredients(req.body, recipeID);
-	res.status(200).json({ success: true, recipe });
+	await updateStepsAndIngredients(req.body, recipeID);
+
+	const finalRecipe = await buildFullRecipe(recipeID);
+	res.status(200).json({ success: true, finalRecipe });
 };
 
 const updateIngredientProcessor = async (req, res) => {
@@ -560,7 +572,7 @@ const router = express.Router();
 
 router.get('/api/recipes/parseTextProgress', getParseTextProgress);
 router.get('/api/recipes/:recipeID/tags', getTagsForRecipe);
-router.get('/api/recipes/:recipeID', getRecipe);
+router.get('/api/recipes/:recipeID', getRecipeHandler);
 router.get('/api/recipe/importFailureURLs', getImportFailureURLs);
 router.get('/api/recipes', getAllRecipes);
 router.post('/api/recipes/import', [checkAdminMiddleware], importRecipeProcessor);

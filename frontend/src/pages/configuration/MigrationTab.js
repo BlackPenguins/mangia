@@ -25,6 +25,7 @@ const MigrationTab = () => {
 
 	return (
 		<div>
+			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addSuggestions" label="v1.9: Add SUGGESTIONS" />
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addAuditColumns" label="v1.8: Add Audit Columns to MENU_DAY" />
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addNewArrival" label="v1.8: Add IsNewArrival to RECIPE" />
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="moveThumbnails" label="v1.7: Move Thumbnails from RECIPE to THUMBNAILS" />
@@ -45,11 +46,11 @@ const MigrationTab = () => {
 };
 
 const MigrationButton = ({ migrationHandler, migrationKeyword, label }) => {
-	const [color, setColor] = useState('primary');
+	const [color, setColor] = useState('');
 
 	return (
 		<div className="migration-button">
-			<Button color={color} onClick={() => migrationHandler(migrationKeyword, setColor)}>
+			<Button className={`mangia-btn ${color}`} onClick={() => migrationHandler(migrationKeyword, setColor)}>
 				{label}
 			</Button>
 		</div>

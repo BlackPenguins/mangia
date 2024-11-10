@@ -16,8 +16,6 @@ import NewArrivalTag from 'components/Recipes/NewArrivalTag';
 import MenuContext from 'authentication/menu-context';
 
 const RecipePage = () => {
-	const menuContext = useContext(MenuContext);
-
 	const params = useParams();
 	const recipeID = params.recipeID;
 	const [recipe, setRecipe] = useState(null);
@@ -41,12 +39,6 @@ const RecipePage = () => {
 		fetchRecipe();
 	}, [fetchRecipe]);
 
-	const nameClasses = ['section-title'];
-
-	if (!recipe?.IsActive) {
-		nameClasses.push('hidden');
-	}
-
 	if (recipe === null) {
 		return (
 			<div className="container">
@@ -54,25 +46,10 @@ const RecipePage = () => {
 			</div>
 		);
 	} else {
-		const isMenuRecipe = menuContext.isMenuRecipeHandler(recipe.RecipeID);
 		return (
 			<section className="hero">
 				<div className="container recipe-details-container">
-					<div className={nameClasses.join(' ')}>
-						{isMenuRecipe && (
-							<Button className="site-btn week-button" onClick={() => menuContext.redirectToPreviousRecipeHandler(recipe.RecipeID)}>
-								<span className="page-button-label">Prev</span>
-							</Button>
-						)}
-						<h2>{recipe.Name}</h2>
-						{isMenuRecipe && (
-							<Button className="site-btn week-button" onClick={() => menuContext.redirectToNextRecipeHandler(recipe.RecipeID)}>
-								<span className="page-button-label">Next</span>
-							</Button>
-						)}
-					</div>
-
-					{/* <Title recipe={recipe} /> */}
+					<RecipeTitle recipe={recipe} />
 					<Row className="topSection">
 						<Col lg={4}>
 							<HeaderImage recipe={recipe} />
@@ -108,6 +85,44 @@ const RecipePage = () => {
 			</section>
 		);
 	}
+};
+
+const RecipeTitle = ({ recipe }) => {
+	const menuContext = useContext(MenuContext);
+	const recipeID = recipe.RecipeID;
+
+	const nameClasses = ['section-title'];
+
+	if (!recipe?.IsActive) {
+		nameClasses.push('hidden');
+	}
+
+	const isMenuRecipe = menuContext.isMenuRecipeHandler(recipeID);
+
+	return (
+		<div className={nameClasses.join(' ')}>
+			<span className="mobile">
+				<h2>{recipe.Name}</h2>
+			</span>
+			<MenuButton isMenuRecipe={isMenuRecipe} label="Prev" action={() => menuContext.redirectToPreviousRecipeHandler(recipeID)} />
+			<span className="desktop">
+				<h2>{recipe.Name}</h2>
+			</span>
+			<MenuButton isMenuRecipe={isMenuRecipe} label="Next" action={() => menuContext.redirectToNextRecipeHandler(recipeID)} />
+		</div>
+	);
+};
+
+const MenuButton = ({ isMenuRecipe, label, action }) => {
+	if (!isMenuRecipe) {
+		return null;
+	}
+
+	return (
+		<Button className="mangia-btn muted recipe-menu-button" onClick={action}>
+			<span>{label}</span>
+		</Button>
+	);
 };
 
 const Statistics = ({ recipe, book }) => {
@@ -205,10 +220,10 @@ const Controls = ({ recipe }) => {
 			{modal}
 
 			<div className="bottom-buttons">
-				<Button className="site-btn danger" color="danger" onClick={() => openModal()}>
+				<Button className="mangia-btn danger" onClick={() => openModal()}>
 					<Trash2 /> Delete
 				</Button>
-				<Button className="site-btn" color="success" onClick={() => navigate(`/recipe/${recipe?.RecipeID}/edit`)}>
+				<Button className="mangia-btn success" onClick={() => navigate(`/recipe/${recipe?.RecipeID}/edit`)}>
 					<Edit /> Edit
 				</Button>
 			</div>
@@ -347,7 +362,7 @@ const useConfirmDeleteModal = (recipeID) => {
 		content: (closeModal) => <div>Are you sure you want to delete this recipe?</div>,
 		buttons: (closeModal) => (
 			<>
-				<Button color="danger" onClick={deleteHandler}>
+				<Button className="mangia-btn danger" onClick={deleteHandler}>
 					Yes, Delete
 				</Button>
 			</>

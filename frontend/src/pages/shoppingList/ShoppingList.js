@@ -28,9 +28,13 @@ const ShoppingList = () => {
 			},
 		});
 		const data = await response.json();
+		updateShoppingListWithServerData(data);
+	}, [tokenFromStorage]);
+
+	const updateShoppingListWithServerData = (data) => {
 		setShoppingListItems(data.departments);
 		setStores(data.stores);
-	}, [tokenFromStorage]);
+	};
 
 	const fetchShoppingListExtras = useCallback(async () => {
 		const response = await fetch(`/api/shoppingListExtra`, {
@@ -83,7 +87,7 @@ const ShoppingList = () => {
 						<div class="col-lg-3"></div>
 						<div class="col-lg-9">
 							<div className="shopping-list-button">
-								<Button color="success" onClick={buildShoppingList} className="site-btn">
+								<Button onClick={buildShoppingList} className="mangia-btn success">
 									Build Shopping List
 								</Button>
 							</div>
@@ -110,6 +114,7 @@ const ShoppingList = () => {
 							tokenFromStorage={tokenFromStorage}
 							selectedStore={selectedStore}
 							fetchShoppingList={fetchShoppingList}
+							updateShoppingListWithServerData={updateShoppingListWithServerData}
 						/>
 
 						<ShoppingListExtraTable shoppingListExtras={shoppingListExtras} hideCheckedItems={hideCheckedItems} tokenFromStorage={tokenFromStorage} />

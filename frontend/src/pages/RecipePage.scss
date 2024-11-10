@@ -13,10 +13,34 @@
 			margin: 0px 25px;
 		}
 		
-		h2 {
+		.desktop {
+			display: inline-block;
+		}
+
+		.mobile {
+			display: none;
+		}
+
+		.recipe-menu-button {
 			display: inline-block;
 		}
 	}
+
+	@media only screen and (max-width: 767px) {
+		.section-title {
+			.mobile {
+				display: inline-block;
+				margin: {
+					top: 40px;
+					bottom: 40px;
+				}
+			}
+			.desktop {
+				display: none;
+			}
+		}
+	}
+
 
 }
 
