@@ -47,8 +47,8 @@ const attachmentStorageEngine = multer.diskStorage({
 	},
 });
 
-const upload = multer({ storage: thumbnailStorageEngine, limits: { fileSize: '50MB' } });
-const uploadAttachments = multer({ storage: attachmentStorageEngine, limits: { fileSize: '50MB' } });
+const upload = multer({ storage: thumbnailStorageEngine, limits: { fileSize: 25 * 1024 * 1024 } });
+const uploadAttachments = multer({ storage: attachmentStorageEngine, limits: { fileSize: 25 * 1024 * 1024 } });
 
 const getTagsForRecipe = (req, res) => {
 	const recipeID = req.params.recipeID;

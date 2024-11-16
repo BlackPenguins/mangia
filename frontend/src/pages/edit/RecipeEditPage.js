@@ -140,16 +140,20 @@ const RecipeEditPage = () => {
 			const imageData = new FormData();
 			imageData.append('imageFile', imageFile);
 
-			await fetch(`/api/recipes/image/${recipeID}`, {
+			fetch(`/api/recipes/image/${recipeID}`, {
 				method: 'POST',
 				body: imageData,
 				headers: {
 					Authorization: `Bearer ${tokenFromStorage}`,
 				},
-			});
-
-			showToast('Recipe Edited', 'Thumbnail has been uploaded');
-			fetchRecipe();
+			})
+				.then((data) => {
+					showToast('Recipe Edited', 'Thumbnail has been uploaded');
+					fetchRecipe();
+				})
+				.catch((error) => {
+					showToast('Thumbnail Failure', error);
+				});
 		}
 	};
 
