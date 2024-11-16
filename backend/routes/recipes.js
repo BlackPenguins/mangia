@@ -171,13 +171,18 @@ const importRecipeProcessor = async (req, res) => {
 
 const uploadImage = async (req, res) => {
 	const recipeID = req.params.recipeID;
-	console.log(req.file, recipeID);
+	console.log(`Upload a thumbnail for recipe ${recipeID}]`);
 
 	if (req.file) {
 		const beforeImageFileName = req.file.filename;
 		const afterImageFileName = beforeImageFileName.replace(LARGE_PREFIX, '');
 
+		console.log(`Before Image Name [${beforeImageFileName}]`);
+		console.log(`After Image Name [${afterImageFileName}]`);
+
 		await resizeThumbnail(recipeID, THUMBNAIL_DIRECTORY, beforeImageFileName, afterImageFileName);
+	} else {
+		console.log('No file was uploaded.');
 	}
 
 	res.status(200).json({});
@@ -195,6 +200,7 @@ export const resizeThumbnail = async (recipeID, sourceDirectory, beforeImageFile
 	const image = sharp(beforeImageFile);
 	const metadata = await image.metadata();
 
+	console.log('Resize image');
 	image.resize({ height: 500, fit: 'outside' }); // Resize to 500 px
 
 	// Dynamically set quality based on the format
@@ -217,6 +223,7 @@ export const resizeThumbnail = async (recipeID, sourceDirectory, beforeImageFile
 			break;
 	}
 
+	console.log('To file');
 	await image.toFile(afterImageFile);
 
 	fs.unlink(beforeImageFile, (err) => {
@@ -225,6 +232,7 @@ export const resizeThumbnail = async (recipeID, sourceDirectory, beforeImageFile
 		}
 	});
 
+	console.log('Insert image');
 	await insertThumbnail(recipeID, afterImageFileName);
 };
 
