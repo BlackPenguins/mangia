@@ -148,7 +148,8 @@ const RecipeEditPage = () => {
 				},
 			})
 				.then((data) => {
-					showToast('Recipe Edited', 'Thumbnail has been uploaded');
+					console.log('DATA', data);
+					showToast('Recipe Edited', `Thumbnail has been uploaded [${data?.status}] [${data?.url}]`);
 					fetchRecipe();
 				})
 				.catch((error) => {

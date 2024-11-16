@@ -21,9 +21,11 @@ const LARGE_PREFIX = 'large_';
 
 const thumbnailStorageEngine = multer.diskStorage({
 	destination: (req, file, callback) => {
+		console.log('STORAGE ENGINE 1');
 		callback(null, THUMBNAIL_DIRECTORY);
 	},
 	filename: (req, file, callback) => {
+		console.log('STORAGE ENGINE 2');
 		const recipeID = req.params.recipeID;
 		const originalFileName = file.originalname;
 		const randomSuffix = Math.floor(Math.random() * 10000);
