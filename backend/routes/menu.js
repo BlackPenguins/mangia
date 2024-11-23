@@ -75,7 +75,7 @@ export const getMenuForWeekOffset = async (weekID, startDate) => {
 };
 
 export const withDateDetails = (day, data) => {
-	if (day.getFullYear() <= 1970) {
+	if (!day || day.getFullYear() <= 1970) {
 		return {
 			hasNoDate: true,
 			...data,
