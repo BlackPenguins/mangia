@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@blackpenguins/penguinore-common-ext": "^1.0.38",
+    "@blackpenguins/penguinore-common-ext": "^1.0.39",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.14.18",
