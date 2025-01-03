@@ -9,15 +9,14 @@ import MadeButton from './RecipeButtons/MadeButton';
 import { AcUnit, Lightbulb } from '@mui/icons-material';
 import LeftoversButton from './RecipeButtons/LeftoversButton';
 import ChangeButton from './RecipeButtons/ChangeButton';
-import AuthContext from '../../authentication/auth-context';
 import LoadingText from 'components/Common/LoadingText';
 import MenuContainer from './MenuContainer';
 import { PrepTimeLabel } from 'pages/edit/RecipeEditPage';
 import { Clock, PlusCircle, Thermometer } from 'react-feather';
-import useBetterModal from 'components/Common/useBetterModal';
 import FilteredRecipes from 'components/Recipes/FilteredRecipes';
 import RecipeRow from 'components/Recipes/RecipeRow';
 import MenuContext from 'authentication/menu-context';
+import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
 
 const MenuSection = ({ showAuditInformation }) => {
 	const [page, setPage] = useState(0);
@@ -105,8 +104,8 @@ const SuggestionCard = ({ suggestion }) => {
 const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, availableSwapDays }) => {
 	const [showAuditInformation, setShowAuditInformation] = useState(false);
 
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 
 	const weekID = menus[0].weekID;
 
@@ -189,7 +188,7 @@ const NewMenuButton = ({ openAddExtraModal }) => {
 };
 
 const MenuCard = ({ menu, fetchMenu, page, currentRecipeIDs, tomorrowsRecipe, availableSwapDays, showAuditInformation }) => {
-	const authContext = useContext(AuthContext);
+	const authContext = useAuth();
 
 	const cardClasses = ['day-header'];
 

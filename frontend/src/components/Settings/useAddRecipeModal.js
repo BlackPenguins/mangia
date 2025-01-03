@@ -1,12 +1,11 @@
 import { useContext, useRef, useState } from 'react';
 import { Button, Input } from 'reactstrap';
 import { useNavigate } from 'react-router-dom';
-import AuthContext from 'authentication/auth-context';
-import useBetterModal from 'components/Common/useBetterModal';
+import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
 
 const useAddRecipeModal = () => {
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 
 	const navigate = useNavigate();
 	const [recipeName, setRecipeName] = useState('');
@@ -37,7 +36,7 @@ const useAddRecipeModal = () => {
 
 	const { modal, openModal, closeModal } = useBetterModal({
 		title: 'Add Recipe',
-		buttons: (closeModal) => (
+		footer: (closeModal) => (
 			<Button className="mangia-btn muted" onClick={() => addRecipeHandler(closeModal)}>
 				Add Recipe
 			</Button>

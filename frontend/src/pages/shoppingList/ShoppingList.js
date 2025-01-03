@@ -1,7 +1,6 @@
 import { useToast } from 'context/toast-context';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { Button } from 'reactstrap';
-import AuthContext from '../../authentication/auth-context';
 import NewItemInput from './NewItemInput';
 
 import './ShoppingList.scss';
@@ -9,10 +8,11 @@ import ShoppingListControls from './ShoppingListControls';
 import ShoppingListExtraTable from './ShoppingListExtraTable';
 import ShoppingListTable from './ShoppingListItemTable';
 import StoreFilters from './StoreFilters';
+import { useAuth } from '@blackpenguins/penguinore-common-ext';
 
 const ShoppingList = () => {
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 
 	const [shoppingListItems, setShoppingListItems] = useState(null);
 	const [shoppingListExtras, setShoppingListExtras] = useState(null);

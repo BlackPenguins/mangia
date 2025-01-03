@@ -1,13 +1,12 @@
-import useBetterModal from 'components/Common/useBetterModal.js';
 import { useCallback, useContext, useRef, useState } from 'react';
 import { Play, Slash } from 'react-feather';
 import { Button, Input } from 'reactstrap';
-import AuthContext from '../../../authentication/auth-context.js';
 import BottomButton from './BottomButton.js';
+import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
 
 const SkipButton = ({ fetchMenu, menu, page }) => {
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 	const inputRef = useRef(null);
 	const [skipReason, setSkipReason] = useState(menu?.skipReason);
 
@@ -30,7 +29,7 @@ const SkipButton = ({ fetchMenu, menu, page }) => {
 	const { modal, openModal, closeModal } = useBetterModal({
 		title: 'Skip Day',
 		size: 'sm',
-		buttons: (closeModal) => (
+		footer: (closeModal) => (
 			<Button className="mangia-btn muted" onClick={() => setSkipHandler(closeModal)}>
 				Skip Day
 			</Button>

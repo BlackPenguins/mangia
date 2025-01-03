@@ -1,11 +1,11 @@
 import { useCallback, useContext } from 'react';
 import { Moon } from 'react-feather';
-import AuthContext from '../../../authentication/auth-context';
 import BottomButton from './BottomButton';
+import { useAuth } from '@blackpenguins/penguinore-common-ext';
 
 const LeftoversButton = ({ fetchMenu, menu, page }) => {
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 	const isLeftovers = menu?.isLeftovers;
 
 	const leftoversHandler = useCallback(async () => {

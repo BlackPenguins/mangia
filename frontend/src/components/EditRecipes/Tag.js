@@ -1,14 +1,14 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { Button, Col, Row } from 'reactstrap';
 import { Tag as TagIcon } from 'react-feather';
+import { useAuth } from '@blackpenguins/penguinore-common-ext';
 
 import './Tag.scss';
-import AuthContext from '../../authentication/auth-context';
 import InputWithAutocomplete from './InputWithAutocomplete';
 
 const Tag = ({ recipeID }) => {
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 
 	const fetchAllTags = async () => {
 		const response = await fetch('/api/tags', {

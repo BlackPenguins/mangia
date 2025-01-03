@@ -24,6 +24,31 @@
 	}
 }
 
+.login-display {
+	.profile-link {
+		i {
+			color: #7fad39;
+		}
+
+		.display-name {
+			color: #7fad39;
+
+			&:hover {
+				color: #658a2f
+			}
+		}
+	}
+
+	.logout-link {
+		color: black;
+
+		&:hover {
+			color: darkgray;
+		}
+	
+	}
+}
+
 .swap-days-buttons {
 	.row {
 		>div {

@@ -1,9 +1,9 @@
-import AuthContext from 'authentication/auth-context';
 import { useCallback, useContext, useEffect, useState } from 'react';
+import { useAuth } from '@blackpenguins/penguinore-common-ext';
 
 const ImportFailuresTab = () => {
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 
 	const [urls, setURLs] = useState([]);
 

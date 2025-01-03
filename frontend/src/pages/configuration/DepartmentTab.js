@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import { Input } from 'reactstrap';
-import AuthContext from '../../authentication/auth-context';
 import BasicEditPanel from './BasicEditPanel';
+import { useAuth } from '@blackpenguins/penguinore-common-ext';
 
 const DepartmentTab = () => {
 	return (
@@ -17,8 +17,8 @@ const DepartmentTab = () => {
 };
 
 const PositionInput = ({ element }) => {
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 
 	const changePosition = async (option) => {
 		await fetch('/api/ingredientDepartments', {

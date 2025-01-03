@@ -2,19 +2,18 @@ import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Button, Col, Input, Row } from 'reactstrap';
 import LoadingText from '../../components/Common/LoadingText';
 
-import AuthContext from '../../authentication/auth-context';
 import { NameInput } from './BasicEditPanel';
 import { useToast } from 'context/toast-context';
 import PriceInput from 'pages/shoppingList/PriceInput';
-import useBetterModal from 'components/Common/useBetterModal';
 import { Trash2 } from 'react-feather';
+import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
 
 const IngredientsTab = () => {
 	const [items, setItems] = useState(null);
 	const [stores, setStores] = useState(null);
 
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 
 	const addItemInputRef = useRef();
 
@@ -121,7 +120,7 @@ const IngredientRow = ({ fetchItems, item, tokenFromStorage, stores, departments
 	const { modal, openModal } = useBetterModal({
 		title: 'Delete Ingredient',
 		size: 'md',
-		buttons: (closeModal) => (
+		footer: (closeModal) => (
 			<>
 				<Button
 					className="mangia-btn danger"
@@ -162,8 +161,8 @@ const IngredientRow = ({ fetchItems, item, tokenFromStorage, stores, departments
 	);
 };
 const DepartmentDropdown = ({ item, departments }) => {
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 	const showToast = useToast();
 
 	const [departmentID, setDepartmentID] = useState(item.IngredientDepartmentID);

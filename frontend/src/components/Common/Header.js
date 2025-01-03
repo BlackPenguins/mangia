@@ -1,13 +1,12 @@
 import { useContext, useState } from 'react';
 import { Menu, Users } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
-import AuthContext from 'authentication/auth-context';
-import LoginDisplay from 'authentication/LoginDisplay';
+import { useAuth, LoginDisplay } from '@blackpenguins/penguinore-common-ext';
 import useAddRecipeModal from 'components/Settings/useAddRecipeModal';
 import useImportRecipeModal from 'components/Settings/ImportRecipeModal';
 
 const Header = () => {
-	const authContext = useContext(AuthContext);
+	const authContext = useAuth();
 	const navigate = useNavigate();
 
 	const [showSidebar, setShowSidebar] = useState(false);
@@ -94,9 +93,7 @@ const Header = () => {
 				<div className="humberger__menu__logo">MANGIA!</div>
 				<div className="humberger__menu__widget">
 					<div className="header__top__right__auth">
-						<span>
-							<Users size={15} /> <LoginDisplay />
-						</span>
+						<LoginDisplay />
 					</div>
 				</div>
 				<nav className="humberger__menu__nav mobile-menu slicknav_nav">{links}</nav>
@@ -109,7 +106,7 @@ const Header = () => {
 							<div className="col-lg-12 col-md-12">
 								<span className="header__top__left">{title}</span>
 								<span className="header__top__right">
-									<Users size={15} /> <LoginDisplay />
+									<LoginDisplay />
 								</span>
 							</div>
 						</div>

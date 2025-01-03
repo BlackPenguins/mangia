@@ -2,12 +2,11 @@ import { useContext, useEffect, useState } from 'react';
 import { Button, Input } from 'reactstrap';
 import { useNavigate } from 'react-router-dom';
 import './ImportRecipeModal.scss';
-import AuthContext from 'authentication/auth-context';
-import useBetterModal from 'components/Common/useBetterModal';
+import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
 
 const useImportRecipeModal = () => {
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 
 	const navigate = useNavigate();
 	const [importURL, setImportURL] = useState('');
@@ -81,7 +80,7 @@ const useImportRecipeModal = () => {
 				<div className={statusClasses}>{status}</div>
 			</>
 		),
-		buttons: (closeModal) => (
+		footer: (closeModal) => (
 			<>
 				{!newRecipeID && (
 					<Button className="mangia-btn muted" onClick={importRecipeFile}>

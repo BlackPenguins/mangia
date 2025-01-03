@@ -1,8 +1,8 @@
 import { useToast } from 'context/toast-context';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Button, Col, Input, Row } from 'reactstrap';
-import AuthContext from '../../authentication/auth-context';
 import LoadingText from '../../components/Common/LoadingText';
+import { useAuth } from '@blackpenguins/penguinore-common-ext';
 
 const BasicEditPanel = ({ label, apiFetch, apiInsert, apiUpdate, idColumn, AdditionalOption }) => {
 	const [items, setItems] = useState(null);
@@ -24,8 +24,8 @@ const BasicEditPanel = ({ label, apiFetch, apiInsert, apiUpdate, idColumn, Addit
 		fetchItems();
 	}, [fetchItems]);
 
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 
 	const addItemInputRef = useRef();
 

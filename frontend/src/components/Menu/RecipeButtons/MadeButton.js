@@ -1,11 +1,11 @@
 import { useCallback, useContext } from 'react';
 import { Flag } from 'react-feather';
-import AuthContext from '../../../authentication/auth-context';
 import BottomButton from './BottomButton';
+import { useAuth } from '@blackpenguins/penguinore-common-ext';
 
 const MadeButton = ({ fetchMenu, menu, page, recipe }) => {
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 
 	const isSkipped = menu?.isSkipped;
 	const isMade = menu?.isMade;

@@ -10,18 +10,18 @@ import Category from '../../components/Recipes/Category';
 import Tag, { TagBox } from '../../components/EditRecipes/Tag';
 import { ArrowUpCircle, Eye, Printer, Trash2 } from 'react-feather';
 import useScanModal from '../../components/Settings/useScanModal';
-import AuthContext from '../../authentication/auth-context';
 import InputWithAutocomplete from '../../components/EditRecipes/InputWithAutocomplete';
 import ImportRecipeModal from '../../components/Settings/ImportRecipeModal';
 import { useToast } from 'context/toast-context';
 import NewIngredientInput from './NewIngredientInput';
+import { useAuth } from '@blackpenguins/penguinore-common-ext';
 
 const RecipeEditPage = () => {
 	const navigate = useNavigate();
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 
-	if (authContext.isNotAdmin()) {
+	if (!authContext.isAdmin) {
 		console.log('Kicking the non-admin out of the edit page!');
 		navigate('/home');
 	}
@@ -527,8 +527,8 @@ const PrepTimeDropdown = ({ value, setValue }) => {
 };
 
 const IngredientsLines = ({ ingredients, recipeID, fetchRecipe }) => {
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 
 	const updateIngredientHandler = async (ingredientID, value) => {
 		const response = await fetch(`/api/recipes/${recipeID}/ingredient/${ingredientID}`, {

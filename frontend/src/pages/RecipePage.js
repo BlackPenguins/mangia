@@ -7,13 +7,12 @@ import Rating from '../components/Settings/Rating';
 import { utcToZonedTime } from 'date-fns-tz';
 import { formatDistance } from 'date-fns';
 import { Edit, Trash2 } from 'react-feather';
-import AuthContext from '../authentication/auth-context';
 import LoadingText from '../components/Common/LoadingText';
-import useBetterModal from 'components/Common/useBetterModal';
 import { PrepTimeLabel, ThumbnailPreview } from './edit/RecipeEditPage';
 import { getThumbnailImage } from 'components/Recipes/RecipeCard';
 import NewArrivalTag from 'components/Recipes/NewArrivalTag';
 import MenuContext from 'authentication/menu-context';
+import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
 
 const RecipePage = () => {
 	const params = useParams();
@@ -205,7 +204,7 @@ const Statistics = ({ recipe, book }) => {
 };
 
 const Controls = ({ recipe }) => {
-	const authContext = useContext(AuthContext);
+	const authContext = useAuth();
 
 	const { modal, openModal } = useConfirmDeleteModal(recipe?.RecipeID);
 
@@ -340,8 +339,8 @@ const History = ({ history }) => {
 };
 
 const useConfirmDeleteModal = (recipeID) => {
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 
 	const navigate = useNavigate();
 
@@ -360,7 +359,7 @@ const useConfirmDeleteModal = (recipeID) => {
 	const { modal, openModal } = useBetterModal({
 		title: 'Delete this Recipe',
 		content: (closeModal) => <div>Are you sure you want to delete this recipe?</div>,
-		buttons: (closeModal) => (
+		footer: (closeModal) => (
 			<>
 				<Button className="mangia-btn danger" onClick={deleteHandler}>
 					Yes, Delete

@@ -1,11 +1,11 @@
 import { useCallback, useContext } from 'react';
 import { Codesandbox } from 'react-feather';
-import AuthContext from '../../../authentication/auth-context';
 import BottomButton from './BottomButton';
+import { useAuth } from '@blackpenguins/penguinore-common-ext';
 
 const RerollButton = ({ fetchMenu, menuID, currentRecipeIDs, page, isSkipped }) => {
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 
 	const reroll = useCallback(async () => {
 		const request = {

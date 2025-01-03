@@ -1,13 +1,12 @@
-import { useCallback, useContext, useState } from 'react';
+import { useCallback } from 'react';
 import { Button } from 'reactstrap';
 import './MenuNav.scss';
 import PageNumberButton from './PageNumberButton';
-import AuthContext from 'authentication/auth-context';
-import useBetterModal from 'components/Common/useBetterModal';
+import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
 
 const MenuNav = ({ menus, weekOfYear, page, setPage, fetchMenu }) => {
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 
 	const hasAtLeastOneMenu = menus.filter((m) => m.menuID).length > 0;
 
@@ -26,7 +25,7 @@ const MenuNav = ({ menus, weekOfYear, page, setPage, fetchMenu }) => {
 	const { modal, openModal } = useBetterModal({
 		title: 'Rebuild the Menu',
 		size: 'md',
-		buttons: (closeModal) => (
+		footer: (closeModal) => (
 			<>
 				<Button
 					className="mangia-btn danger"

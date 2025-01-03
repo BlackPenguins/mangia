@@ -1,12 +1,11 @@
 import { useContext, useState } from 'react';
 import { Button, Col, FormText, Input, Row } from 'reactstrap';
-import AuthContext from 'authentication/auth-context';
 import './ScanModal.scss';
-import useBetterModal from 'components/Common/useBetterModal';
+import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
 
 const useScanModal = (fetchRecipe, attachments, recipeID) => {
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 
 	const [imageFile, setImageFile] = useState('');
 	const [text, setText] = useState(null);
@@ -98,7 +97,7 @@ const useScanModal = (fetchRecipe, attachments, recipeID) => {
 				</div>
 			</div>
 		),
-		buttons: (closeModal) => (
+		footer: (closeModal) => (
 			<Button size="sm" className="mangia-btn success" onClick={importFile}>
 				Add Attachment
 			</Button>

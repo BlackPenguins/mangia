@@ -1,19 +1,18 @@
-import AuthContext from 'authentication/auth-context';
 import LoadingText from 'components/Common/LoadingText';
-import useBetterModal from 'components/Common/useBetterModal';
 import { DaysAgo } from 'components/Recipes/RecipeCard';
 import { useToast } from 'context/toast-context';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Flag } from 'react-feather';
 import { Button, Col, Input, Row } from 'reactstrap';
 import { NameInput } from './BasicEditPanel';
+import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
 
 const SuggestionsTab = () => {
 	const [suggestions, setSuggestions] = useState(null);
 	const [expirationDate, setExpirationDate] = useState(null);
 
-	const authContext = useContext(AuthContext);
-	const tokenFromStorage = authContext.token;
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
 
 	const addSuggestionInputRef = useRef();
 
@@ -136,7 +135,7 @@ const SuggestionRow = ({ fetchSuggestions, suggestion, tokenFromStorage }) => {
 	const { modal, openModal } = useBetterModal({
 		title: 'Make Suggestion',
 		size: 'md',
-		buttons: (closeModal) => (
+		footer: (closeModal) => (
 			<>
 				<Button
 					className="mangia-btn"
