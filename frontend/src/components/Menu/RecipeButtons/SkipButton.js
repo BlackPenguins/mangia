@@ -1,4 +1,4 @@
-import { useCallback, useContext, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Play, Slash } from 'react-feather';
 import { Button, Input } from 'reactstrap';
 import BottomButton from './BottomButton.js';
@@ -26,7 +26,7 @@ const SkipButton = ({ fetchMenu, menu, page }) => {
 		closeModal();
 	};
 
-	const { modal, openModal, closeModal } = useBetterModal({
+	const { modal, openModal } = useBetterModal({
 		title: 'Skip Day',
 		size: 'sm',
 		footer: (closeModal) => (
@@ -73,13 +73,9 @@ const SkipButton = ({ fetchMenu, menu, page }) => {
 		}
 	}, [page, menu, fetchMenu, isSkipped, tokenFromStorage]);
 
-	let label = 'SKIP';
-	let className = 'skip-button';
 	let Icon = Slash;
 
 	if (isSkipped) {
-		label = 'UNSKIP';
-		className = 'unskip-button';
 		Icon = Play;
 	}
 

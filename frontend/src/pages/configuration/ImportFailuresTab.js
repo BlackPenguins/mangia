@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@blackpenguins/penguinore-common-ext';
 
 const ImportFailuresTab = () => {

@@ -1,5 +1,5 @@
-import { useContext, useState } from 'react';
-import { Menu, Users } from 'react-feather';
+import { useState } from 'react';
+import { Menu } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, LoginDisplay } from '@blackpenguins/penguinore-common-ext';
 import useAddRecipeModal from 'components/Settings/useAddRecipeModal';

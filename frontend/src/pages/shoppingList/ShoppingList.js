@@ -1,5 +1,5 @@
 import { useToast } from 'context/toast-context';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Button } from 'reactstrap';
 import NewItemInput from './NewItemInput';
 

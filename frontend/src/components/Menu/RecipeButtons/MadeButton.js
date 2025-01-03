@@ -1,4 +1,4 @@
-import { useCallback, useContext } from 'react';
+import { useCallback } from 'react';
 import { Flag } from 'react-feather';
 import BottomButton from './BottomButton';
 import { useAuth } from '@blackpenguins/penguinore-common-ext';

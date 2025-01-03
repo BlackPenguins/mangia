@@ -1,5 +1,5 @@
 import { Settings, Trash } from 'react-feather';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { Button, Col, Input, Row } from 'reactstrap';
 import FilteredRecipes from 'components/Recipes/FilteredRecipes';
 import RecipeRow from 'components//Recipes/RecipeRow';

@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { Button, Col, FormText, Input, Row } from 'reactstrap';
 import './ScanModal.scss';
 import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';

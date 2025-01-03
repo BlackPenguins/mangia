@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Button, Col, Row } from 'reactstrap';
 import { Tag as TagIcon } from 'react-feather';
 import { useAuth } from '@blackpenguins/penguinore-common-ext';

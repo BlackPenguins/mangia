@@ -1,4 +1,4 @@
-import { useCallback, useContext } from 'react';
+import { useCallback } from 'react';
 import { Moon } from 'react-feather';
 import BottomButton from './BottomButton';
 import { useAuth } from '@blackpenguins/penguinore-common-ext';
@@ -20,8 +20,6 @@ const LeftoversButton = ({ fetchMenu, menu, page }) => {
 		});
 		fetchMenu(page);
 	}, [page, menu, fetchMenu, isLeftovers, tokenFromStorage]);
-
-	let classes = ['leftovers-button'];
 
 	return <BottomButton Icon={Moon} action={leftoversHandler} buttonClass="leftovers-button" />;
 };

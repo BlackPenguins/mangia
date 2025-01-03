@@ -1,7 +1,7 @@
 import LoadingText from 'components/Common/LoadingText';
 import { DaysAgo } from 'components/Recipes/RecipeCard';
 import { useToast } from 'context/toast-context';
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Flag } from 'react-feather';
 import { Button, Col, Input, Row } from 'reactstrap';
 import { NameInput } from './BasicEditPanel';

@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button, Input } from 'reactstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
@@ -34,7 +34,7 @@ const useAddRecipeModal = () => {
 
 	const inputRef = useRef();
 
-	const { modal, openModal, closeModal } = useBetterModal({
+	const { modal, openModal } = useBetterModal({
 		title: 'Add Recipe',
 		footer: (closeModal) => (
 			<Button className="mangia-btn muted" onClick={() => addRecipeHandler(closeModal)}>
