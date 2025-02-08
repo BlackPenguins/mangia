@@ -60,9 +60,11 @@ const IngredientsTab = () => {
 				'Content-Type': 'application/json',
 			},
 		});
-		const data = await response.json();
-		const fetchedDepartments = data;
-		setDepartments(fetchedDepartments);
+		const fetchedDepartments = await response.json();
+		const sortedDepartments = fetchedDepartments.sort( (a, b) => {
+			return a.Name > b.Name;
+		});
+		setDepartments(sortedDepartments);
 	}, []);
 
 	useEffect(() => {

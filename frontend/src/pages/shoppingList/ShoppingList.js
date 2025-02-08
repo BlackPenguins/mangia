@@ -117,7 +117,7 @@ const ShoppingList = () => {
 							updateShoppingListWithServerData={updateShoppingListWithServerData}
 						/>
 
-						<NewItemInput tokenFromStorage={tokenFromStorage} fetchShoppingListExtras={fetchShoppingListExtras} />
+						{authContext.isAdmin && <NewItemInput tokenFromStorage={tokenFromStorage} fetchShoppingListExtras={fetchShoppingListExtras} /> }
 						<ShoppingListExtraTable shoppingListExtras={shoppingListExtras} showCheckedItems={showCheckedItems} tokenFromStorage={tokenFromStorage} />
 						
 					</div>

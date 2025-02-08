@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Col, Input, Row } from 'reactstrap';
 import PriceInput from './PriceInput';
+import { useAuth } from '@blackpenguins/penguinore-common-ext';
 
 const CHECKBOX_WIDTH = 1;
 const NAME_WIDTH = 5;
@@ -23,6 +24,7 @@ const ShoppingListTableRow = ({
 	storeHasLowestPrice,
 	updateShoppingListWithServerData,
 }) => {
+	const authContext = useAuth();
 	const [isChecked, setIsChecked] = useState(ingredient.isChecked);
 	const [prices, setPrices] = useState([]);
 
@@ -63,13 +65,15 @@ const ShoppingListTableRow = ({
 	return (
 		<Row className={classes.join(' ')}>
 			<Col className="check-col col" lg={CHECKBOX_WIDTH} sm={MOBILE_CHECKBOX_WIDTH} xs={MOBILE_CHECKBOX_WIDTH}>
-				<Input
-					checked={isChecked}
-					onClick={() => {
-						setValue(!isChecked);
-					}}
-					type="checkbox"
-				/>
+				{authContext.isAdmin && (
+					<Input
+						checked={isChecked}
+						onClick={() => {
+							setValue(!isChecked);
+						}}
+						type="checkbox"
+					/>
+				)}
 			</Col>
 			<Col className="name-col col" lg={NAME_WIDTH} sm={MOBILE_NAME_WIDTH} xs={MOBILE_NAME_WIDTH}>
 				{ingredient.amount} {ingredient.name}

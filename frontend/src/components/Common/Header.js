@@ -61,17 +61,21 @@ const Header = () => {
 							<span>Import Recipe</span>
 						</div>
 					</li>
-					<li>
-						<div className="nav-link" onClick={() => navigateTo('shoppingList')}>
-							<span>Shopping List</span>
-						</div>
-					</li>
-					<li>
-						<div className="nav-link" onClick={() => navigateTo('configuration')}>
-							<span>Config</span>
-						</div>
-					</li>
 				</>
+			)}
+
+			<li>
+				<div className="nav-link" onClick={() => navigateTo('shoppingList')}>
+					<span>Shopping List</span>
+				</div>
+			</li>
+
+			{authContext.isAdmin && (
+				<li>
+					<div className="nav-link" onClick={() => navigateTo('configuration')}>
+						<span>Config</span>
+					</div>
+				</li>
 			)}
 		</ul>
 	);

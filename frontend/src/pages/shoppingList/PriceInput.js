@@ -1,12 +1,14 @@
 import { useToast } from 'context/toast-context';
 import { useEffect, useState } from 'react';
 import { Col, Input } from 'reactstrap';
+import { useAuth } from '@blackpenguins/penguinore-common-ext';
 
 const STORE_PRICES_WIDTH = 4;
 
 const MOBILE_STORE_PRICES_WIDTH = 4;
 
 export const PriceInput = ({ ingredientTagID, prices, store, tokenFromStorage }) => {
+	const authContext = useAuth();
 	const [price, setPrice] = useState(null);
 	const [isLowest, setIsLowest] = useState(false);
 	const [ingredientTagPriceID, setIngredientTagPriceID] = useState(null);
@@ -64,6 +66,10 @@ export const PriceInput = ({ ingredientTagID, prices, store, tokenFromStorage })
 	const showToast = useToast();
 
 	const priceHandler = () => {
+		if( !authContext.isAdmin ) {
+			return;
+		}
+
 		if (ingredientTagPriceID === null) {
 			insertPrice(price);
 		} else {
@@ -85,6 +91,7 @@ export const PriceInput = ({ ingredientTagID, prices, store, tokenFromStorage })
 					type="text"
 					id="store-name"
 					value={price}
+					disabled={!authContext.isAdmin}
 					onChange={(e) => {
 						setPrice(e.target.value);
 					}}

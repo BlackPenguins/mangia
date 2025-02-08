@@ -143,7 +143,7 @@ const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, availableSwapDays }
 		<>
 			<Row className="menu---list">
 				{menus?.map((menu, index) => {
-					const tomorrowsRecipe = menus[index + 1]?.recipe;
+					const tomorrowsMenu = menus[index + 1];
 					return (
 						<MenuCard
 							key={index}
@@ -152,13 +152,13 @@ const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, availableSwapDays }
 							menu={menu}
 							page={page}
 							currentRecipeIDs={currentRecipeIDs}
-							tomorrowsRecipe={tomorrowsRecipe}
+							tomorrowsMenu={tomorrowsMenu}
 							showAuditInformation={showAuditInformation}
 						/>
 					);
 				})}
 				{extraModal}
-				<NewMenuButton openAddExtraModal={openAddExtraModal} />
+				{authContext.isAdmin && <NewMenuButton openAddExtraModal={openAddExtraModal} /> }
 			</Row>
 			<span class="hide-checked-items">
 				<FormGroup switch>
@@ -188,7 +188,7 @@ const NewMenuButton = ({ openAddExtraModal }) => {
 	);
 };
 
-const MenuCard = ({ menu, fetchMenu, page, currentRecipeIDs, tomorrowsRecipe, availableSwapDays, showAuditInformation }) => {
+const MenuCard = ({ menu, fetchMenu, page, currentRecipeIDs, tomorrowsMenu, availableSwapDays, showAuditInformation }) => {
 	const authContext = useAuth();
 
 	const cardClasses = ['day-header'];
@@ -239,7 +239,7 @@ const MenuCard = ({ menu, fetchMenu, page, currentRecipeIDs, tomorrowsRecipe, av
 					bottomButtons={bottomButtons}
 				/>
 				<DailyNotes menu={menu} />
-				<DayPreparation tomorrowsRecipe={tomorrowsRecipe} />
+				<DayPreparation tomorrowsMenu={tomorrowsMenu} />
 				<AuditInformation menu={menu} showAuditInformation={showAuditInformation} />
 			</MenuContainer>
 		</div>
@@ -285,11 +285,16 @@ const DailyNotes = ({ menu }) => {
 	);
 };
 
-const DayPreparation = ({ tomorrowsRecipe }) => {
+const DayPreparation = ({ tomorrowsMenu }) => {
+	if ((tomorrowsMenu?.isSkipped === 1 || tomorrowsMenu?.isLeftovers === 1)) {
+		return null;
+	}
+
+	const tomorrowsRecipe = tomorrowsMenu?.recipe;
 	const dayPrep = tomorrowsRecipe?.DayPrep;
 	const defrost = tomorrowsRecipe?.Defrost;
 
-	if (!dayPrep && !defrost) {
+	if( !dayPrep && !defrost ) {
 		return null;
 	}
 

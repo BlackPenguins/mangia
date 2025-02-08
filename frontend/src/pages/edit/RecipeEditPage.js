@@ -149,11 +149,21 @@ const RecipeEditPage = () => {
 	};
 
 	const updateRecipe = async () => {
-		console.log('Updating recipe', dirtyData);
+		const cleanedData = dirtyData;
+
+		const preheat = cleanedData['preheat'];
+		if(preheat) {
+			if(isNaN(preheat)) {
+				showToast('Bad Data', "The preheat must be a number.", false);
+				delete cleanedData.preheat;
+			}
+		}
+
+		console.log('Updating recipe', cleanedData);
 
 		const response = await fetch(`/api/recipes/${recipeID}`, {
 			method: 'PATCH',
-			body: JSON.stringify(dirtyData),
+			body: JSON.stringify(cleanedData),
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
 				'Content-Type': 'application/json',

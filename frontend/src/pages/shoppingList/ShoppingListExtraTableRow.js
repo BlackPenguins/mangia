@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Col, Input, Row } from 'reactstrap';
+import { useAuth } from '@blackpenguins/penguinore-common-ext';
 
 const ShoppingListExtraTableRow = ({ item, showCheckedItems, tokenFromStorage }) => {
+	const authContext = useAuth();
 	const [isChecked, setIsChecked] = useState(item.IsChecked);
 
 	const setValue = (isChecked) => {
@@ -22,6 +24,7 @@ const ShoppingListExtraTableRow = ({ item, showCheckedItems, tokenFromStorage })
 	return (
 		<Row className={classes.join(' ')}>
 			<Col className="check-col col" lg={1} sm={1} xs={1}>
+			{authContext.isAdmin && (
 				<Input
 					checked={isChecked}
 					onClick={() => {
@@ -29,6 +32,7 @@ const ShoppingListExtraTableRow = ({ item, showCheckedItems, tokenFromStorage })
 					}}
 					type="checkbox"
 				/>
+			)}
 			</Col>
 			<Col className="name-col col" lg={11} sm={11} xs={11}>
 				{item.Name}
