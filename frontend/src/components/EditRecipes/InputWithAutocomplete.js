@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Input } from 'reactstrap';
 
 const InputWithAutocomplete = ({ fetchAvailableResults, selectedValue, setSelectedValue, onkeyDownHandler, label, id }) => {
@@ -63,11 +63,11 @@ const InputWithAutocomplete = ({ fetchAvailableResults, selectedValue, setSelect
 		e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
 	};
 
-	const fetchData = async () => {
+	const fetchData = useCallback( async () => {
 		// Call the supplier function passed from the parent component to get all possible suggestions
 		const newData = await fetchAvailableResults();
 		setAllResults(newData);
-	};
+	}, [fetchAvailableResults]);
 
 	useEffect(() => {
 		fetchData();

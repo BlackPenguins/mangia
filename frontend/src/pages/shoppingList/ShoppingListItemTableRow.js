@@ -14,8 +14,8 @@ const MOBILE_STORE_PRICES_SECTION_WIDTH = 12;
 
 const ShoppingListTableRow = ({
 	ingredient,
-	hideCheckedItems,
-	hidePrices,
+	showCheckedItems,
+	showPrices,
 	tokenFromStorage,
 	stores,
 	selectedStore,
@@ -45,14 +45,14 @@ const ShoppingListTableRow = ({
 	if (isChecked) {
 		classes.push('checked');
 
-		if (hideCheckedItems) {
+		if (!showCheckedItems) {
 			return null;
 		}
 	}
 
 	let countWidth;
 	let mobileCountWidth;
-	if (hidePrices) {
+	if (!showPrices) {
 		countWidth = RECIPE_COUNT_WIDTH + STORE_PRICES_SECTION_WIDTH;
 		mobileCountWidth = MOBILE_RECIPE_COUNT_WIDTH + MOBILE_STORE_PRICES_SECTION_WIDTH;
 	} else {
@@ -77,7 +77,7 @@ const ShoppingListTableRow = ({
 			<Col className="count-col col" lg={countWidth} sm={mobileCountWidth} xs={mobileCountWidth}>
 				{ingredient.recipeCount}
 			</Col>
-			{!hidePrices && (
+			{showPrices && (
 				<Col className="stores-col col" lg={STORE_PRICES_SECTION_WIDTH} sm={MOBILE_STORE_PRICES_SECTION_WIDTH} xs={MOBILE_STORE_PRICES_SECTION_WIDTH}>
 					<Row>
 						{stores &&

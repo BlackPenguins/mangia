@@ -3,6 +3,9 @@ import { deleteRecipe, insertImportFailureURL, insertRecipe, selectRecipeByName,
 import { deleteStepsByRecipeID, insertStep } from '../database/step.js';
 import { scrape } from '../scrapers/ScraperFactory.js';
 
+export const INGREDIENT_REGEX = /([\d\/\s]+\s(?:cup|teaspoon|tablespoon|tbsp|pound|ounce|tsp|oz|lb|tb)?(?:s)?)(.*)/i;
+export const INGREDIENT_EXTRACT_REGEX = /([\d\/\s]+)\s*(cup|teaspoon|tablespoon|tbsp|pound|ounce|tsp|oz|lb|tb)?(?:s)?/i;
+
 export const importRecipe = async (url) => {
 	const importResponse = {};
 
@@ -86,14 +89,12 @@ const createRecipe = async (recipe, url) => {
 };
 
 export const breakdownIngredient = (ingredient) => {
-	const dumbRe = /([\d\/]+\s\w+)\s+(.*)/;
-	const smarterRe = /([\d\/\s]+\s(?:cup|teaspoon|tsp|tb|tablespoon|pound|ounce|oz|lb)?(?:s)?)(.*)/;
 
 	let extractedAmount = 0;
 	let extractedName = '';
 
 	if (ingredient) {
-		const matches = ingredient.match(smarterRe);
+		const matches = ingredient.match(INGREDIENT_REGEX);
 
 		if (ingredient.indexOf('0') === 0) {
 			extractedName = ingredient.substr(2).trim();
@@ -127,6 +128,7 @@ export const createIngredients = async (recipeID, recipe, tagCache) => {
 				formattedIngredient = formattedIngredient.replace('⅓', '2/3');
 				formattedIngredient = formattedIngredient.replace('⅓', '1/8');
 				formattedIngredient = formattedIngredient.replace('⅓', '3/4');
+				formattedIngredient = formattedIngredient.replace('▢', '');
 
 				const ingredientToInsert = {
 					Name: formattedIngredient,

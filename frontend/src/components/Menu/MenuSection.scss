@@ -48,6 +48,18 @@
 				
 			}
 		}
+
+		.note-settings {
+			cursor: pointer;
+			position: absolute;
+			top: 10px;
+			right: 25px;
+			color: white;
+
+			&:hover {
+				opacity: 0.7;
+			}
+		}
 	}
 
 	.menu-footer {

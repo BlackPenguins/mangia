@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Col, Input, Row } from 'reactstrap';
 
-const ShoppingListExtraTableRow = ({ item, hideCheckedItems, tokenFromStorage }) => {
+const ShoppingListExtraTableRow = ({ item, showCheckedItems, tokenFromStorage }) => {
 	const [isChecked, setIsChecked] = useState(item.IsChecked);
 
 	const setValue = (isChecked) => {
@@ -14,7 +14,7 @@ const ShoppingListExtraTableRow = ({ item, hideCheckedItems, tokenFromStorage })
 	if (isChecked) {
 		classes.push('checked');
 
-		if (hideCheckedItems) {
+		if (!showCheckedItems) {
 			return null;
 		}
 	}

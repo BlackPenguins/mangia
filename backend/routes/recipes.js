@@ -6,7 +6,8 @@ import { deleteIngredient, deleteIngredientsByRecipeID, insertIngredient, select
 
 import Tesseract, { createWorker } from 'tesseract.js';
 import multer from 'multer';
-import sharp from 'sharp';
+import Jimp from "jimp";
+
 import { deleteWithRecipeID, selectByRecipeID } from '../database/menu.js';
 import { insertTag, selectTagByName } from '../database/tags.js';
 
@@ -21,11 +22,9 @@ const LARGE_PREFIX = 'large_';
 
 const thumbnailStorageEngine = multer.diskStorage({
 	destination: (req, file, callback) => {
-		console.log('STORAGE ENGINE 1');
 		callback(null, THUMBNAIL_DIRECTORY);
 	},
 	filename: (req, file, callback) => {
-		console.log('STORAGE ENGINE 2');
 		const recipeID = req.params.recipeID;
 		const originalFileName = file.originalname;
 		const randomSuffix = Math.floor(Math.random() * 10000);
@@ -175,6 +174,7 @@ const uploadImage = async (req, res) => {
 	const recipeID = req.params.recipeID;
 	console.log(`Upload a thumbnail for recipe ${recipeID}]`);
 
+	let success = false;
 	if (req.file) {
 		const beforeImageFileName = req.file.filename;
 		const afterImageFileName = beforeImageFileName.replace(LARGE_PREFIX, '');
@@ -182,15 +182,17 @@ const uploadImage = async (req, res) => {
 		console.log(`Before Image Name [${beforeImageFileName}]`);
 		console.log(`After Image Name [${afterImageFileName}]`);
 
-		await resizeThumbnail(recipeID, THUMBNAIL_DIRECTORY, beforeImageFileName, afterImageFileName);
+		success = await resizeThumbnail(res, recipeID, THUMBNAIL_DIRECTORY, beforeImageFileName, afterImageFileName);
 	} else {
 		console.log('No file was uploaded.');
 	}
 
-	res.status(200).json({});
+	if( success ) {
+		res.status(200).json({});
+	}
 };
 
-export const resizeThumbnail = async (recipeID, sourceDirectory, beforeImageFileName, afterImageFileName) => {
+export const resizeThumbnail = async (res, recipeID, sourceDirectory, beforeImageFileName, afterImageFileName) => {
 	const beforeImageFile = `${sourceDirectory}/${beforeImageFileName}`;
 	const afterImageFile = `${THUMBNAIL_DIRECTORY}/${afterImageFileName}`;
 
@@ -198,44 +200,24 @@ export const resizeThumbnail = async (recipeID, sourceDirectory, beforeImageFile
 		console.error('Input and output of thumbnail resize was same path.');
 		return;
 	}
+	try {
+		const image = await Jimp.read(beforeImageFile);
+		image.resize(Jimp.AUTO, 320); // Resize to 500 px
+		await image.writeAsync(afterImageFile);
 
-	const image = sharp(beforeImageFile);
-	const metadata = await image.metadata();
+		fs.unlink(beforeImageFile, (err) => {
+			if (err) {
+				console.error('Error deleting the file:', err);
+			}
+		});
 
-	console.log('Resize image');
-	image.resize({ height: 500, fit: 'outside' }); // Resize to 500 px
-
-	// Dynamically set quality based on the format
-	switch (metadata.format) {
-		case 'jpeg':
-		case 'jpg':
-			image.jpeg({ quality: 100 });
-			break;
-		case 'png':
-			image.png({ compressionLevel: 0 });
-			break;
-		case 'webp':
-			image.webp({ quality: 100 });
-			break;
-		case 'tiff':
-			image.tiff({ quality: 100 });
-			break;
-		default:
-			console.warn(`Unknown or unsupported format: ${metadata.format}`);
-			break;
+		await insertThumbnail(recipeID, afterImageFileName);
+		return true;
+	} catch( e ) {
+		console.log("Could not upload image: " + e);
+		res.status(500).json({ message: "An error has occurred during image upload! " + e.message });
+		return false;
 	}
-
-	console.log('To file');
-	await image.toFile(afterImageFile);
-
-	fs.unlink(beforeImageFile, (err) => {
-		if (err) {
-			console.error('Error deleting the file:', err);
-		}
-	});
-
-	console.log('Insert image');
-	await insertThumbnail(recipeID, afterImageFileName);
 };
 
 const uploadAttachment = async (req, res) => {

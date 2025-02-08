@@ -9,8 +9,8 @@ const MOBILE_NAME_WIDTH = 9;
 const MOBILE_RECIPE_COUNT_WIDTH = 2;
 
 const ShoppingListTable = ({
-	hideCheckedItems,
-	hidePrices,
+	showCheckedItems,
+	showPrices,
 	shoppingListItems,
 	stores,
 	tokenFromStorage,
@@ -32,7 +32,7 @@ const ShoppingListTable = ({
 
 					const showGroup = hasLowestPriceInDepartment;
 
-					if (!showGroup || (hideCheckedItems && hasAllChecked)) {
+					if (!showGroup || (!showCheckedItems && hasAllChecked)) {
 						// Hide the group if all items within the group are checked off
 						return null;
 					} else {
@@ -55,8 +55,8 @@ const ShoppingListTable = ({
 									{group.ingredients.map((ingredient, i) => (
 										<ShoppingListTableRow
 											key={i}
-											hideCheckedItems={hideCheckedItems}
-											hidePrices={hidePrices}
+											showCheckedItems={showCheckedItems}
+											showPrices={showPrices}
 											ingredient={ingredient}
 											tokenFromStorage={tokenFromStorage}
 											stores={stores}

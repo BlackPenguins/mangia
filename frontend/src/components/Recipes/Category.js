@@ -11,21 +11,7 @@ const Category = ({ category, setCategory }) => {
 				}}
 				value={category}
 			>
-				<option className="none" value="None">
-					None
-				</option>
-				<option className="dinner" value="Dinner">
-					Dinner
-				</option>
-				<option className="sidedish" value="Sidedish">
-					Sidedish
-				</option>
-				<option className="appetizer" value="Appetizer">
-					Appetizer
-				</option>
-				<option className="dessert" value="Dessert">
-					Dessert
-				</option>
+				
 			</Input>
 			<label htmlFor="edit-category-dropdown">Category</label>
 		</div>

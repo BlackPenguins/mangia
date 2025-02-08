@@ -17,6 +17,7 @@ import FilteredRecipes from 'components/Recipes/FilteredRecipes';
 import RecipeRow from 'components/Recipes/RecipeRow';
 import MenuContext from 'authentication/menu-context';
 import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
+import DailyNotesButton from './RecipeButtons/DailyNotesButton';
 
 const MenuSection = ({ showAuditInformation }) => {
 	const [page, setPage] = useState(0);
@@ -213,6 +214,7 @@ const MenuCard = ({ menu, fetchMenu, page, currentRecipeIDs, tomorrowsRecipe, av
 			<MenuContainer>
 				<div className={cardClasses.join(' ')}>
 					{authContext.isAdmin && <ChangeButton fetchMenu={fetchMenu} menu={menu} page={page} availableSwapDays={availableSwapDays} />}
+					{authContext.isAdmin && <DailyNotesButton fetchMenu={fetchMenu} menu={menu} page={page} />}
 					{menu.hasNoDate && (
 						<>
 							<div>EXTRA ITEM</div>

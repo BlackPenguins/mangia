@@ -1,27 +1,27 @@
 import { FormGroup, Input, Label } from 'reactstrap';
 
-const ShoppingListControls = ({ hideCheckedItems, setHideCheckedItems, hidePrices, setHidePrices }) => {
+const ShoppingListControls = ({ showCheckedItems, setShowCheckedItems, showPrices, setShowPrices }) => {
 	return (
 		<span class="hide-checked-items">
 			<FormGroup switch>
 				<Input
 					type="switch"
-					checked={hideCheckedItems}
+					checked={showCheckedItems}
 					onClick={() => {
-						setHideCheckedItems(!hideCheckedItems);
+						setShowCheckedItems(!showCheckedItems);
 					}}
 				/>
-				<Label check>Hide Checked Items</Label>
+				<Label check>Show Checked Items</Label>
 			</FormGroup>
 			<FormGroup switch>
 				<Input
 					type="switch"
-					checked={hidePrices}
+					checked={showPrices}
 					onClick={() => {
-						setHidePrices(!hidePrices);
+						setShowPrices(!showPrices);
 					}}
 				/>
-				<Label check>Hide Prices</Label>
+				<Label check>Show Prices</Label>
 			</FormGroup>
 		</span>
 	);

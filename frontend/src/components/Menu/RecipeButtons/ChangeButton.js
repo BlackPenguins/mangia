@@ -54,7 +54,6 @@ const ChangeButton = ({ fetchMenu, menu, page, availableSwapDays }) => {
 						</Button>
 					</div>
 				)}
-				<DailyNotes menu={menu} fetchMenu={fetchMenu} tokenFromStorage={tokenFromStorage} page={page} />
 
 				<h3>Swap Days</h3>
 				<SwapDaysButtons
@@ -82,49 +81,6 @@ const ChangeButton = ({ fetchMenu, menu, page, availableSwapDays }) => {
 				<Settings onClick={openModal} />
 			</span>
 		</>
-	);
-};
-
-const DailyNotes = ({ menu, fetchMenu, tokenFromStorage, page }) => {
-	const menuID = menu.menuID;
-
-	const [value, setValue] = useState(menu.dailyNotes);
-
-	const showToast = useToast();
-
-	const notesHandler = async (dayID) => {
-		if (dayID) {
-			await fetch(`/api/menu/notes/${menuID}`, {
-				method: 'POST',
-				body: JSON.stringify({ dailyNotes: value }),
-				headers: {
-					// This is required. NodeJS server won't know how to read it without it.
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${tokenFromStorage}`,
-				},
-			});
-
-			fetchMenu(page);
-			showToast('Menu', `Notes saved for ${menu.date}`);
-		}
-	};
-
-	return (
-		<div className="form-floating daily-notes">
-			<Input
-				className="editInput"
-				id="recipe-steps"
-				type="textarea"
-				placeholder="Daily Notes"
-				onChange={(e) => {
-					setValue(e.target.value);
-				}}
-				onBlur={notesHandler}
-				value={value}
-				rows={3}
-			/>
-			<label htmlFor="recipe-steps">Daily Notes</label>
-		</div>
 	);
 };
 

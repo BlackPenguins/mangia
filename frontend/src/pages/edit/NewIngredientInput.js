@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { PlusCircle } from 'react-feather';
 import { Button, Col, Input, Row } from 'reactstrap';
+import { useAuth } from '@blackpenguins/penguinore-common-ext';
 
-export const NewIngredientInput = ({ tokenFromStorage, fetchRecipe, recipeID }) => {
+export const NewIngredientInput = ({ fetchRecipe, recipeID }) => {
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
+
 	const [value, setValue] = useState('');
 
 	const onAddHandler = async () => {

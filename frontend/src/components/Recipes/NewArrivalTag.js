@@ -1,7 +1,7 @@
 import './NewArrivalTag.scss';
 
 const NewArrivalTag = ({ recipe }) => {
-	if (recipe?.IsNewArrival != 1) {
+	if (recipe?.IsNewArrival !== 1) {
 		return null;
 	}
 

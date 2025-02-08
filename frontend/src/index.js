@@ -5,15 +5,17 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 import { MenuContextProvider } from './authentication/menu-context.js';
-import { AuthProvider } from '@blackpenguins/penguinore-common-ext';
+import { AuthProvider, ToastProvider } from '@blackpenguins/penguinore-common-ext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
 	<BrowserRouter>
 		<AuthProvider>
+			<ToastProvider>
 			<MenuContextProvider>
 				<App />
 			</MenuContextProvider>
+			</ToastProvider>
 		</AuthProvider>
 	</BrowserRouter>
 );

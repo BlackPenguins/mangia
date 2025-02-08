@@ -5,6 +5,7 @@ import { selectAllStores, selectPrices } from '../database/store.js';
 import { getOrInsertWeek } from '../database/week.js';
 import { checkAdminMiddleware } from './auth.js';
 import { getMenuForWeekOffset } from './menu.js';
+import { INGREDIENT_EXTRACT_REGEX } from '../scrapers/RecipeImporter.js';
 
 const getShoppingListItemsHandler = async (req, res) => {
 	const shoppingList = await getCurrentShoppingList();
@@ -264,15 +265,12 @@ const convertToTeaspoons = (value) => {
 		};
 	}
 
-	const smarterRe = /([\d\/\s]+)\s*(cup|teaspoon|tsp|tb|tablespoon|pound|ounce|oz|lb)?(?:s)?/;
-
-	const matches = value.match(smarterRe);
+	const matches = value.match(INGREDIENT_EXTRACT_REGEX);
 
 	const amount = matches[1]?.trim();
-	const measurement = matches[2]?.trim();
+	const measurement = matches[2]?.trim().toLowerCase();
 
 	let baseTeaspoons = 0;
-	let baseMultiplier = 0;
 
 	let isWholeUnit = false;
 	let unit = null;
@@ -283,6 +281,7 @@ const convertToTeaspoons = (value) => {
 			break;
 		case 'tb':
 		case 'tablespoon':
+		case 'tbsp':
 			baseTeaspoons = 3;
 			break;
 		case 'tsp':
@@ -322,7 +321,7 @@ const convertToTeaspoons = (value) => {
 		convert = { wholeUnits: false, amount: parseFloat(baseTeaspoons * totalBaseMultiplier) };
 	}
 
-	console.log(`Amount [${amount}] Measurement [${measurement}] TotalMultipler[${totalBaseMultiplier}] Final [${convert.amount}]`);
+	console.log(`IncomingValue [${value}] Amount [${amount}] Measurement [${measurement}] TotalMultipler[${totalBaseMultiplier}] Final [${convert.amount}]`);
 
 	return convert;
 };

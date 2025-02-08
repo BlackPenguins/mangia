@@ -93,7 +93,7 @@ const Header = () => {
 				<div className="humberger__menu__logo">MANGIA!</div>
 				<div className="humberger__menu__widget">
 					<div className="header__top__right__auth">
-						<LoginDisplay />
+						<LoginDisplay onLoginHandler={() =>  setShowSidebar(false)}/>
 					</div>
 				</div>
 				<nav className="humberger__menu__nav mobile-menu slicknav_nav">{links}</nav>

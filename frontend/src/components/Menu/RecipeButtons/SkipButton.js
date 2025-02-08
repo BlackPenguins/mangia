@@ -71,7 +71,7 @@ const SkipButton = ({ fetchMenu, menu, page }) => {
 		} else {
 			openModal();
 		}
-	}, [page, menu, fetchMenu, isSkipped, tokenFromStorage]);
+	}, [page, menu, fetchMenu, isSkipped, tokenFromStorage, openModal]);
 
 	let Icon = Slash;
 

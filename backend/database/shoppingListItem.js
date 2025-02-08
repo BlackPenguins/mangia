@@ -31,7 +31,6 @@ export const deleteIngredientTagFromShoppingList = (ingredientTagID) => {
 };
 
 export const deleteShoppingListItems = (weekID) => {
-	console.log('DELETETING FROM WEEK ' + weekID);
 	return new Promise((resolve, reject) => {
 		pool.query('DELETE FROM SHOPPING_LIST_ITEM WHERE WeekID = ?', [weekID], (error, result) => {
 			if (error) {

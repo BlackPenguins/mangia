@@ -65,7 +65,7 @@ const RecipePage = () => {
 							<Steps steps={recipe?.steps} />
 							{recipe.thumbnails &&
 								recipe.thumbnails.map((thumbnail, index) => {
-									if (index == 0) {
+									if (index === 0) {
 										// We already show it in the main thumbnail
 										return null;
 									} else {
@@ -100,26 +100,28 @@ const RecipeTitle = ({ recipe }) => {
 
 	return (
 		<div className={nameClasses.join(' ')}>
-			<span className="mobile">
-				<h2>{recipe.Name}</h2>
-			</span>
-			<MenuButton isMenuRecipe={isMenuRecipe} label="Prev" action={() => menuContext.redirectToPreviousRecipeHandler(recipeID)} />
+			
+			<MenuButton isMenuRecipe={isMenuRecipe} label="Prev" labelMobile="<" action={() => menuContext.redirectToPreviousRecipeHandler(recipeID)} />
 			<span className="desktop">
 				<h2>{recipe.Name}</h2>
 			</span>
-			<MenuButton isMenuRecipe={isMenuRecipe} label="Next" action={() => menuContext.redirectToNextRecipeHandler(recipeID)} />
+			<span className="mobile">
+				<h2>{recipe.Name}</h2>
+			</span>
+			<MenuButton isMenuRecipe={isMenuRecipe} label="Next" labelMobile=">" action={() => menuContext.redirectToNextRecipeHandler(recipeID)} />
 		</div>
 	);
 };
 
-const MenuButton = ({ isMenuRecipe, label, action }) => {
+const MenuButton = ({ isMenuRecipe, label, labelMobile, action }) => {
 	if (!isMenuRecipe) {
 		return null;
 	}
 
 	return (
 		<Button className="mangia-btn muted recipe-menu-button" onClick={action}>
-			<span>{label}</span>
+			<span className="desktop">{label}</span>
+			<span className="mobile">{labelMobile}</span>
 		</Button>
 	);
 };

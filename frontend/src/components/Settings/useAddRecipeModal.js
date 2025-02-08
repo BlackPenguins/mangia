@@ -25,6 +25,7 @@ const useAddRecipeModal = () => {
 
 		if (response.status === 200) {
 			console.log('Recipe added successfully.', data);
+			setRecipeName('');
 			closeModal();
 			navigate(`/recipe/${data.recipeID}`);
 		} else {

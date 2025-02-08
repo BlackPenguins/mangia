@@ -1,22 +1,25 @@
 import { useCallback, useEffect, useState } from 'react';
-import { debounce } from 'lodash';
 
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, FormGroup, FormText, Input, Label, Row } from 'reactstrap';
+import { Bookmark, Save } from '@mui/icons-material';
+import { useToast } from '@blackpenguins/penguinore-common-ext';
 
 import './RecipeEditPage.scss';
 import Rating from '../../components/Settings/Rating';
-import Category from '../../components/Recipes/Category';
 import Tag, { TagBox } from '../../components/EditRecipes/Tag';
 import { ArrowUpCircle, Eye, Printer, Trash2 } from 'react-feather';
 import useScanModal from '../../components/Settings/useScanModal';
 import InputWithAutocomplete from '../../components/EditRecipes/InputWithAutocomplete';
-import ImportRecipeModal from '../../components/Settings/ImportRecipeModal';
-import { useToast } from 'context/toast-context';
 import NewIngredientInput from './NewIngredientInput';
 import { useAuth } from '@blackpenguins/penguinore-common-ext';
+import useImportRecipeModal from '../../components/Settings/ImportRecipeModal';
 
 const RecipeEditPage = () => {
+	const [dirty, setDirty] = useState(false);
+	const [dirtyData, setDirtyData] = useState({});
+	const [dirtyIngredients, setDirtyIngredients] = useState({});
+
 	const navigate = useNavigate();
 	const authContext = useAuth();
 	const tokenFromStorage = authContext.tokenFromStorage;
@@ -112,16 +115,45 @@ const RecipeEditPage = () => {
 
 	const previewAction = () => navigate(`/recipe/${recipeID}`);
 
-	const [showImportModal, setShowImportModal] = useState(false);
-
 	const showToast = useToast();
 
-	const updateRecipe = async (recipe, label) => {
-		console.log('Updating recipe', recipe);
+	const saveHandler = async () => {
+		await updateIngredients();
+		await updateRecipe();
+		setDirty(false);
+		setDirtyData({});
+		setDirtyIngredients({});
+	}
+
+	const updateIngredients = async () => {
+		for( const [ingredientID, value] of Object.entries(dirtyIngredients)) {
+			await updateIngredientHandler(ingredientID, { value });
+		}
+	}
+
+	const updateIngredientHandler = async (ingredientID, value) => {
+		const response = await fetch(`/api/recipes/${recipeID}/ingredient/${ingredientID}`, {
+			method: 'PATCH',
+			body: JSON.stringify(value),
+			headers: {
+				// This is required. NodeJS server won't know how to read it without it.
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
+			},
+		});
+		const data = await response.json();
+
+		if (data.success) {
+			console.log('Ingredient updated successfully.', data);
+		}
+	};
+
+	const updateRecipe = async () => {
+		console.log('Updating recipe', dirtyData);
 
 		const response = await fetch(`/api/recipes/${recipeID}`, {
 			method: 'PATCH',
-			body: JSON.stringify(recipe),
+			body: JSON.stringify(dirtyData),
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
 				'Content-Type': 'application/json',
@@ -129,9 +161,9 @@ const RecipeEditPage = () => {
 			},
 		});
 
-		const data = await response.json();
+		await response.json();
 
-		showToast('Recipe Edited', `${label} has been saved`);
+		showToast('Saved', `Recipe has been saved`);
 		fetchRecipe();
 	};
 
@@ -149,75 +181,39 @@ const RecipeEditPage = () => {
 			})
 				.then((data) => {
 					console.log('DATA', data);
-					showToast('Recipe Edited', `Thumbnail has been uploaded [${data?.status}] [${data?.url}]`);
+					if( data.status === 200) {
+						showToast('Recipe Edited', `Thumbnail has been uploaded.`);
+					} else {
+						showToast('Upload Failed', `Thumbnail could not be uploaded`, false);
+					}
 					fetchRecipe();
 				})
 				.catch((error) => {
-					showToast('Thumbnail Failure', error);
+					showToast('Thumbnail Failure', error, false);
 				});
 		}
 	};
 
-	const debounceEditFunction = useCallback(debounce(updateRecipe, 1500), [tokenFromStorage]);
+	const stageChange = ( name, value ) => {
+		setDirtyData( (prevState) => ({
+			...prevState,
+			[name]: value,
+		}));
+		setDirty(true);
+	};
+
+	const stageIngredientChange = ( name, value ) => {
+		setDirtyIngredients( (prevState) => ({
+			...prevState,
+			[name]: value,
+		}));
+		setDirty(true);
+	};
 
 	const isActiveHandler = (value) => {
 		setIsActive(value);
-		debounceEditFunction({ isActive: value }, 'Show Recipe in Book');
-	};
-
-	const nameHandler = (value) => {
-		setName(value);
-		debounceEditFunction({ name: value }, 'Name');
-	};
-
-	const descriptionHandler = (value) => {
-		setDescription(value);
-		debounceEditFunction({ description: value }, 'Description');
-	};
-
-	const categoryHandler = (value) => {
-		setCategory(value);
-		debounceEditFunction({ category: value }, 'Category');
-	};
-
-	const proteinHandler = (value) => {
-		setProtein(value);
-		debounceEditFunction({ protein: value }, 'Protein');
-	};
-
-	const preheatHandler = (value) => {
-		setPreheat(value);
-		debounceEditFunction({ preheat: value }, 'Preheat');
-	};
-
-	const prepTimeHandler = (value) => {
-		setPrepTime(value);
-		debounceEditFunction({ prepTime: value }, 'Prep Time');
-	};
-
-	const stepsHandler = (value) => {
-		setSteps(value);
-		debounceEditFunction({ steps: value.split('\n') }, 'Steps');
-	};
-
-	const ingredientsHandler = (value) => {
-		setIngredientsBulk(value);
-		debounceEditFunction({ ingredients: value.split('\n') }, 'Ingredients');
-	};
-
-	const notesHandler = (value) => {
-		setNotes(value);
-		debounceEditFunction({ notes: value }, 'Notes');
-	};
-
-	const dayPrepHandler = (value) => {
-		setDayPrep(value);
-		debounceEditFunction({ dayPrep: value }, 'Day Prep');
-	};
-
-	const urlHandler = (value) => {
-		setURL(value);
-		debounceEditFunction({ url: value }, 'URL');
+		stageChange('isActive', value);
+		setDirty(true);
 	};
 
 	const thumbnailHandler = (value) => {
@@ -226,22 +222,8 @@ const RecipeEditPage = () => {
 
 	const ratingHandler = (value) => {
 		setRating(value);
-		debounceEditFunction({ rating: value }, 'Rating');
-	};
-
-	const defrostHandler = (value) => {
-		setDefrost(value);
-		debounceEditFunction({ defrost: value }, 'Defrost');
-	};
-
-	const pageHandler = (value) => {
-		setPage(value);
-		debounceEditFunction({ page: value }, 'Book Page');
-	};
-
-	const bookIDHandler = (value) => {
-		setBookID(value);
-		debounceEditFunction({ bookID: value }, 'Book');
+		stageChange( 'rating', value );
+		setDirty(true);
 	};
 
 	const nameClasses = ['section-title'];
@@ -250,9 +232,19 @@ const RecipeEditPage = () => {
 		nameClasses.push('hidden');
 	}
 
+	const {modal, openModal} = useImportRecipeModal();
+
+
 	return (
 		<div className="container recipe-edit-container">
-			{showImportModal && <ImportRecipeModal closeModalHandler={() => setShowImportModal(true)} currentRecipeID={recipeID} />}
+
+			{dirty && (
+				<div className='unsaved-changes'>
+					<Bookmark/> You have unsaved changes!
+				</div>
+			)}
+
+			{modal}
 
 			<div className={nameClasses.join(' ')}>
 				<h2>Edit Recipe</h2>
@@ -267,40 +259,56 @@ const RecipeEditPage = () => {
 					</Row>
 					<Row>
 						<Col lg={9}>
-							<NameInput value={name} setValue={nameHandler} filteredRecipes={filteredRecipes} filterRecipesHandler={filterRecipesHandler} />
-							<DescriptionInput value={description} setValue={descriptionHandler} />
+							<NameInput value={name} setValue={setName} filteredRecipes={filteredRecipes} filterRecipesHandler={filterRecipesHandler} stageChange={stageChange} dirty={dirty} />
+							<EditTextarea label='Description' name='description' value={description} setValue={setDescription} stageChange={stageChange} rows={2} dirty={dirty}/>
 							<Row>
 								<Col lg={4}>
-									<Category category={category} setCategory={categoryHandler} />
+									<EditDropdown label='Category' name='category' value={category} setValue={setCategory} stageChange={stageChange} dirty={dirty}>
+										<option className="none" value="None">None</option>
+										<option className="dinner" value="Dinner">Dinner</option>
+										<option className="sidedish" value="Sidedish">Sidedish</option>
+										<option className="appetizer" value="Appetizer">Appetizer</option>
+										<option className="dessert" value="Dessert">Dessert</option>
+									</EditDropdown>
 								</Col>
 								<Col lg={8}>
-									<ProteinDropdown value={protein} setValue={proteinHandler} />
+									<EditDropdown label='Protein' name='protein' value={protein} setValue={setProtein} stageChange={stageChange} dirty={dirty}>
+										<option value="None">None</option>
+										<option value="Fish">Fish</option>
+										<option value="Steak">Steak</option>
+									</EditDropdown>
 								</Col>
 							</Row>
 							<Row>
 								<Col lg={12}>
-									<StepsTextarea value={steps} setValue={stepsHandler} />
+									<EditTextarea label='Steps' name='steps' value={steps} setValue={setSteps} stageChange={stageChange} dirty={dirty} rows={15} valueModifier={(value) => value.split("\n")}/>
 								</Col>
 							</Row>
 						</Col>
 						<Col lg={3}>
-							<NotesTextarea value={notes} setValue={notesHandler} />
-							<PrepTimeDropdown value={prepTime} setValue={prepTimeHandler} />
-							<PreheatInput value={preheat} setValue={preheatHandler} />
-							<DayPrepTextarea value={dayPrep} setValue={dayPrepHandler} />
-							<DefrostInput value={defrost} setValue={defrostHandler} />
+							<EditTextarea label='Notes' name='notes' value={notes} setValue={setNotes} stageChange={stageChange} dirty={dirty} rows={16}/>
+							<EditDropdown label='Prep Time' name='prepTime' value={prepTime} setValue={setPrepTime} stageChange={stageChange} dirty={dirty}>
+								<option value="OneHour">One Hour</option>
+								<option value="FewHours">Few Hours</option>
+								<option value="AllDay">All Day</option>
+							</EditDropdown>
+							<EditTextInput label='Preheat Temp.' name='preheat' value={preheat} setValue={setPreheat} stageChange={stageChange} dirty={dirty} />
+							<EditTextarea label='Day Earlier Preparation' name='dayPrep' value={dayPrep} setValue={setDayPrep} stageChange={stageChange} dirty={dirty} rows={5}/>
+							<EditTextInput label='Defrost' name='defrost' value={defrost} setValue={setDefrost} stageChange={stageChange} dirty={dirty}/>
 						</Col>
 					</Row>
 					<Row>
 						<Col lg={9}>
 							<BooksSection
 								bookID={bookID}
-								setBookID={bookIDHandler}
+								setBookID={setBookID}
 								page={page}
-								setPage={pageHandler}
+								setPage={setPage}
 								attachments={attachments}
 								fetchRecipe={fetchRecipe}
 								recipeID={recipeID}
+								stageChange={stageChange}
+								dirty={dirty}
 							/>
 						</Col>
 						<Col lg={3} className="rating-row">
@@ -310,7 +318,7 @@ const RecipeEditPage = () => {
 
 					<Row>
 						<Col>
-							<URLInput value={url} setValue={urlHandler} />
+							<EditTextInput label='URL' name='url' value={url} setValue={setURL} stageChange={stageChange} dirty={dirty}/>
 						</Col>
 					</Row>
 					<Row>
@@ -323,18 +331,21 @@ const RecipeEditPage = () => {
 
 					<Row>
 						<Col lg={12}>
-							<IngredientsLines ingredients={ingredients} recipeID={recipeID} fetchRecipe={fetchRecipe} />
+							<IngredientsLines updateIngredientHandler={updateIngredientHandler} stageIngredientChange={stageIngredientChange} ingredients={ingredients} recipeID={recipeID} fetchRecipe={fetchRecipe} dirty={dirty} />
 						</Col>
 					</Row>
 
-					<IngredientsTextarea value={ingredientsBulk} setValue={ingredientsHandler} />
+					<EditTextarea label='Bulk Ingredients' name='ingredients' value={ingredientsBulk} setValue={setIngredientsBulk} stageChange={stageChange} dirty={dirty} rows={15} valueModifier={(value) => value.split("\n")} />
 
 					<div className="bottom-buttons">
 						<Button className="mangia-btn muted" onClick={previewAction}>
 							<Eye /> Preview
 						</Button>
-						<Button className="mangia-btn muted" onClick={() => setShowImportModal(true)}>
+						<Button className="mangia-btn muted" onClick={() => openModal()}>
 							<ArrowUpCircle /> Import
+						</Button>
+						<Button className="mangia-btn success" onClick={() => saveHandler()}>
+							<Save /> Save
 						</Button>
 					</div>
 				</div>
@@ -395,7 +406,7 @@ export const ThumbnailPreview = ({ tokenFromStorage, fetchRecipe, thumbnail, can
 				</span>
 			)}
 
-			<img src={imageSource} />
+			<img alt='thumbnail' src={imageSource} />
 		</span>
 	);
 };
@@ -417,22 +428,15 @@ const ActiveCheckbox = ({ value, setValue }) => {
 	);
 };
 
-const NameInput = ({ value, setValue, filteredRecipes, filterRecipesHandler }) => {
+const NameInput = ({ value, setValue, filteredRecipes, filterRecipesHandler, stageChange }) => {
+	const nameHandler = ( newValue ) => {
+		setValue(newValue);
+		filterRecipesHandler(newValue);
+	};
+
 	return (
-		<div className="form-floating">
-			<Input
-				className="editInput"
-				id="recipe-name"
-				type="text"
-				maxLength={50}
-				placeholder="Name"
-				onChange={(e) => {
-					setValue(e.target.value);
-					filterRecipesHandler(e.target.value);
-				}}
-				value={value}
-			></Input>
-			<label htmlFor="recipe-name">Name</label>
+		<>
+			<EditTextInput label='Name' name='name' value={value} setValue={nameHandler} stageChange={stageChange} />
 			{filteredRecipes.length > 0 && (
 				<div className="recipe-name-results">
 					{filteredRecipes.map((recipe, index) => {
@@ -444,48 +448,65 @@ const NameInput = ({ value, setValue, filteredRecipes, filterRecipesHandler }) =
 					})}
 				</div>
 			)}
-		</div>
+		</>
 	);
 };
 
-const DescriptionInput = ({ value, setValue }) => {
-	return (
-		<div className="form-floating">
-			<Input
-				className="editInput"
-				id="recipe-description"
-				type="textarea"
-				placeholder="Description"
-				onChange={(e) => {
-					setValue(e.target.value);
-				}}
-				value={value}
-			/>
-			<label htmlFor="recipe-description">Description</label>
-		</div>
-	);
-};
+const EditTextInput = ({ label, name, value, setValue, stageChange, dirty, children }) => {
+	return <EditInput label={label} name={name} value={value} setValue={setValue} stageChange={stageChange} dirty={dirty} type='text' children={children} />
+}
 
-const ProteinDropdown = ({ value, setValue }) => {
+const EditTextarea = ({ label, name, value, setValue, stageChange, dirty, rows, valueModifier, children }) => {
+	return <EditInput label={label} name={name} value={value} setValue={setValue} stageChange={stageChange} dirty={dirty} type='textarea' rows={rows} valueModifier={valueModifier} children={children}/>
+}
+
+const EditDropdown = ({ label, name, value, setValue, stageChange, dirty, rows, valueModifier, children }) => {
+	return <EditInput label={label} name={name} value={value} setValue={setValue} stageChange={stageChange} dirty={dirty} type='select' rows={rows} valueModifier={valueModifier} children={children}/>
+}
+
+const EditInput = ({ label, name, value, setValue, stageChange, dirty, type, rows, valueModifier, children }) => {
+	const containerID = `recipe-${name}`;
+	const inputID = `${containerID}-input`;
+
+	const [dirtyInput, setDirtyInput] = useState(false);
+
+	const classes = ["editInput"];
+
+	if( dirtyInput && dirty ) {
+		classes.push("dirty-input");
+	}
+
+	const handleInput = (value) => {
+		setValue(value);
+
+		let newValue = value;
+		if( valueModifier ) {
+			newValue = valueModifier(value);
+		}
+
+		stageChange(name, newValue);
+		setDirtyInput(true);
+	}
+
 	return (
-		<div className="form-floating">
+		<div className={`form-floating ${containerID}`}>
 			<Input
-				id="protein-dropdown"
-				className="edit-protein-dropdown"
-				type="select"
+				id={inputID}
+				className={classes.join(' ')}
+				type={type}
+				rows={rows}
 				onChange={(e) => {
-					setValue(e.target.value);
+					handleInput(e.target.value);
 				}}
 				value={value}
 			>
-				<option value="None">None</option>
-				<option value="Fish">Fish</option>
-				<option value="Steak">Steak</option>
+				{children}
 			</Input>
-			<label htmlFor="protein-dropdown">Protein</label>
+			<label htmlFor={inputID}>{label}</label>
 		</div>
 	);
 };
+
 
 export const PrepTimeLabel = ({ value }) => {
 	let display = '';
@@ -500,55 +521,16 @@ export const PrepTimeLabel = ({ value }) => {
 		case 'AllDay':
 			display = 'All Day';
 			break;
+		default:
+			display = "Unknown";
 	}
 
 	return <span className="prep-time-label">{display}</span>;
 };
 
-const PrepTimeDropdown = ({ value, setValue }) => {
-	return (
-		<div className="form-floating">
-			<Input
-				id="prep-time-dropdown"
-				className="edit-prep-time-dropdown"
-				type="select"
-				onChange={(e) => {
-					setValue(e.target.value);
-				}}
-				value={value}
-			>
-				<option value="OneHour">One Hour</option>
-				<option value="FewHours">Few Hours</option>
-				<option value="AllDay">All Day</option>
-			</Input>
-			<label htmlFor="prep-time-dropdown">Prep Time</label>
-		</div>
-	);
-};
 
-const IngredientsLines = ({ ingredients, recipeID, fetchRecipe }) => {
-	const authContext = useAuth();
-	const tokenFromStorage = authContext.tokenFromStorage;
 
-	const updateIngredientHandler = async (ingredientID, value) => {
-		const response = await fetch(`/api/recipes/${recipeID}/ingredient/${ingredientID}`, {
-			method: 'PATCH',
-			body: JSON.stringify(value),
-			headers: {
-				// This is required. NodeJS server won't know how to read it without it.
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${tokenFromStorage}`,
-			},
-		});
-		const data = await response.json();
-
-		if (data.success) {
-			console.log('Ingredient updated successfully.', data);
-		}
-	};
-
-	const debounceEditFunction = useCallback(debounce(updateIngredientHandler, 1500), [tokenFromStorage]);
-
+const IngredientsLines = ({ updateIngredientHandler, stageIngredientChange, dirty, ingredients, recipeID, fetchRecipe }) => {
 	return (
 		<div className="ingredient-section">
 			{ingredients &&
@@ -558,28 +540,26 @@ const IngredientsLines = ({ ingredients, recipeID, fetchRecipe }) => {
 							key={singleIngredient.ingredientID}
 							index={index}
 							singleIngredient={singleIngredient}
-							debounceEditFunction={debounceEditFunction}
-							updateIngredientHandler={updateIngredientHandler}
+							dirty={dirty}
+							stageIngredientChange={stageIngredientChange}
 							recipeID={recipeID}
 							fetchRecipe={fetchRecipe}
-							tokenFromStorage={tokenFromStorage}
+							updateIngredientHandler={updateIngredientHandler}
 						/>
 					);
 				})}
 
-			<NewIngredientInput tokenFromStorage={tokenFromStorage} recipeID={recipeID} fetchRecipe={fetchRecipe} />
+			<NewIngredientInput recipeID={recipeID} fetchRecipe={fetchRecipe} />
 		</div>
 	);
 };
 
-const IngredientLine = ({ index, singleIngredient, debounceEditFunction, updateIngredientHandler, recipeID, fetchRecipe, tokenFromStorage }) => {
+const IngredientLine = ({ index, singleIngredient, dirty, updateIngredientHandler, recipeID, fetchRecipe, stageIngredientChange }) => {
+	const authContext = useAuth();
+	const tokenFromStorage = authContext.tokenFromStorage;
+
 	const [value, setValue] = useState(singleIngredient.name);
 	const [tagName, setTagName] = useState(singleIngredient?.tagName);
-
-	const updateIngredientByID = (value) => {
-		setValue(value);
-		debounceEditFunction(singleIngredient.ingredientID, { value });
-	};
 
 	const removeTagHandler = () => {
 		setTagName(null);
@@ -606,18 +586,7 @@ const IngredientLine = ({ index, singleIngredient, debounceEditFunction, updateI
 					<Trash2 />
 				</Button>
 				<div className="ingredient-input form-floating">
-					<Input
-						className="editInput form-control"
-						id="recipe-ingredients"
-						type="text"
-						placeholder="Ingredients"
-						onChange={(e) => {
-							updateIngredientByID(e.target.value);
-						}}
-						value={value}
-						tabIndex={-1}
-					/>
-					<label htmlFor="recipe-ingredients">{`Ingredient ${index + 1}`}</label>
+					<EditTextInput label={`Ingredient ${index + 1}`} name={singleIngredient.ingredientID} value={value} setValue={setValue} stageChange={stageIngredientChange} dirty={dirty} />
 				</div>
 			</Col>
 			<Col lg={3}>
@@ -673,138 +642,8 @@ const IngredientTagDropdown = ({ singleIngredient, tagName, updateIngredientHand
 		);
 	}
 };
-const IngredientsTextarea = ({ value, setValue }) => {
-	return (
-		<div className="form-floating ingredients">
-			<Input
-				className="editInput form-control"
-				id="recipe-ingredients"
-				type="textarea"
-				placeholder="Ingredients"
-				onChange={(e) => {
-					setValue(e.target.value);
-				}}
-				value={value}
-				rows={15}
-			/>
-			<label htmlFor="recipe-ingredients">Bulk Ingredients</label>
-		</div>
-	);
-};
 
-const StepsTextarea = ({ value, setValue }) => {
-	return (
-		<div className="form-floating steps">
-			<Input
-				className="editInput"
-				id="recipe-steps"
-				type="textarea"
-				placeholder="Steps"
-				onChange={(e) => {
-					setValue(e.target.value);
-				}}
-				value={value}
-				rows={15}
-			/>
-			<label htmlFor="recipe-steps">Steps</label>
-		</div>
-	);
-};
-
-const NotesTextarea = ({ value, setValue }) => {
-	return (
-		<div className="form-floating notes">
-			<Input
-				className="editInput"
-				id="recipe-notes"
-				type="textarea"
-				placeholder="Notes"
-				rows={16}
-				onChange={(e) => {
-					setValue(e.target.value);
-				}}
-				value={value}
-			/>
-			<label htmlFor="recipe-notes">Notes</label>
-		</div>
-	);
-};
-
-const DayPrepTextarea = ({ value, setValue }) => {
-	return (
-		<div className="form-floating notes">
-			<Input
-				className="editInput"
-				id="recipe-day-prep"
-				type="textarea"
-				placeholder="Day Preparation"
-				rows={5}
-				onChange={(e) => {
-					setValue(e.target.value);
-				}}
-				value={value}
-			/>
-			<label htmlFor="recipe-day-prep">Day Earlier Preparation</label>
-		</div>
-	);
-};
-
-const PreheatInput = ({ value, setValue }) => {
-	return (
-		<div className="form-floating">
-			<Input
-				id="preheat"
-				className="mb-3"
-				style={{ width: '100%' }}
-				type="text"
-				placeholder="Preheat"
-				onChange={(e) => {
-					setValue(e.target.value);
-				}}
-				value={value}
-			/>
-			<label htmlFor="preheat">Preheat Temp.</label>
-		</div>
-	);
-};
-
-const DefrostInput = ({ value, setValue }) => {
-	return (
-		<div className="form-floating">
-			<Input
-				id="defrost"
-				className="mb-3"
-				style={{ width: '100%' }}
-				type="text"
-				placeholder="Defrost"
-				onChange={(e) => {
-					setValue(e.target.value);
-				}}
-				value={value}
-			/>
-			<label htmlFor="defrost">Defrost</label>
-		</div>
-	);
-};
-
-const URLInput = ({ value, setValue }) => {
-	return (
-		<div className="form-floating">
-			<Input
-				id="recipe-url"
-				className="mb-3"
-				type="text"
-				placeholder="URL"
-				onChange={(e) => {
-					setValue(e.target.value);
-				}}
-				value={value}
-			></Input>
-			<label htmlFor="recipe-url">URL</label>
-		</div>
-	);
-};
-const BooksSection = ({ bookID, setBookID, page, setPage, fetchRecipe, attachments, recipeID }) => {
+const BooksSection = ({ bookID, setBookID, page, setPage, fetchRecipe, attachments, recipeID, stageChange, dirty }) => {
 	const [books, setBooks] = useState([]);
 
 	const fetchBooks = useCallback(async () => {
@@ -837,34 +676,13 @@ const BooksSection = ({ bookID, setBookID, page, setPage, fetchRecipe, attachmen
 		<Row>
 			{modal}
 			<Col lg={4}>
-				<div className="form-floating">
-					<Input
-						className="edit-book-dropdown"
-						type="select"
-						onChange={(e) => {
-							setBookID(e.target.value);
-						}}
-						value={bookID}
-					>
-						<option value={0}>None</option>
-						{bookOptions}
-					</Input>
-					<label htmlFor="edit-book-dropdown">Book</label>
-				</div>
+				<EditDropdown label='Book' name='bookID' value={bookID} setValue={setBookID} stageChange={stageChange} dirty={dirty}>
+					<option value={0}>None</option>
+					{bookOptions}
+				</EditDropdown>
 			</Col>
 			<Col lg={2}>
-				<div className="form-floating">
-					<Input
-						id="page"
-						type="text"
-						placeholder="Page"
-						onChange={(e) => {
-							setPage(e.target.value);
-						}}
-						value={page}
-					></Input>
-					<label htmlFor="page">Page</label>
-				</div>
+				<EditTextInput label='Page' name='page' value={page} setValue={setPage} stageChange={stageChange} dirty={dirty}/>
 			</Col>
 			<Col lg={6} className="recipe-edit-btn">
 				<Button className="mangia-btn muted" onClick={openModal}>

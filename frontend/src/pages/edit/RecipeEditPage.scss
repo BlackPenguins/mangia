@@ -22,12 +22,34 @@
 	filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);
 }
 
-.save-button {
-	width: 100%;
-	padding: 50px;
-	margin: 15px 0px;
+.unsaved-changes {
+	background-color: #ffe9bf;
+	;
+	color: #333; 
+	padding: 10px;
+	font-weight: bold;
+	position: fixed; 
+	bottom: 15px;
+	right: 15px; 
+	width: 300px; 
+	z-index: 1000;
+	text-align: center;
+	border: {
+		color: #7e5200;
+		width: 2px;
+		style: solid;
+	}
 }
 
+.dirty-input {
+	background-color: #ffe9bf;
+}
+
+.dirty-input:focus {
+	background-color: #ffe9bf;
+}
+
+  
 .edit-book-dropdown {
 	vertical-align: top;
 	display: inline-block;
@@ -73,15 +95,15 @@
 
 
 
-.form-floating.ingredients textarea {
+.form-floating.recipe-ingredients textarea {
 	height: auto;
 }
 
-.form-floating.steps textarea {
+.form-floating.recipe-steps textarea {
 	height: auto;
 }
 
-.form-floating.notes textarea {
+.form-floating.recipe-notes textarea {
 	height: auto;
 }
 

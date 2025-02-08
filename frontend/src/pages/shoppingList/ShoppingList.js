@@ -72,8 +72,8 @@ const ShoppingList = () => {
 	}, [fetchShoppingList, tokenFromStorage]);
 
 	const [selectedStore, setSelectedStore] = useState(null);
-	const [hideCheckedItems, setHideCheckedItems] = useState(false);
-	const [hidePrices, setHidePrices] = useState(false);
+	const [showCheckedItems, setShowCheckedItems] = useState(false);
+	const [showPrices, setShowPrices] = useState(false);
 
 	return (
 		<section className="hero">
@@ -99,16 +99,16 @@ const ShoppingList = () => {
 					<div class="col-lg-3">
 						<StoreFilters stores={stores} selectedStore={selectedStore} setSelectedStore={setSelectedStore} />
 						<ShoppingListControls
-							hideCheckedItems={hideCheckedItems}
-							setHideCheckedItems={setHideCheckedItems}
-							hidePrices={hidePrices}
-							setHidePrices={setHidePrices}
+							showCheckedItems={showCheckedItems}
+							setShowCheckedItems={setShowCheckedItems}
+							showPrices={showPrices}
+							setShowPrices={setShowPrices}
 						/>
 					</div>
 					<div class="col-lg-9">
 						<ShoppingListTable
-							hideCheckedItems={hideCheckedItems}
-							hidePrices={hidePrices}
+							showCheckedItems={showCheckedItems}
+							showPrices={showPrices}
 							shoppingListItems={shoppingListItems}
 							stores={stores}
 							tokenFromStorage={tokenFromStorage}
@@ -117,8 +117,9 @@ const ShoppingList = () => {
 							updateShoppingListWithServerData={updateShoppingListWithServerData}
 						/>
 
-						<ShoppingListExtraTable shoppingListExtras={shoppingListExtras} hideCheckedItems={hideCheckedItems} tokenFromStorage={tokenFromStorage} />
 						<NewItemInput tokenFromStorage={tokenFromStorage} fetchShoppingListExtras={fetchShoppingListExtras} />
+						<ShoppingListExtraTable shoppingListExtras={shoppingListExtras} showCheckedItems={showCheckedItems} tokenFromStorage={tokenFromStorage} />
+						
 					</div>
 				</div>
 			</div>

@@ -1,7 +1,7 @@
 import { Col, Row } from 'reactstrap';
 import ShoppingListExtraTableRow from './ShoppingListExtraTableRow';
 
-const ShoppingListExtraTable = ({ shoppingListExtras, hideCheckedItems, tokenFromStorage }) => {
+const ShoppingListExtraTable = ({ shoppingListExtras, showCheckedItems, tokenFromStorage }) => {
 	return (
 		<div className="container">
 			<div className="shopping-list">
@@ -12,7 +12,7 @@ const ShoppingListExtraTable = ({ shoppingListExtras, hideCheckedItems, tokenFro
 				</Row>
 				{shoppingListExtras &&
 					shoppingListExtras.map((item) => {
-						return <ShoppingListExtraTableRow item={item} hideCheckedItems={hideCheckedItems} tokenFromStorage={tokenFromStorage} />;
+						return <ShoppingListExtraTableRow key={item.ShoppingListExtraID} item={item} showCheckedItems={showCheckedItems} tokenFromStorage={tokenFromStorage} />;
 					})}
 			</div>
 		</div>

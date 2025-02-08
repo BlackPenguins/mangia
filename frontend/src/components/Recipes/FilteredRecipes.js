@@ -60,7 +60,6 @@ const FilteredRecipes = ({ CardType, layoutClass, onClickHandler, categoryFilter
 					return isFilteredByCategory(recipe);
 				})
 		);
-		setSearch('');
 	}, [categoryFilter, allRecipes, isFilteredByCategory]);
 
 	return (
