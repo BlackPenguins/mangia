@@ -8,6 +8,9 @@ import { selectAllMenuDay } from '../database/menu.js';
 import { getWeekRange } from './menu.js';
 import { getPool } from '../database/utils.js';
 import { insertThumbnail } from '../database/thumbnails.js';
+import { selectIngredientsByRecipeID, updateIngredient } from '../database/ingredient.js';
+import { breakdownIngredient } from '../scrapers/RecipeImporter.js';
+import { convertToTeaspoons } from './shoppingListItem.js';
 
 const router = express.Router();
 
@@ -122,6 +125,41 @@ const migrationHandler = async (req, res) => {
 			await simpleDBQuery('Add Audit Column', 'ALTER TABLE MENU_DAY ADD COLUMN IsAged TINYINT', res);
 			await simpleDBQuery('Add Audit Column', 'ALTER TABLE MENU_DAY ADD COLUMN IsNewArrival TINYINT', res);
 			await simpleDBQuery('Add Audit Column', 'ALTER TABLE MENU_DAY ADD COLUMN TotalRankings INT', res);
+			break;
+		case 'addIsMissingUnits':
+			await simpleDBQuery('Add Column', 'ALTER TABLE SHOPPING_LIST_ITEM ADD COLUMN IsMissingUnits TINYINT', res);
+			await simpleDBQuery('Add Column', 'ALTER TABLE INGREDIENT ADD COLUMN IsMissingUnits TINYINT', res);
+			break;
+
+		case 'calculateMissingForIngredients':
+			const recipesToCalc = await selectAllRecipes();
+			let total = 0;
+			for( const recipToCalc of recipesToCalc ) {
+
+				const ingredients = await selectIngredientsByRecipeID(recipToCalc.RecipeID);
+				for( const ingredient of ingredients ) {
+
+					// If it's not tracked for shopping list, we dont need a unit
+					if( ingredient.IngredientTagID != null ) {
+
+						if( ingredient.IsMissingUnits === 1 ) {
+							console.log( "Ingredient already missing units." );
+						} else {
+							const { extractedAmount } = breakdownIngredient(ingredient.Name);
+							const ingredientID = ingredient.IngredientID;
+
+							const converted = convertToTeaspoons(extractedAmount);
+							if( converted.isMissingUnits ) {
+								console.log(" ==== MISSING", { ingredientID, name: ingredient.Name } );
+								await updateIngredient({ IsMissingUnits: true }, ingredient.IngredientID);
+								total++;
+							}
+						}
+					}
+				}
+			
+			}
+			console.log(`Corrected [${total}] ingredients.` );
 			break;
 		case 'addSuggestions':
 			await simpleDBQuery(

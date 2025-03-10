@@ -39,6 +39,10 @@
 		width: 2px;
 		style: solid;
 	}
+	
+	a {
+		color: #333; 
+	}
 }
 
 .dirty-input {
@@ -189,6 +193,10 @@ body {
 			.ingredient-input {
 				width: 100%;
 				display: inline-block;
+			}
+
+			.missing-units input {
+				border: 2px solid darkred;
 			}
 		}
 	}

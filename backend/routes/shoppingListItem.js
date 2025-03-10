@@ -30,6 +30,7 @@ const getCurrentShoppingList = async () => {
 			name: shoppingListItem.TagName,
 			isChecked: shoppingListItem.IsChecked,
 			recipeCount: shoppingListItem.RecipeCount,
+			isMissingUnits: shoppingListItem.IsMissingUnits,
 			shoppingListItemID: shoppingListItem.ShoppingListItemID,
 			ingredientTagID: shoppingListItem.IngredientTagID,
 			department: shoppingListItem.Department,
@@ -157,6 +158,7 @@ const buildShoppingListHandler = async (req, res) => {
 				IngredientTagID: ingredient.tagID,
 				IsChecked: 0,
 				RecipeCount: ingredient.recipeCount,
+				IsMissingUnits: ingredient.isMissingUnits
 			};
 			await insertShoppingListItem(newShoppingListItem);
 		}
@@ -180,8 +182,8 @@ const sumIngredients = (ingredients) => {
 					tagID: ingredient.tagID,
 					value: converted.amount,
 					wholeUnits: converted.wholeUnits,
-					invalidAmount: converted.invalidAmount,
 					unit: converted.unit,
+					isMissingUnits: converted.isMissingUnits,
 					recipeCount: 1,
 					ingredientDepartment: ingredient.ingredientDepartment,
 					ingredientDepartmentPosition: ingredient.ingredientDepartmentPosition,
@@ -256,12 +258,13 @@ const sumIngredients = (ingredients) => {
 	return finalIngredients;
 };
 
-const convertToTeaspoons = (value) => {
+export const convertToTeaspoons = (value) => {
 	if (!value) {
 		return {
-			unit: 'MISSING AMOUNT',
+			unit: '',
 			amount: 1,
 			wholeUnits: true,
+			isMissingUnits: true
 		};
 	}
 
@@ -316,9 +319,9 @@ const convertToTeaspoons = (value) => {
 
 	let convert;
 	if (isWholeUnit) {
-		convert = { wholeUnits: true, unit, amount: parseFloat(totalBaseMultiplier) };
+		convert = { isMissingUnits: false, wholeUnits: true, unit, amount: parseFloat(totalBaseMultiplier) };
 	} else {
-		convert = { wholeUnits: false, amount: parseFloat(baseTeaspoons * totalBaseMultiplier) };
+		convert = { isMissingUnits: false, wholeUnits: false, amount: parseFloat(baseTeaspoons * totalBaseMultiplier) };
 	}
 
 	console.log(`IncomingValue [${value}] Amount [${amount}] Measurement [${measurement}] TotalMultipler[${totalBaseMultiplier}] Final [${convert.amount}]`);

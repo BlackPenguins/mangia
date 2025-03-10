@@ -250,7 +250,9 @@ const RecipeEditPage = () => {
 
 			{dirty && (
 				<div className='unsaved-changes'>
+					<a href='#saveButton'>
 					<Bookmark/> You have unsaved changes!
+					</a>
 				</div>
 			)}
 
@@ -354,7 +356,7 @@ const RecipeEditPage = () => {
 						<Button className="mangia-btn muted" onClick={() => openModal()}>
 							<ArrowUpCircle /> Import
 						</Button>
-						<Button className="mangia-btn success" onClick={() => saveHandler()}>
+						<Button id='saveButton' className="mangia-btn success" onClick={() => saveHandler()}>
 							<Save /> Save
 						</Button>
 					</div>
@@ -571,9 +573,10 @@ const IngredientLine = ({ index, singleIngredient, dirty, updateIngredientHandle
 	const [value, setValue] = useState(singleIngredient.name);
 	const [tagName, setTagName] = useState(singleIngredient?.tagName);
 
-	const removeTagHandler = () => {
+	const removeTagHandler = async () => {
 		setTagName(null);
-		updateIngredientHandler(singleIngredient.ingredientID, { tagName: null });
+		await updateIngredientHandler(singleIngredient.ingredientID, { tagName: null });
+		fetchRecipe();
 	};
 
 	const removeHandler = async () => {
@@ -589,13 +592,19 @@ const IngredientLine = ({ index, singleIngredient, dirty, updateIngredientHandle
 		fetchRecipe();
 	};
 
+	const ingredientInputClasses = ['ingredient-input', 'form-floating'];
+
+	if( singleIngredient.isMissingUnits === 1) {
+		ingredientInputClasses.push("missing-units");
+	}
+
 	return (
 		<Row className="ingredient-row">
 			<Col lg={9}>
 				<Button tabIndex={-1} className="mangia-btn danger delete-ingredient-btn" size="small" onClick={removeHandler}>
 					<Trash2 />
 				</Button>
-				<div className="ingredient-input form-floating">
+				<div className={ingredientInputClasses.join(' ')}>
 					<EditTextInput label={`Ingredient ${index + 1}`} name={singleIngredient.ingredientID} value={value} setValue={setValue} stageChange={stageIngredientChange} dirty={dirty} />
 				</div>
 			</Col>
@@ -606,18 +615,20 @@ const IngredientLine = ({ index, singleIngredient, dirty, updateIngredientHandle
 					removeTagHandler={removeTagHandler}
 					updateIngredientHandler={updateIngredientHandler}
 					setTagName={setTagName}
+					fetchRecipe={fetchRecipe}
 				/>
 			</Col>
 		</Row>
 	);
 };
-const IngredientTagDropdown = ({ singleIngredient, tagName, updateIngredientHandler, removeTagHandler, setTagName }) => {
+const IngredientTagDropdown = ({ singleIngredient, tagName, updateIngredientHandler, removeTagHandler, setTagName, fetchRecipe }) => {
 	const [selectedValue, setSelectedValue] = useState('');
 
-	const setTagHandler = (value) => {
+	const setTagHandler = async (value) => {
 		setTagName(value);
-		updateIngredientHandler(singleIngredient.ingredientID, { tagName: value });
+		await updateIngredientHandler(singleIngredient.ingredientID, { tagName: value });
 		setSelectedValue('');
+		fetchRecipe();
 	};
 
 	const fetchAllTags = async () => {

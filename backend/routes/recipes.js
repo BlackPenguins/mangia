@@ -2,7 +2,7 @@ import express from 'express';
 import { addTag, deleteRecipe, deleteTag, insertRecipe, selectAllRecipes, selectimportFailureURLs, selectRecipeByID, selectTags, updateRecipe } from '../database/recipes.js';
 import { breakdownIngredient, createIngredients, createSteps, importRecipe } from '../scrapers/RecipeImporter.js';
 import { deleteStepsByRecipeID, selectStepsByRecipeID } from '../database/step.js';
-import { deleteIngredient, deleteIngredientsByRecipeID, insertIngredient, selectIngredientsByRecipeID, updateIngredient } from '../database/ingredient.js';
+import { deleteIngredient, deleteIngredientsByRecipeID, insertIngredient, selectIngredientByIngredientID, selectIngredientsByRecipeID, updateIngredient } from '../database/ingredient.js';
 
 import Tesseract, { createWorker } from 'tesseract.js';
 import multer from 'multer';
@@ -16,6 +16,7 @@ import { checkAdminMiddleware } from './auth.js';
 import { insertIngredientTag, selectIngredientTagByName } from '../database/ingredientTags.js';
 import { withDateDetails } from './menu.js';
 import { deleteThumbnail, insertThumbnail, selectAllThumbnails } from '../database/thumbnails.js';
+import { convertToTeaspoons } from './shoppingListItem.js';
 
 export const THUMBNAIL_DIRECTORY = './images/thumbnails';
 const LARGE_PREFIX = 'large_';
@@ -128,6 +129,7 @@ export const addIngredientsToRecipe = async (recipe) => {
 			name: ingredient.Name,
 			tagName: ingredient.TagName,
 			tagID: ingredient.IngredientTagID,
+			isMissingUnits: ingredient.IsMissingUnits,
 			calculatedAmount: extractedAmount,
 			calculatedValue: extractedName,
 			ingredientDepartment: ingredient.IngredientDepartment,
@@ -449,9 +451,28 @@ const updateIngredientProcessor = async (req, res) => {
 	// Update the ingredient with the tag
 	console.log(` Update Ingredient for ${ingredientID}`, updatedIngredient);
 	const recipe = await updateIngredient(updatedIngredient, ingredientID);
+
+	await validateAndUpdateMissingUnits(ingredientID);
 	res.status(200).json({ success: true, updatedIngredient });
 };
 
+const validateAndUpdateMissingUnits = async(ingredientID) => {
+	const ingredient = await selectIngredientByIngredientID(ingredientID);
+
+	const updatedIngredient = {};
+
+	if( ingredient.IngredientTagID == null ) {
+		// No tag, nothing to track in shopping list, units don't matter
+		updatedIngredient.IsMissingUnits = false;
+	} else {
+		const { extractedAmount } = breakdownIngredient(ingredient.Name);
+		const converted = convertToTeaspoons(extractedAmount);
+		updatedIngredient.IsMissingUnits = converted.isMissingUnits;
+	}
+
+	await updateIngredient(updatedIngredient, ingredientID);
+
+}
 const addIngredientProcessor = async (req, res) => {
 	const name = req.body.name;
 	const recipeID = req.params.recipeID;

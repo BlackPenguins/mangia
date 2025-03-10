@@ -90,8 +90,8 @@
 
 			&.name-col {
 				display: flex;
-				flex-direction: column;
-				justify-content: center;
+				flex-direction: row;
+				justify-content: left;
 				align-items: flex-start;
 				padding: 15px 0px 15px 15px;
 			}
@@ -110,6 +110,19 @@
 			}
 		}
 	}
+}
+
+
+.missing-units {
+	margin: 0px auto;
+	background-color: #ffbcbc;
+	color: black;
+	border-radius: 1000px;
+	padding: {
+		right: 0.75em;
+		left: 0.75em;
+	};
+	font-size: 0.9em;
 }
 
 .add-item-button {

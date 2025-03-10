@@ -269,6 +269,13 @@ const Ingredients = ({ ingredients }) => {
 						return (
 							<li className={classes.join(' ')} key={index}>
 								{ingredient.name}
+
+								{ingredient?.isMissingUnits == 1 && (
+									<span className='missing-units'>
+										Missing Units
+									</span>
+								)}
+
 							</li>
 						);
 					})}

@@ -77,10 +77,17 @@ const ShoppingListTableRow = ({
 			</Col>
 			<Col className="name-col col" lg={NAME_WIDTH} sm={MOBILE_NAME_WIDTH} xs={MOBILE_NAME_WIDTH}>
 				{ingredient.amount} {ingredient.name}
+
+				{ingredient?.isMissingUnits == 1 && (
+					<span className='missing-units'>
+						Missing Units
+					</span>
+				)}
 			</Col>
 			<Col className="count-col col" lg={countWidth} sm={mobileCountWidth} xs={mobileCountWidth}>
 				{ingredient.recipeCount}
 			</Col>
+			
 			{showPrices && (
 				<Col className="stores-col col" lg={STORE_PRICES_SECTION_WIDTH} sm={MOBILE_STORE_PRICES_SECTION_WIDTH} xs={MOBILE_STORE_PRICES_SECTION_WIDTH}>
 					<Row>
