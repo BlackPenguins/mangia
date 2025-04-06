@@ -17,6 +17,7 @@ import ImportFailuresTab from 'pages/configuration/ImportFailuresTab';
 import StoreTab from 'pages/configuration/StoreTab';
 import { ToastProvider } from 'context/toast-context';
 import SuggestionsTab from 'pages/configuration/SuggestionsTab';
+import AuditTab from 'pages/configuration/AuditTab';
 
 function App() {
 	return (
@@ -30,6 +31,7 @@ function App() {
 						<Route path="menu" element={<MenuPage />} />
 						<Route path="shoppingList" element={<ShoppingList />} />
 						<Route path="configuration" element={<ConfigurationPage />}>
+							<Route path="audit" element={<AuditTab />} />
 							<Route path="suggestions" element={<SuggestionsTab />} />
 							<Route path="books" element={<BooksTab />} />
 							<Route path="ingredients" element={<IngredientsTab />} />

@@ -3,6 +3,7 @@ import { Button } from 'reactstrap';
 import './MenuNav.scss';
 import PageNumberButton from './PageNumberButton';
 import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
+import FridgeModal from './FridgeModal';
 
 const MenuNav = ({ menus, weekOfYear, page, setPage, fetchMenu }) => {
 	const authContext = useAuth();
@@ -20,7 +21,7 @@ const MenuNav = ({ menus, weekOfYear, page, setPage, fetchMenu }) => {
 			},
 		});
 		fetchMenu(page);
-	}, [page, fetchMenu]);
+	}, [page, tokenFromStorage, fetchMenu]);
 
 	const { modal, openModal } = useBetterModal({
 		title: 'Rebuild the Menu',
@@ -47,7 +48,7 @@ const MenuNav = ({ menus, weekOfYear, page, setPage, fetchMenu }) => {
 		} else {
 			generateMenu();
 		}
-	}, [generateMenu, hasAtLeastOneMenu]);
+	}, [generateMenu, hasAtLeastOneMenu, openModal]);
 
 	return (
 		<div className="menu-nav-container">
@@ -57,6 +58,7 @@ const MenuNav = ({ menus, weekOfYear, page, setPage, fetchMenu }) => {
 					<Button onClick={generateButtonHandler} className="mangia-btn success">
 						Build Menu
 					</Button>
+					<FridgeModal/>
 				</div>
 			)}
 			<div className="menu-nav">

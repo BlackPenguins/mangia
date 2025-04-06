@@ -1,10 +1,8 @@
 import { Settings, Trash } from 'react-feather';
-import { useState } from 'react';
-import { Button, Col, Input, Row } from 'reactstrap';
+import { Button, Col, Row } from 'reactstrap';
 import FilteredRecipes from 'components/Recipes/FilteredRecipes';
 import RecipeRow from 'components//Recipes/RecipeRow';
 import './ChangeModal.scss';
-import { useToast } from 'context/toast-context';
 import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
 
 const ChangeButton = ({ fetchMenu, menu, page, availableSwapDays }) => {

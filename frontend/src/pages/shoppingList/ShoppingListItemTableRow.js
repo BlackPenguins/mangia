@@ -78,7 +78,7 @@ const ShoppingListTableRow = ({
 			<Col className="name-col col" lg={NAME_WIDTH} sm={MOBILE_NAME_WIDTH} xs={MOBILE_NAME_WIDTH}>
 				{ingredient.amount} {ingredient.name}
 
-				{ingredient?.isMissingUnits == 1 && (
+				{ingredient?.isMissingUnits === 1 && (
 					<span className='missing-units'>
 						Missing Units
 					</span>

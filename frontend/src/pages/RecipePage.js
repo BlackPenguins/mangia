@@ -4,15 +4,15 @@ import { useNavigate, useParams } from 'react-router-dom';
 import './RecipePage.scss';
 import { Button, Col, Row } from 'reactstrap';
 import Rating from '../components/Settings/Rating';
-import { utcToZonedTime } from 'date-fns-tz';
 import { formatDistance } from 'date-fns';
 import { Edit, Trash2 } from 'react-feather';
 import LoadingText from '../components/Common/LoadingText';
 import { PrepTimeLabel, ThumbnailPreview } from './edit/RecipeEditPage';
-import { getThumbnailImage } from 'components/Recipes/RecipeCard';
 import NewArrivalTag from 'components/Recipes/NewArrivalTag';
 import MenuContext from 'authentication/menu-context';
 import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
+import { useThumbnailBackgroundStyle } from 'components/Recipes/RecipeRow';
+import { TZDate } from '@date-fns/tz';
 
 const RecipePage = () => {
 	const params = useParams();
@@ -129,7 +129,8 @@ const MenuButton = ({ isMenuRecipe, label, labelMobile, action }) => {
 const Statistics = ({ recipe, book }) => {
 	const lastMadeDateUTC = new Date(recipe.lastmade);
 	const [recipeTags, setRecipeTags] = useState([]);
-	const lastMadeDate = utcToZonedTime(lastMadeDateUTC, 'America/New_York');
+
+	const lastMadeDate = new TZDate(lastMadeDateUTC, 'America/New_York');
 
 	const days = formatDistance(lastMadeDate, new Date(), { addSuffix: true });
 
@@ -150,8 +151,8 @@ const Statistics = ({ recipe, book }) => {
 				<div className="tag-container">
 					{recipeTags.map((tag, index) => {
 						return (
-							<span key={index} className="tag">
-								<span className="tag-name">{tag.Name}</span>
+							<span key={index} className="tag-box-1 recipe">
+								<span className="tag-name-1">{tag.Name}</span>
 							</span>
 						);
 					})}
@@ -232,13 +233,7 @@ const Controls = ({ recipe }) => {
 	);
 };
 const HeaderImage = ({ recipe }) => {
-	const thumbnailImage = getThumbnailImage(recipe, false);
-
-	const thumbnailStyle = {
-		backgroundImage: `url(${thumbnailImage})`,
-		backgroundSize: 'cover',
-		height: '300px',
-	};
+	const thumbnailStyle = useThumbnailBackgroundStyle(recipe, false, '300px');
 
 	return (
 		<div style={thumbnailStyle} className="thumbnail-container">
@@ -270,7 +265,7 @@ const Ingredients = ({ ingredients }) => {
 							<li className={classes.join(' ')} key={index}>
 								{ingredient.name}
 
-								{ingredient?.isMissingUnits == 1 && (
+								{ingredient?.isMissingUnits === 1 && (
 									<span className='missing-units'>
 										Missing Units
 									</span>

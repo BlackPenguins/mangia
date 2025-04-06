@@ -15,37 +15,6 @@
 		
 		margin-right: 10px;
 		color: white;
-
-		.remove-tag {
-			padding: 2px 10px;
-
-			&:hover {
-				cursor: pointer;
-				color: rgb(255, 87, 87);
-			}
-		}
-
-		.tag-name {
-			padding: 2px 15px;
-		}
-
-		&.recipe {
-			.tag-name {
-				background-color: rgb(148, 150, 24);
-			}
-			.remove-tag {
-				background-color: rgb(118, 119, 27);
-			}
-		}
-
-		&.ingredient {
-			.tag-name {
-				background-color: rgb(24, 93, 150);
-			}
-			.remove-tag {
-				background-color: rgb(20, 61, 95);
-			}
-		}
 	}
 	
 }
@@ -84,5 +53,87 @@
 		color: #fae042;
 		cursor: pointer;
 		font-weight: 700;
+	}
+}
+
+
+$recipe-tag-color: rgb(148, 150, 24);
+
+.tag-box-1 {
+    display: flex;
+    align-items: center;
+    width: 100%; /* Make it take full width of parent */
+    border-radius: 5px;
+    overflow: hidden;
+	margin: 0px 10px;
+
+	&.recipe {
+		.tag-name-1 {
+			background-color: $recipe-tag-color;
+		}
+		.tag-remove-1 {
+			background-color: $recipe-tag-color;
+			filter: brightness(80%);
+		}
+	}
+
+	&.ingredient {
+		.tag-name-1 {
+			background-color: var(--tag-color);
+		}
+		.tag-remove-1 {
+			background-color: var(--tag-color);
+			filter: brightness(80%);
+		}
+	}
+
+	&.fridge {
+		margin: {
+			top: 10px;
+			bottom: 10px;
+		}
+
+		.tag-name-1 {
+			background-color: var(--tag-color);
+			padding: 20px;
+		}
+		.tag-remove-1 {
+			background-color: var(--tag-color);
+			filter: brightness(80%);
+			padding: 15px;
+		}
+	}
+
+	.tag-remove-1 {
+		&:hover {
+			cursor: pointer;
+			filter: brightness(120%);
+		}
+		font-size: 1.4em;
+		
+		color: white;
+		padding: 0px 10px;
+		cursor: pointer;
+
+		& :before {
+			content: "×";
+			color: white;  // Ensures the "X" remains white
+			font-size: 16px;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+	}
+
+	.tag-name-1 {
+		font-family: Cairo, sans-serif;
+		font-weight: 800;
+		
+		color: white;
+	
+		background-color: lightblue;
+		flex-grow: 1;  /* Allows it to expand */
+		padding: 5px 10px;
 	}
 }

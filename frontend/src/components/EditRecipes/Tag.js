@@ -9,6 +9,7 @@ import InputWithAutocomplete from './InputWithAutocomplete';
 const Tag = ({ recipeID }) => {
 	const authContext = useAuth();
 	const tokenFromStorage = authContext.tokenFromStorage;
+    const [allResults, setAllResults] = useState([]);
 
 	const fetchAllTags = async () => {
 		const response = await fetch('/api/tags', {
@@ -18,7 +19,7 @@ const Tag = ({ recipeID }) => {
 			},
 		});
 		const data = await response.json();
-		return data.map((d) => d.Name);
+		setAllResults(data.map((d) => d.Name));
 	};
 
 	const fetchRecipeTags = useCallback(async () => {
@@ -30,6 +31,7 @@ const Tag = ({ recipeID }) => {
 
 	useEffect(() => {
 		fetchRecipeTags();
+		fetchAllTags();
 	}, [fetchRecipeTags]);
 
 	const [recipeTags, setRecipeTags] = useState([]);
@@ -70,7 +72,8 @@ const Tag = ({ recipeID }) => {
 				<InputWithAutocomplete
 					id="recipe-tag"
 					label="Tag"
-					fetchAvailableResults={fetchAllTags}
+					allResults={allResults}
+					setAllResults={setAllResults}
 					selectedValue={selectedValue}
 					setSelectedValue={setSelectedValue}
 					onkeyDownHandler={(value) => addTagHandler(value)}
@@ -93,18 +96,16 @@ const Tag = ({ recipeID }) => {
 		</Row>
 	);
 };
-export const TagBox = ({ type, tag, removeTagHandler }) => {
+export const TagBox = ({ type, tag, removeTagHandler, tagColor = "rgb(24, 93, 150)" }) => {
 	if (!tag?.Name) {
 		return null;
 	}
 	const removeTag = () => removeTagHandler(tag.TagID);
 	return (
-		<span key={tag.TagID} className={`tag ${type}`}>
-			<span onClick={removeTag} className="remove-tag">
-				X
-			</span>
-			<span className="tag-name">{tag.Name}</span>
-		</span>
+		<div key={tag.TagID} className={`tag-box-1 ${type}`} style={{'--tag-color': tagColor}}>
+			<span onClick={removeTag} class="tag-remove-1">&times;</span>
+			<span class="tag-name-1">{tag.Name}</span>
+		</div>
 	);
 };
 

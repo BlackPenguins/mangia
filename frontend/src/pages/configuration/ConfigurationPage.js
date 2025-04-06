@@ -18,6 +18,11 @@ const ConfigurationPage = () => {
 							</div>
 							<ul>
 								<li>
+									<NavLink to="audit" activeClassName="active">
+										Audit
+									</NavLink>
+								</li>
+								<li>
 									<NavLink to="suggestions" activeClassName="active">
 										Suggestions
 									</NavLink>

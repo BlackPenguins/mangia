@@ -1,0 +1,28 @@
+.audit-list {
+    .row {
+        color: rgb(140, 255, 245);
+        
+        &:nth-child(even) {
+            background-color: #0d4452;
+        }
+
+        &:nth-child(odd) {
+            background-color: #0b3a46;
+        }
+
+        &.this-week {
+            background-color: rgb(117, 117, 6);
+        }
+
+        .data {
+            flex-direction: column;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+
+    .recipe-row {
+        background-color: transparent;
+    }
+}

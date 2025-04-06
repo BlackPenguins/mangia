@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import Rating from '../Settings/Rating';
 import './RecipeCard.scss';
-import { utcToZonedTime } from 'date-fns-tz';
+// import { utcToZonedTime } from 'date-fns-tz';
 import { differenceInDays, formatDistance } from 'date-fns';
 import NewArrivalTag from './NewArrivalTag';
+import { useThumbnailBackgroundStyle } from './RecipeRow';
+import { TZDate } from '@date-fns/tz';
 
 const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottomButtons, isMenu }) => {
 	let recipeName = '';
@@ -14,13 +16,7 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 
 	const hideInformation = isSkipped || isLeftovers;
 
-	const thumbnailImage = getThumbnailImage(recipe, hideInformation);
-
-	const thumbnailStyle = {
-		backgroundImage: `url(${thumbnailImage})`,
-		backgroundSize: 'cover',
-		height: '200px',
-	};
+	const thumbnailStyle = useThumbnailBackgroundStyle(recipe, hideInformation, '200px');
 
 	let thumbnail = (
 		<>
@@ -45,9 +41,9 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 		<div className={classes.join(' ')}>
 			<NewArrivalTag recipe={recipe} />
 			<CardStatus isSkipped={isSkipped} skipReason={skipReason} recipe={recipe} isMade={isMade} isLeftovers={isLeftovers} />
-			<a href="#" className="img-prod">
+			<span className="img-prod">
 				{thumbnail}
-			</a>
+			</span>
 			<div className="text py-3 pb-4 px-3 text-center">
 				{!hideInformation && (
 					<>
@@ -88,7 +84,8 @@ export const DaysAgo = ({ label, lastMade, recentDayThreshold }) => {
 	}
 
 	const lastMadeDateUTC = new Date(lastMade);
-	const lastMadeDate = utcToZonedTime(lastMadeDateUTC, 'America/New_York');
+
+	const lastMadeDate = new TZDate(lastMadeDateUTC, 'America/New_York');
 
 	const days = formatDistance(lastMadeDate, new Date(), { addSuffix: true });
 	const dayCount = differenceInDays(lastMadeDate, new Date());

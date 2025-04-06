@@ -7,13 +7,13 @@ import { useToast } from '@blackpenguins/penguinore-common-ext';
 
 import './RecipeEditPage.scss';
 import Rating from '../../components/Settings/Rating';
-import Tag, { TagBox } from '../../components/EditRecipes/Tag';
+import Tag from '../../components/EditRecipes/Tag';
 import { ArrowUpCircle, Eye, Printer, Trash2 } from 'react-feather';
 import useScanModal from '../../components/Settings/useScanModal';
-import InputWithAutocomplete from '../../components/EditRecipes/InputWithAutocomplete';
 import NewIngredientInput from './NewIngredientInput';
 import { useAuth } from '@blackpenguins/penguinore-common-ext';
 import useImportRecipeModal from '../../components/Settings/ImportRecipeModal';
+import IngredientTagDropdown from './IngredientTagDropdown';
 
 const RecipeEditPage = () => {
 	const [dirty, setDirty] = useState(false);
@@ -598,6 +598,12 @@ const IngredientLine = ({ index, singleIngredient, dirty, updateIngredientHandle
 		ingredientInputClasses.push("missing-units");
 	}
 
+	const ingredientTagUpdateHandler = async (value) => {
+		setTagName(value);
+		await updateIngredientHandler(singleIngredient.ingredientID, { tagName: value });
+		fetchRecipe();
+	}
+
 	return (
 		<Row className="ingredient-row">
 			<Col lg={9}>
@@ -609,60 +615,17 @@ const IngredientLine = ({ index, singleIngredient, dirty, updateIngredientHandle
 				</div>
 			</Col>
 			<Col lg={3}>
-				<IngredientTagDropdown
-					singleIngredient={singleIngredient}
+				<IngredientTagDropdown 
+					currentTagID={singleIngredient?.tagID}
 					tagName={tagName}
 					removeTagHandler={removeTagHandler}
-					updateIngredientHandler={updateIngredientHandler}
-					setTagName={setTagName}
-					fetchRecipe={fetchRecipe}
+					ingredientTagUpdateHandler={ingredientTagUpdateHandler}
 				/>
 			</Col>
 		</Row>
 	);
 };
-const IngredientTagDropdown = ({ singleIngredient, tagName, updateIngredientHandler, removeTagHandler, setTagName, fetchRecipe }) => {
-	const [selectedValue, setSelectedValue] = useState('');
 
-	const setTagHandler = async (value) => {
-		setTagName(value);
-		await updateIngredientHandler(singleIngredient.ingredientID, { tagName: value });
-		setSelectedValue('');
-		fetchRecipe();
-	};
-
-	const fetchAllTags = async () => {
-		const response = await fetch('/api/ingredientTags', {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
-		const data = await response.json();
-		const ingredients = data.ingredientsWithPrices;
-
-		return ingredients.map((d) => d.Name);
-	};
-
-	if (tagName) {
-		return (
-			<span className="tag-container ingredient-tag">
-				<TagBox type="ingredient" tag={{ Name: tagName, TagID: singleIngredient?.tagID }} removeTagHandler={removeTagHandler} />
-			</span>
-		);
-	} else {
-		return (
-			<InputWithAutocomplete
-				id="ingredient-tag"
-				label="Search Tag"
-				fetchAvailableResults={fetchAllTags}
-				selectedValue={selectedValue}
-				setSelectedValue={setSelectedValue}
-				onkeyDownHandler={(value) => setTagHandler(value)}
-			/>
-		);
-	}
-};
 
 const BooksSection = ({ bookID, setBookID, page, setPage, fetchRecipe, attachments, recipeID, stageChange, dirty }) => {
 	const [books, setBooks] = useState([]);

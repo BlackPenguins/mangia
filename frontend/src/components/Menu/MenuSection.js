@@ -39,7 +39,7 @@ const MenuSection = ({ showAuditInformation }) => {
 		const menuRecipeIDs = menu.filter((m) => m.isSkipped !== 1 && m.isLeftovers !== 1).map((m) => m.recipe?.RecipeID);
 		setCurrentRecipeIDs(recipeIDs);
 		menuContext.setMenuRecipeIDsHandler(menuRecipeIDs);
-	}, []);
+	}, [menuContext]);
 
 	useEffect(() => {
 		fetchMenu(page);
@@ -141,6 +141,19 @@ const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, availableSwapDays }
 
 	return (
 		<>
+			<span class="hide-checked-items">
+				<FormGroup switch>
+					<Input
+						type="switch"
+						checked={showAuditInformation}
+						onClick={() => {
+							setShowAuditInformation(!showAuditInformation);
+						}}
+					/>
+					<Label check>Show Audit Information</Label>
+				</FormGroup>
+			</span>
+
 			<Row className="menu---list">
 				{menus?.map((menu, index) => {
 					const tomorrowsMenu = menus[index + 1];
@@ -160,18 +173,6 @@ const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, availableSwapDays }
 				{extraModal}
 				{authContext.isAdmin && <NewMenuButton openAddExtraModal={openAddExtraModal} /> }
 			</Row>
-			<span class="hide-checked-items">
-				<FormGroup switch>
-					<Input
-						type="switch"
-						checked={showAuditInformation}
-						onClick={() => {
-							setShowAuditInformation(!showAuditInformation);
-						}}
-					/>
-					<Label check>Show Audit Information</Label>
-				</FormGroup>
-			</span>
 		</>
 	);
 };
@@ -337,7 +338,7 @@ const AuditInformation = ({ menu, showAuditInformation }) => {
 				<BeforeAfter label="Weight" before={menu.originalWeight} after={menu.adjustedWeight} />
 				<tr>
 					<td className="aged">{menu.isAged === 1 ? 'Aged' : ''}</td>
-					<td>&nbsp;</td>
+					<td><MatchedIngredients menu={menu}/></td>
 					<td className="new">{menu.isNewArrival === 1 ? 'New' : ''}</td>
 				</tr>
 			</table>
@@ -345,7 +346,15 @@ const AuditInformation = ({ menu, showAuditInformation }) => {
 	);
 };
 
-const BeforeAfter = ({ label, before, after, extra }) => {
+export const MatchedIngredients = ( {menu}) => {
+	if( !menu.matchedIngredients) {
+		return <>&nbsp;</>;
+	}
+
+	return <span className='matched-ingredients'>{menu.matchedIngredients} &#129365;</span>;
+}
+
+export const BeforeAfter = ({ label, before, after, extra }) => {
 	const difference = Math.round(after - before);
 
 	let differenceClass;

@@ -69,7 +69,7 @@ const ShoppingList = () => {
 		});
 		fetchShoppingList();
 		showToast('Shopping List', 'Shopping list has been rebuilt.');
-	}, [fetchShoppingList, tokenFromStorage]);
+	}, [fetchShoppingList, showToast, tokenFromStorage]);
 
 	const [selectedStore, setSelectedStore] = useState(null);
 	const [showCheckedItems, setShowCheckedItems] = useState(false);

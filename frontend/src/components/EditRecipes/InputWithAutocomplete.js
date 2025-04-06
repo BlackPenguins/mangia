@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Input } from 'reactstrap';
 
-const InputWithAutocomplete = ({ fetchAvailableResults, selectedValue, setSelectedValue, onkeyDownHandler, label, id }) => {
-	const [allResults, setAllResults] = useState([]);
+const InputWithAutocomplete = ({ selectedValue, setSelectedValue, onkeyDownHandler, label, id, allResults, setAllResults }) => {
 	const [filteredResults, setFilteredResults] = useState([]);
 	const [resultSuggestionIndex, setResultSuggestionIndex] = useState(0);
 	const [showSuggestions, setShowSuggestions] = useState(false);
@@ -26,12 +25,12 @@ const InputWithAutocomplete = ({ fetchAvailableResults, selectedValue, setSelect
 			} else {
 				// There is no result, use the exact value in the input
 				onkeyDownHandler(selectedValue);
+				setAllResults( [...allResults, selectedValue]);
 			}
 
 			// Once we select something from dropodown, hide the suggestions until we type again
 			setResultSuggestionIndex(0);
 			setShowSuggestions(false);
-			fetchData();
 		} else if (e.key === 'ArrowUp') {
 			if (resultSuggestionIndex === 0) {
 				// You cannot go above the first suggestion
@@ -56,21 +55,13 @@ const InputWithAutocomplete = ({ fetchAvailableResults, selectedValue, setSelect
 		// Once we select something from dropodown, hide the suggestions until we type again
 		setResultSuggestionIndex(0);
 		setShowSuggestions(false);
-		fetchData();
 	};
 
 	const focusHandler = (e) => {
 		e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
 	};
 
-	const fetchData = useCallback( async () => {
-		// Call the supplier function passed from the parent component to get all possible suggestions
-		const newData = await fetchAvailableResults();
-		setAllResults(newData);
-	}, [fetchAvailableResults]);
-
 	useEffect(() => {
-		fetchData();
 		setFilteredResults([]);
 	}, []);
 

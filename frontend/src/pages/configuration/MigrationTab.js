@@ -25,6 +25,9 @@ const MigrationTab = () => {
 
 	return (
 		<div>
+			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addMatchedIngredients" label="v2.0: Add MatchedIngredients to MENU_DAY" />
+			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addFridge" label="v2.0: Add Fridge" />
+			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addDeptColor" label="v2.0: Add Dept Color" />
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="calculateMissingForIngredients" label="v1.10: Calculate IsMissingUnits for all Ingredients" />
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addIsMissingUnits" label="v1.10: Add IsMissingUnits to RECIPE and SHOPPING_INGREDIENT_ITEM" />
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addSuggestions" label="v1.9: Add SUGGESTIONS" />

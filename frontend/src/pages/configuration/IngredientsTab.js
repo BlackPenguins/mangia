@@ -61,9 +61,10 @@ const IngredientsTab = () => {
 			},
 		});
 		const fetchedDepartments = await response.json();
-		const sortedDepartments = fetchedDepartments.sort( (a, b) => {
-			return a.Name > b.Name;
+		const sortedDepartments = fetchedDepartments.sort((a, b) => {
+			return a.Name.localeCompare(b.Name);
 		});
+
 		setDepartments(sortedDepartments);
 	}, []);
 
