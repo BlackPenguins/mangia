@@ -13,7 +13,7 @@ import { insertTag, selectTagByName } from '../database/tags.js';
 
 import fs from 'fs';
 import { checkAdminMiddleware } from './auth.js';
-import { insertIngredientTag, selectIngredientTagByName } from '../database/ingredientTags.js';
+import { insertIngredientTag, selectIngredientTagByName, selectIngredientTagsByRecipeID } from '../database/ingredientTags.js';
 import { withDateDetails } from './menu.js';
 import { deleteThumbnail, insertThumbnail, selectAllThumbnails } from '../database/thumbnails.js';
 import { convertToTeaspoons } from './shoppingListItem.js';
@@ -148,6 +148,19 @@ export const addThumbnails = async (recipe) => {
 		...recipe,
 	};
 };
+
+export const addIngredientTags = async (recipe) => {
+	const recipeID = recipe.RecipeID;
+
+	const ingredientTags = (await selectIngredientTagsByRecipeID(recipeID)).map( i => i.IngredientTagID);
+
+	return {
+		ingredientTags,
+		...recipe,
+	};
+}
+
+
 const getAllRecipes = (req, res) => {
 	const selectPromise = selectAllRecipes();
 

@@ -2,9 +2,12 @@ import express from 'express';
 import { selectAllRecipes, selectAllRecipesByLastMadeOrder, selectRecipeByID, updateRecipe } from '../database/recipes.js';
 import { deleteMenu, insertMenu, selectByWeekID, selectMenuByDay, selectMenuByMenuID, swapMenu, updateMenu } from '../database/menu.js';
 import { checkAdminMiddleware } from './auth.js';
-import { addIngredientsToRecipe, addThumbnails } from './recipes.js';
+import { addIngredientsToRecipe, addIngredientTags, addThumbnails } from './recipes.js';
 import { getOrInsertWeek } from '../database/week.js';
 import { selectAllSuggestions, selectTwoSuggestions } from '../database/suggestions.js';
+import { selectAllFridge } from '../database/fridge.js';
+import { selectIngredientTagsByRecipeID } from '../database/ingredientTags.js';
+import { differenceInDays } from 'date-fns';
 
 const DAYS_OF_WEEK = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
 const MONTHS_OF_YEAR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -41,7 +44,8 @@ export const getMenuForWeekOffset = async (weekID, startDate) => {
 			if (menuDay?.RecipeID) {
 				const recipeFromDB = await selectRecipeByID(menuDay.RecipeID);
 				const recipeWithThumbnails = await addThumbnails(recipeFromDB);
-				await addIngredientsToRecipe(recipeWithThumbnails);
+				const recipeWithThumbnailsAndTags = await addIngredientTags(recipeWithThumbnails);
+				await addIngredientsToRecipe(recipeWithThumbnailsAndTags);
 				formattedDaysArray.push(
 					withDateDetails(new Date(menuDay.Day), {
 						menuID: menuDay.MenuID,
@@ -55,10 +59,11 @@ export const getMenuForWeekOffset = async (weekID, startDate) => {
 						adjustedRanking: menuDay.AdjustedRanking,
 						originalWeight: menuDay.OriginalWeight,
 						adjustedWeight: menuDay.AdjustedWeight,
+						matchedIngredients: menuDay.MatchedIngredients,
 						totalRankings: menuDay.TotalRankings,
 						isAged: menuDay.IsAged,
 						isNewArrival: menuDay.IsNewArrival,
-						recipe: recipeWithThumbnails,
+						recipe: recipeWithThumbnailsAndTags,
 					})
 				);
 			}
@@ -139,6 +144,7 @@ const changeMenuItem = async (req, res) => {
 		adjustedRanking: null,
 		isAged: null,
 		isNewArrival: null,
+		matchedIngredients: null
 	};
 	await updateMenu(newMenuDay, menuID);
 
@@ -170,7 +176,7 @@ const generateMenu = async (req, res) => {
 
 	let recipes = await selectAllRecipesByLastMadeOrder();
 
-	const pickedRecipes = getRandomWeightedRecipe(recipes, 7);
+	const pickedRecipes = await getRandomWeightedRecipe(recipes, 7);
 
 	for (let i = 0; i < 7; i++) {
 		const day = new Date(startDate.getTime());
@@ -192,7 +198,8 @@ const generateMenu = async (req, res) => {
 				pickedRecipe.adjustedRanking,
 				pickedRecipe.isAged,
 				pickedRecipe.IsNewArrival,
-				pickedRecipe.totalRankings
+				pickedRecipe.totalRankings,
+				pickedRecipe.matchedIngredients
 			);
 			console.log(`Day inserted into Menu - ${pickedRecipe.RecipeID}, ${pickedRecipe.Name}, ${pickedRecipe.adjustedWeight}`);
 		} else {
@@ -200,6 +207,7 @@ const generateMenu = async (req, res) => {
 				recipeID: pickedRecipe.RecipeID,
 				originalWeight: pickedRecipe.originalWeight,
 				adjustedWeight: pickedRecipe.adjustedWeight,
+				matchedIngredients: pickedRecipe.matchedIngredients,
 				originalRanking: pickedRecipe.originalRanking,
 				adjustedRanking: pickedRecipe.adjustedRanking,
 				isAged: pickedRecipe.isAged,
@@ -229,6 +237,7 @@ const rerollMenuItem = async (req, res) => {
 		skipReason: '',
 		originalWeight: pickedRecipes[0].originalWeight,
 		adjustedWeight: pickedRecipes[0].adjustedWeight,
+		matchedIngredients: pickedRecipes[0].matchedIngredients,
 		originalRanking: pickedRecipes[0].originalRanking,
 		adjustedRanking: pickedRecipes[0].adjustedRanking,
 		isAged: pickedRecipes[0].isAged,
@@ -350,7 +359,17 @@ const leftoversMenuItem = async (req, res) => {
 	);
 };
 
-const getRandomWeightedRecipe = (recipes, amountToPick) => {
+const auditHandler = async (req, res) => {
+	let recipes = await selectAllRecipesByLastMadeOrder();
+	const { sortedRecipes } = await getWeightedRecipes( recipes );
+
+	res.status(200).json({sortedRecipes});
+};
+
+// THE ALGORITHM
+const getWeightedRecipes = async (recipes) => {
+	const fridgeItems = await selectAllFridge();
+	console.log("FRIDGE IN ALGORITHM", fridgeItems);
 	let totalWeight = 0;
 
 	const filteredRecipes = recipes.filter((r) => r.Category === 'Dinner' && r.IsActive);
@@ -362,8 +381,21 @@ const getRandomWeightedRecipe = (recipes, amountToPick) => {
 		let adjustedWeight = originalWeight;
 		let isAged = false;
 
+		const lastMadeDateUTC = new Date(recipe.lastmade);
+		const lastMadeDate = utcToZonedTime(lastMadeDateUTC, 'America/New_York');
+
+		const dayCount = differenceInDays(lastMadeDate, new Date());
+
+		const ingredientTags = (await selectIngredientTagsByRecipeID(recipe.RecipeID)).map( i => i.IngredientTagID);
+
+		console.log("ingre", ingredientTags);
+
+		const matchingIngredients = fridgeItems.filter(fridgeItem => ingredientTags.includes(fridgeItem.IngredientTagID)).length;
+		console.log("match", matchingIngredients);
+
 		// Once we reach the back half of the recipes, skew the weight even more so they are more likely
 		if (itemIndex > filteredRecipes.length / 2) {
+			console.log("AGGEDDD");
 			// Extra weight for the back half
 			adjustedWeight = adjustedWeight * 1.1;
 			isAged = true;
@@ -374,6 +406,16 @@ const getRandomWeightedRecipe = (recipes, amountToPick) => {
 			adjustedWeight = adjustedWeight * 1.6;
 		}
 
+
+		if( matchingIngredients > 0) {
+			if( dayCount > 28 ) {
+				adjustedWeight = adjustedWeight + (matchingIngredients * 50);
+			} else {
+				// We just ate this, don't let the fact we have the ingredients bring it to the top again
+				adjustedWeight = adjustedWeight + (matchingIngredients * 5);
+			}
+		}
+
 		console.log(`ADD WEIGHT : RecipeID ${recipe.RecipeID}, ${recipe.Name}, ${recipe.lastmade}, Original Weight ${originalWeight} Weight ${adjustedWeight}`);
 
 		recipe = {
@@ -382,6 +424,8 @@ const getRandomWeightedRecipe = (recipes, amountToPick) => {
 			adjustedWeight: adjustedWeight.toFixed(2),
 			isAged,
 			totalRankings: filteredRecipes.length,
+			matchedIngredients: matchingIngredients,
+			ingredientTags,
 			...recipe,
 		};
 		filteredRecipes[itemIndex] = recipe;
@@ -401,6 +445,14 @@ const getRandomWeightedRecipe = (recipes, amountToPick) => {
 			`ADJUSTED WEIGHT : RecipeID ${recipe.RecipeID}, ${recipe.Name}, ${recipe.lastmade} | WEIGHTS ${recipe.originalWeight}, ${recipe.adjustedWeight} | RANKS ${recipe.originalRanking}, ${recipe.adjustedRanking}`
 		);
 	});
+
+	return { totalWeight, sortedRecipes };
+}
+
+
+const getRandomWeightedRecipe = async (recipes, amountToPick) => {
+	
+	let { totalWeight, sortedRecipes } = await getWeightedRecipes( recipes);
 
 	let pickedRecipes = [];
 
@@ -522,6 +574,7 @@ const router = express.Router();
  * However, the code used to get the week will be reused in /generateMenu
  * Always based on the current time, so if we check on friday it will show week 1, if we check on saturday it will show week 2
  */
+router.get('/api/menu/audit', auditHandler);
 router.get('/api/menu/:weekOffset', getMenuForWeek);
 router.post('/api/menu/move/:menuID', [checkAdminMiddleware], moveMenuItem);
 router.delete('/api/menu/:menuID', [checkAdminMiddleware], removeMenuItem);

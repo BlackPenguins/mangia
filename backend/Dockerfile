@@ -4,6 +4,7 @@ WORKDIR /app
 
 RUN rm -rf node_modules
 RUN npm install nodemon -g
+RUN npm install date-fns -g
 
 COPY package.json .
 RUN npm install

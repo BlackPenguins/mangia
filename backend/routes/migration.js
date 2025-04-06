@@ -130,7 +130,19 @@ const migrationHandler = async (req, res) => {
 			await simpleDBQuery('Add Column', 'ALTER TABLE SHOPPING_LIST_ITEM ADD COLUMN IsMissingUnits TINYINT', res);
 			await simpleDBQuery('Add Column', 'ALTER TABLE INGREDIENT ADD COLUMN IsMissingUnits TINYINT', res);
 			break;
-
+		case 'addDeptColor':
+			await simpleDBQuery('Add Column', 'ALTER TABLE ingredient_department ADD COLUMN Color VARCHAR(10)', res);
+			break;
+		case 'addFridge':
+				await simpleDBQuery(
+					'Create FRIDGE',
+					'CREATE TABLE FRIDGE (FridgeID INT AUTO_INCREMENT PRIMARY KEY, IngredientTagID INT NOT NULL, DateAdded DATE, FOREIGN KEY (IngredientTagID) REFERENCES INGREDIENT_TAG(IngredientTagID))',
+					res
+				);
+				break;
+		case 'addMatchedIngredients':
+			await simpleDBQuery('Add MENU_DAY Column', 'ALTER TABLE MENU_DAY ADD COLUMN MatchedIngredients INT', res);
+			break;
 		case 'calculateMissingForIngredients':
 			const recipesToCalc = await selectAllRecipes();
 			let total = 0;

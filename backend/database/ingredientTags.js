@@ -26,6 +26,18 @@ export const selectIngredientTagByName = (tagName) => {
 	});
 };
 
+export const selectIngredientTagsByRecipeID = (recipeID) => {
+	return new Promise((resolve, reject) => {
+		pool.query('SELECT i.IngredientTagID FROM INGREDIENT i where RecipeID = ?', [recipeID], (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve(result);
+			}
+		});
+	});
+};
+
 export const insertIngredientTag = (newTag) => {
 	return new Promise((resolve, reject) => {
 		pool.query('INSERT INTO INGREDIENT_TAG SET ?', newTag, (error, result) => {

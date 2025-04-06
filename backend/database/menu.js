@@ -26,11 +26,11 @@ export const selectMenuByMenuID = (menuID) => {
 	});
 };
 
-export const insertMenu = (day, recipeID, weekID, originalWeight, adjustedWeight, originalRanking, adjustedRanking, isAged, isNewArrival, totalRankings) => {
+export const insertMenu = (day, recipeID, weekID, originalWeight, adjustedWeight, originalRanking, adjustedRanking, isAged, isNewArrival, totalRankings, matchedIngredients) => {
 	return new Promise((resolve, reject) => {
 		pool.query(
-			'INSERT INTO MENU_DAY (Day, RecipeID, IsMade, IsSkipped, IsLeftovers, WeekID, OriginalWeight, AdjustedWeight, OriginalRanking, AdjustedRanking, IsAged, IsNewArrival, TotalRankings) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-			[day, recipeID, 0, 0, 0, weekID, originalWeight, adjustedWeight, originalRanking, adjustedRanking, isAged, isNewArrival, totalRankings],
+			'INSERT INTO MENU_DAY (Day, RecipeID, IsMade, IsSkipped, IsLeftovers, WeekID, OriginalWeight, AdjustedWeight, OriginalRanking, AdjustedRanking, IsAged, IsNewArrival, TotalRankings, MatchedIngredients) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+			[day, recipeID, 0, 0, 0, weekID, originalWeight, adjustedWeight, originalRanking, adjustedRanking, isAged, isNewArrival, totalRankings, matchedIngredients],
 			(error, result) => {
 				if (error) {
 					return reject(error.sqlMessage);

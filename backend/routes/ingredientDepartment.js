@@ -38,11 +38,16 @@ const updateIngredientDepartmentHandler = (req, res) => {
 	const ingredientDepartmentID = req.body.id;
 	const position = req.body.position;
 	const name = req.body.name;
+	const color = req.body.color;
 
 	const update = {};
 
 	if (position) {
 		update.Position = position;
+	}
+
+	if (color) {
+		update.Color = color;
 	}
 
 	if (name) {
