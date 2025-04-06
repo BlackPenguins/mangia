@@ -1,4 +1,4 @@
-import { getDaysForAWeek, getWeekRange } from '../routes/menu.js';
+import { getWeekRange } from  '#root/routes/menu.js';
 import { getPool } from './utils.js';
 
 const pool = getPool();

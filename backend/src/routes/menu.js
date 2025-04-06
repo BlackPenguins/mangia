@@ -1,13 +1,14 @@
 import express from 'express';
-import { selectAllRecipes, selectAllRecipesByLastMadeOrder, selectRecipeByID, updateRecipe } from '../database/recipes.js';
-import { deleteMenu, insertMenu, selectByWeekID, selectMenuByDay, selectMenuByMenuID, swapMenu, updateMenu } from '../database/menu.js';
+import { selectAllRecipes, selectAllRecipesByLastMadeOrder, selectRecipeByID, updateRecipe } from  '#root/database/recipes.js';
+import { deleteMenu, insertMenu, selectByWeekID, selectMenuByDay, selectMenuByMenuID, swapMenu, updateMenu } from  '#root/database/menu.js';
 import { checkAdminMiddleware } from './auth.js';
 import { addIngredientsToRecipe, addIngredientTags, addThumbnails } from './recipes.js';
-import { getOrInsertWeek } from '../database/week.js';
-import { selectAllSuggestions, selectTwoSuggestions } from '../database/suggestions.js';
-import { selectAllFridge } from '../database/fridge.js';
-import { selectIngredientTagsByRecipeID } from '../database/ingredientTags.js';
+import { getOrInsertWeek } from  '#root/database/week.js';
+import { selectAllSuggestions, selectTwoSuggestions } from  '#root/database/suggestions.js';
+import { selectAllFridge } from  '#root/database/fridge.js';
+import { selectIngredientTagsByRecipeID } from  '#root/database/ingredientTags.js';
 import { differenceInDays } from 'date-fns';
+import { TZDate } from "@date-fns/tz";
 
 const DAYS_OF_WEEK = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
 const MONTHS_OF_YEAR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -369,7 +370,6 @@ const auditHandler = async (req, res) => {
 // THE ALGORITHM
 const getWeightedRecipes = async (recipes) => {
 	const fridgeItems = await selectAllFridge();
-	console.log("FRIDGE IN ALGORITHM", fridgeItems);
 	let totalWeight = 0;
 
 	const filteredRecipes = recipes.filter((r) => r.Category === 'Dinner' && r.IsActive);
@@ -382,20 +382,19 @@ const getWeightedRecipes = async (recipes) => {
 		let isAged = false;
 
 		const lastMadeDateUTC = new Date(recipe.lastmade);
-		const lastMadeDate = utcToZonedTime(lastMadeDateUTC, 'America/New_York');
+		const lastMadeDate = new TZDate(lastMadeDateUTC, 'America/New_York');
 
 		const dayCount = differenceInDays(lastMadeDate, new Date());
 
+		console.log("DAY COUNT", dayCount);
+
 		const ingredientTags = (await selectIngredientTagsByRecipeID(recipe.RecipeID)).map( i => i.IngredientTagID);
 
-		console.log("ingre", ingredientTags);
 
 		const matchingIngredients = fridgeItems.filter(fridgeItem => ingredientTags.includes(fridgeItem.IngredientTagID)).length;
-		console.log("match", matchingIngredients);
 
 		// Once we reach the back half of the recipes, skew the weight even more so they are more likely
 		if (itemIndex > filteredRecipes.length / 2) {
-			console.log("AGGEDDD");
 			// Extra weight for the back half
 			adjustedWeight = adjustedWeight * 1.1;
 			isAged = true;
@@ -408,11 +407,11 @@ const getWeightedRecipes = async (recipes) => {
 
 
 		if( matchingIngredients > 0) {
-			if( dayCount > 28 ) {
+			if( dayCount < -28 ) {
 				adjustedWeight = adjustedWeight + (matchingIngredients * 50);
 			} else {
 				// We just ate this, don't let the fact we have the ingredients bring it to the top again
-				adjustedWeight = adjustedWeight + (matchingIngredients * 5);
+				adjustedWeight = adjustedWeight + (matchingIngredients * 10);
 			}
 		}
 

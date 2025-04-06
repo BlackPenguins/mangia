@@ -1,5 +1,5 @@
 import express from 'express';
-import { insertPrices, insertStore, selectAllStores, selectPrices, updatePrices, updateStore } from '../database/store.js';
+import { insertPrices, insertStore, selectAllStores, selectPrices, updatePrices, updateStore } from  '#root/database/store.js';
 import { checkAdminMiddleware } from './auth.js';
 
 const getAllStoresHandler = (req, res) => {

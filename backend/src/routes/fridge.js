@@ -1,7 +1,7 @@
 import express from 'express';
 import { checkAdminMiddleware } from './auth.js';
-import { deleteFridge, insertFridge, selectAllFridge } from '../database/fridge.js';
-import { selectIngredientTagByName } from '../database/ingredientTags.js';
+import { deleteFridge, insertFridge, selectAllFridge } from  '#root/database/fridge.js';
+import { selectIngredientTagByName } from  '#root/database/ingredientTags.js';
 
 const getFridgeHandler = (req, res) => {
 	const selectPromise = selectAllFridge();

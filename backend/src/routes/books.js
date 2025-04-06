@@ -1,5 +1,5 @@
 import express from 'express';
-import { insertBook, selectAllBooks, selectBookByID, updateBook } from '../database/books.js';
+import { insertBook, selectAllBooks, selectBookByID, updateBook } from  '#root/database/books.js';
 import { checkAdminMiddleware } from './auth.js';
 
 const getBookByIDHandler = async (req, res) => {

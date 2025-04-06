@@ -1,5 +1,5 @@
 import express from 'express';
-import { selectAllTags } from '../database/tags.js';
+import { selectAllTags } from  '#root/database/tags.js';
 
 const getAllTagsHandler = (req, res) => {
 	const selectPromise = selectAllTags();

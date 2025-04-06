@@ -1,7 +1,7 @@
 import express from 'express';
 import { checkAdminMiddleware } from './auth.js';
-import { insertShoppingListExtra, selectAllShoppingListExtra, updateShoppingListExtra, updateShoppingListExtraAsChecked } from '../database/shoppingListExtra.js';
-import { getOrInsertWeek } from '../database/week.js';
+import { insertShoppingListExtra, selectAllShoppingListExtra, updateShoppingListExtra, updateShoppingListExtraAsChecked } from  '#root/database/shoppingListExtra.js';
+import { getOrInsertWeek } from  '#root/database/week.js';
 
 const router = express.Router();
 

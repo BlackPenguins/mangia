@@ -1,5 +1,5 @@
 import express from 'express';
-import { insertIngredientDepartment, selectAllIngredientDepartments, updateDepartment } from '../database/ingredientDepartment.js';
+import { insertIngredientDepartment, selectAllIngredientDepartments, updateDepartment } from  '#root/database/ingredientDepartment.js';
 import { checkAdminMiddleware } from './auth.js';
 
 const getAllIngredientDepartmentsHandler = (req, res) => {

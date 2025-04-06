@@ -1,8 +1,8 @@
 import express from 'express';
-import { removeIngredientTagFromIngredient } from '../database/ingredient.js';
-import { deleteIngredientTag, deleteIngredientTagPrice, insertIngredientTag, selectAllIngredientTags, updateIngredientTag } from '../database/ingredientTags.js';
-import { deleteIngredientTagFromShoppingList } from '../database/shoppingListItem.js';
-import { selectAllStores } from '../database/store.js';
+import { removeIngredientTagFromIngredient } from  '#root/database/ingredient.js';
+import { deleteIngredientTag, deleteIngredientTagPrice, insertIngredientTag, selectAllIngredientTags, updateIngredientTag } from  '#root/database/ingredientTags.js';
+import { deleteIngredientTagFromShoppingList } from  '#root/database/shoppingListItem.js';
+import { selectAllStores } from  '#root/database/store.js';
 import { checkAdminMiddleware } from './auth.js';
 import { getPricesForStore } from './shoppingListItem.js';
 

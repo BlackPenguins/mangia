@@ -1,20 +1,21 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
+import { format } from 'date-fns/format';
 
-import booksRoutes from './routes/books.js';
-import recipesRoutes from './routes/recipes.js';
-import menuRoutes from './routes/menu.js';
-import setupRoutes from './routes/setup.js';
-import tagRoutes from './routes/tags.js';
-import ingredientTagRoutes from './routes/ingredientTags.js';
-import ingredientDepartmentRoutes from './routes/ingredientDepartment.js';
-import shoppingListItemRoutes from './routes/shoppingListItem.js';
-import shoppingListExtraRoutes from './routes/shoppingListExtra.js';
-import storeRoutes from './routes/store.js';
-import migrationRoutes from './routes/migration.js';
-import suggestionRoutes from './routes/suggestions.js';
-import fridgeRoutes from './routes/fridge.js';
+import booksRoutes from  '#root/routes/books.js';
+import recipesRoutes from  '#root/routes/recipes.js';
+import menuRoutes from  '#root/routes/menu.js';
+import setupRoutes from  '#root/routes/setup.js';
+import tagRoutes from  '#root/routes/tags.js';
+import ingredientTagRoutes from  '#root/routes/ingredientTags.js';
+import ingredientDepartmentRoutes from  '#root/routes/ingredientDepartment.js';
+import shoppingListItemRoutes from  '#root/routes/shoppingListItem.js';
+import shoppingListExtraRoutes from  '#root/routes/shoppingListExtra.js';
+import storeRoutes from  '#root/routes/store.js';
+import migrationRoutes from  '#root/routes/migration.js';
+import suggestionRoutes from  '#root/routes/suggestions.js';
+import fridgeRoutes from  '#root/routes/fridge.js';
 
 // We start the client-side by running: npm run start
 // We start the server-side by running: nodemon (something that runs an auto-updating nodejs)

@@ -1,5 +1,5 @@
 import express from 'express';
-import { getPool } from '../database/utils.js';
+import { getPool } from  '#root/database/utils.js';
 
 const router = express.Router();
 

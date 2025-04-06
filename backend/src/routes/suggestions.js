@@ -1,6 +1,6 @@
 import express from 'express';
 import { checkAdminMiddleware } from './auth.js';
-import { insertSuggestion, selectAllSuggestions, updateSuggestion } from '../database/suggestions.js';
+import { insertSuggestion, selectAllSuggestions, updateSuggestion } from  '#root/database/suggestions.js';
 
 const router = express.Router();
 

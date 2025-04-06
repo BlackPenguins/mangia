@@ -1,7 +1,7 @@
-import { deleteIngredientsByRecipeID, insertIngredient } from '../database/ingredient.js';
-import { deleteRecipe, insertImportFailureURL, insertRecipe, selectRecipeByName, updateRecipe } from '../database/recipes.js';
-import { deleteStepsByRecipeID, insertStep } from '../database/step.js';
-import { scrape } from '../scrapers/ScraperFactory.js';
+import { deleteIngredientsByRecipeID, insertIngredient } from  '#root/database/ingredient.js';
+import { deleteRecipe, insertImportFailureURL, insertRecipe, selectRecipeByName, updateRecipe } from  '#root/database/recipes.js';
+import { deleteStepsByRecipeID, insertStep } from  '#root/database/step.js';
+import { scrape } from '#root/scrapers/ScraperFactory.js';
 
 export const INGREDIENT_REGEX = /([\d\/\s]+\s(?:cup|teaspoon|tablespoon|tbsp|pound|ounce|tsp|oz|lb|tb)?(?:s)?)(.*)/i;
 export const INGREDIENT_EXTRACT_REGEX = /([\d\/\s]+)\s*(cup|teaspoon|tablespoon|tbsp|pound|ounce|tsp|oz|lb|tb)?(?:s)?/i;

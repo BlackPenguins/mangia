@@ -1,15 +1,15 @@
 import { checkAdminMiddleware } from './auth.js';
 import express from 'express';
-import { selectAllRecipes } from '../database/recipes.js';
+import { selectAllRecipes } from  '#root/database/recipes.js';
 import { resizeThumbnail, THUMBNAIL_DIRECTORY } from './recipes.js';
 import fs from 'fs';
 import { simpleDBQuery } from './setup.js';
-import { selectAllMenuDay } from '../database/menu.js';
+import { selectAllMenuDay } from  '#root/database/menu.js';
 import { getWeekRange } from './menu.js';
-import { getPool } from '../database/utils.js';
-import { insertThumbnail } from '../database/thumbnails.js';
-import { selectIngredientsByRecipeID, updateIngredient } from '../database/ingredient.js';
-import { breakdownIngredient } from '../scrapers/RecipeImporter.js';
+import { getPool } from  '#root/database/utils.js';
+import { insertThumbnail } from  '#root/database/thumbnails.js';
+import { selectIngredientsByRecipeID, updateIngredient } from  '#root/database/ingredient.js';
+import { breakdownIngredient } from '#root/scrapers/RecipeImporter.js';
 import { convertToTeaspoons } from './shoppingListItem.js';
 
 const router = express.Router();

@@ -1,21 +1,21 @@
 import express from 'express';
-import { addTag, deleteRecipe, deleteTag, insertRecipe, selectAllRecipes, selectimportFailureURLs, selectRecipeByID, selectTags, updateRecipe } from '../database/recipes.js';
-import { breakdownIngredient, createIngredients, createSteps, importRecipe } from '../scrapers/RecipeImporter.js';
-import { deleteStepsByRecipeID, selectStepsByRecipeID } from '../database/step.js';
-import { deleteIngredient, deleteIngredientsByRecipeID, insertIngredient, selectIngredientByIngredientID, selectIngredientsByRecipeID, updateIngredient } from '../database/ingredient.js';
+import { addTag, deleteRecipe, deleteTag, insertRecipe, selectAllRecipes, selectimportFailureURLs, selectRecipeByID, selectTags, updateRecipe } from  '#root/database/recipes.js';
+import { breakdownIngredient, createIngredients, createSteps, importRecipe } from '#root/scrapers/RecipeImporter.js';
+import { deleteStepsByRecipeID, selectStepsByRecipeID } from  '#root/database/step.js';
+import { deleteIngredient, deleteIngredientsByRecipeID, insertIngredient, selectIngredientByIngredientID, selectIngredientsByRecipeID, updateIngredient } from  '#root/database/ingredient.js';
 
 import Tesseract, { createWorker } from 'tesseract.js';
 import multer from 'multer';
 import Jimp from "jimp";
 
-import { deleteWithRecipeID, selectByRecipeID } from '../database/menu.js';
-import { insertTag, selectTagByName } from '../database/tags.js';
+import { deleteWithRecipeID, selectByRecipeID } from  '#root/database/menu.js';
+import { insertTag, selectTagByName } from  '#root/database/tags.js';
 
 import fs from 'fs';
 import { checkAdminMiddleware } from './auth.js';
-import { insertIngredientTag, selectIngredientTagByName, selectIngredientTagsByRecipeID } from '../database/ingredientTags.js';
+import { insertIngredientTag, selectIngredientTagByName, selectIngredientTagsByRecipeID } from  '#root/database/ingredientTags.js';
 import { withDateDetails } from './menu.js';
-import { deleteThumbnail, insertThumbnail, selectAllThumbnails } from '../database/thumbnails.js';
+import { deleteThumbnail, insertThumbnail, selectAllThumbnails } from  '#root/database/thumbnails.js';
 import { convertToTeaspoons } from './shoppingListItem.js';
 
 export const THUMBNAIL_DIRECTORY = './images/thumbnails';

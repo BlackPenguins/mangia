@@ -1,11 +1,11 @@
 import express from 'express';
-import { selectByWeekID } from '../database/menu.js';
-import { deleteShoppingListItems, insertShoppingListItem, selectAllShoppingListItem, updateShoppingListItemAsChecked } from '../database/shoppingListItem.js';
-import { selectAllStores, selectPrices } from '../database/store.js';
-import { getOrInsertWeek } from '../database/week.js';
+import { selectByWeekID } from  '#root/database/menu.js';
+import { deleteShoppingListItems, insertShoppingListItem, selectAllShoppingListItem, updateShoppingListItemAsChecked } from  '#root/database/shoppingListItem.js';
+import { selectAllStores, selectPrices } from  '#root/database/store.js';
+import { getOrInsertWeek } from  '#root/database/week.js';
 import { checkAdminMiddleware } from './auth.js';
 import { getMenuForWeekOffset } from './menu.js';
-import { INGREDIENT_EXTRACT_REGEX } from '../scrapers/RecipeImporter.js';
+import { INGREDIENT_EXTRACT_REGEX } from '#root/scrapers/RecipeImporter.js';
 
 const getShoppingListItemsHandler = async (req, res) => {
 	const shoppingList = await getCurrentShoppingList();
