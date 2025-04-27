@@ -103,8 +103,8 @@ export const TagBox = ({ type, tag, removeTagHandler, tagColor = "rgb(24, 93, 15
 	const removeTag = () => removeTagHandler(tag.TagID);
 	return (
 		<div key={tag.TagID} className={`tag-box-1 ${type}`} style={{'--tag-color': tagColor}}>
-			<span onClick={removeTag} class="tag-remove-1">&times;</span>
-			<span class="tag-name-1">{tag.Name}</span>
+			<span onClick={removeTag} className="tag-remove-1">&times;</span>
+			<span className="tag-name-1">{tag.Name}</span>
 		</div>
 	);
 };

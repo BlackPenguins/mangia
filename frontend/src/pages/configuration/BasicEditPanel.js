@@ -67,7 +67,7 @@ const BasicEditPanel = ({ label, apiFetch, apiInsert, apiUpdate, idColumn, Addit
 					</Button>
 				</Col>
 			</Row>
-			<div class="shoping__cart__table">
+			<div className="shoping__cart__table">
 				{items == null && <LoadingText text={`Loading ${label}s`} />}
 				{items && items?.length === 0 && <div>No {label.toLowerCase()}s found</div>}
 				<table>

@@ -4,8 +4,9 @@ import './MenuNav.scss';
 import PageNumberButton from './PageNumberButton';
 import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
 import FridgeModal from './FridgeModal';
+import { BarChart2 } from 'react-feather';
 
-const MenuNav = ({ menus, weekOfYear, page, setPage, fetchMenu }) => {
+const MenuNav = ({ menus, weekOfYear, page, setPage, fetchMenu, showAuditInformation, setShowAuditInformation }) => {
 	const authContext = useAuth();
 	const tokenFromStorage = authContext.tokenFromStorage;
 
@@ -54,7 +55,10 @@ const MenuNav = ({ menus, weekOfYear, page, setPage, fetchMenu }) => {
 		<div className="menu-nav-container">
 			{modal}
 			{authContext.isAdmin && (
-				<div className="generate-button">
+				<div className="menu-buttons">
+					<Button onClick={() => setShowAuditInformation( (prevState) => !prevState)} className="mangia-btn info">
+						<BarChart2/> Audit {showAuditInformation ? "Off" : "On"}
+					</Button>
 					<Button onClick={generateButtonHandler} className="mangia-btn success">
 						Build Menu
 					</Button>

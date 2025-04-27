@@ -89,14 +89,14 @@ const IngredientsTab = () => {
 					</Button>
 				</Col>
 			</Row>
-			<div class="shoping__cart__table">
+			<div className="shoping__cart__table">
 				{items == null && <LoadingText text={`Loading Ingredients`} />}
 				{items && items?.length === 0 && <div>No Ingredients found</div>}
 				<table>
 					<tbody>
 						{items &&
 							items.map((item) => (
-								<IngredientRow fetchItems={fetchItems} item={item} tokenFromStorage={tokenFromStorage} stores={stores} departments={departments} />
+								<IngredientRow key={item.IngredientTagID} fetchItems={fetchItems} item={item} tokenFromStorage={tokenFromStorage} stores={stores} departments={departments} />
 							))}
 					</tbody>
 				</table>
@@ -156,7 +156,7 @@ const IngredientRow = ({ fetchItems, item, tokenFromStorage, stores, departments
 					</Col>
 					{stores &&
 						stores.map((store) => {
-							return <PriceInput ingredientTagID={item.IngredientTagID} store={store} prices={item.prices} tokenFromStorage={tokenFromStorage} />;
+							return <PriceInput key={store.storeID} ingredientTagID={item.IngredientTagID} store={store} prices={item.prices} tokenFromStorage={tokenFromStorage} />;
 						})}
 				</Row>
 			</td>
@@ -168,7 +168,7 @@ const DepartmentDropdown = ({ item, departments }) => {
 	const tokenFromStorage = authContext.tokenFromStorage;
 	const showToast = useToast();
 
-	const [departmentID, setDepartmentID] = useState(item.IngredientDepartmentID);
+	const [departmentID, setDepartmentID] = useState(item.IngredientDepartmentID || 0);
 
 	const changeDepartment = async (option) => {
 		await fetch('/api/ingredientTags', {
@@ -185,7 +185,7 @@ const DepartmentDropdown = ({ item, departments }) => {
 
 	const classes = ['edit-book-dropdown'];
 
-	if (departmentID == null) {
+	if (departmentID === 0) {
 		classes.push('unused');
 	}
 
@@ -202,7 +202,7 @@ const DepartmentDropdown = ({ item, departments }) => {
 				<option value={0}>None</option>
 				{departments &&
 					departments.map((department) => {
-						return <option value={department.IngredientDepartmentID}>{department.Name}</option>;
+						return <option key={department.IngredientDepartmentID} value={department.IngredientDepartmentID}>{department.Name}</option>;
 					})}
 			</Input>
 			<label htmlFor="edit-book-dropdown">Department</label>

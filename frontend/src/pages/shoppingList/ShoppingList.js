@@ -1,6 +1,6 @@
 import { useToast } from 'context/toast-context';
 import { useCallback, useEffect, useState } from 'react';
-import { Button } from 'reactstrap';
+import { Button, Col, Row } from 'reactstrap';
 import NewItemInput from './NewItemInput';
 
 import './ShoppingList.scss';
@@ -47,7 +47,6 @@ const ShoppingList = () => {
 		});
 		const data = await response.json();
 		const arr = data.result;
-		console.log('ARR', arr);
 		setShoppingListExtras(arr);
 	}, [tokenFromStorage]);
 
@@ -83,20 +82,20 @@ const ShoppingList = () => {
 				</div>
 
 				{authContext.isAdmin && (
-					<div class="row">
-						<div class="col-lg-3"></div>
-						<div class="col-lg-9">
+					<Row>
+						<Col lg={3}></Col>
+						<Col lg={9}>
 							<div className="shopping-list-button">
 								<Button onClick={buildShoppingList} className="mangia-btn success">
 									Build Shopping List
 								</Button>
 							</div>
-						</div>
-					</div>
+						</Col>
+					</Row>
 				)}
 
-				<div class="row">
-					<div class="col-lg-3">
+				<Row>
+					<Col lg={3}>
 						<StoreFilters stores={stores} selectedStore={selectedStore} setSelectedStore={setSelectedStore} />
 						<ShoppingListControls
 							showCheckedItems={showCheckedItems}
@@ -104,8 +103,8 @@ const ShoppingList = () => {
 							showPrices={showPrices}
 							setShowPrices={setShowPrices}
 						/>
-					</div>
-					<div class="col-lg-9">
+					</Col>
+					<Col lg={9}>
 						<ShoppingListTable
 							showCheckedItems={showCheckedItems}
 							showPrices={showPrices}
@@ -119,9 +118,8 @@ const ShoppingList = () => {
 
 						{authContext.isAdmin && <NewItemInput tokenFromStorage={tokenFromStorage} fetchShoppingListExtras={fetchShoppingListExtras} /> }
 						<ShoppingListExtraTable shoppingListExtras={shoppingListExtras} showCheckedItems={showCheckedItems} tokenFromStorage={tokenFromStorage} />
-						
-					</div>
-				</div>
+					</Col>
+				</Row>
 			</div>
 		</section>
 	);

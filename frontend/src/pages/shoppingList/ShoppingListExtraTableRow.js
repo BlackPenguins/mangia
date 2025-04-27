@@ -27,7 +27,7 @@ const ShoppingListExtraTableRow = ({ item, showCheckedItems, tokenFromStorage })
 			{authContext.isAdmin && (
 				<Input
 					checked={isChecked}
-					onClick={() => {
+					onChange={() => {
 						setValue(!isChecked);
 					}}
 					type="checkbox"

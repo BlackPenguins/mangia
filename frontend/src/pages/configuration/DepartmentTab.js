@@ -32,7 +32,7 @@ const ColorInput = ({element}) => {
 	const authContext = useAuth();
 	const tokenFromStorage = authContext.tokenFromStorage;
 
-	const [color, setColor] = useState(element.Color);
+	const [color, setColor] = useState(element.Color || "#000000");
 
 	const changeColor = async (option) => {
 		await fetch('/api/ingredientDepartments', {
@@ -79,7 +79,7 @@ const PositionInput = ({ element }) => {
 		});
 	};
 
-	const [position, setPosition] = useState(element.Position);
+	const [position, setPosition] = useState(element.Position || 0);
 
 	const updatePosition = (option) => {
 		setPosition(option);

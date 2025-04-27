@@ -4,6 +4,7 @@ import IngredientTagDropdown from 'pages/edit/IngredientTagDropdown';
 import { useCallback, useEffect, useState } from 'react';
 import { Button, Col, Row } from 'reactstrap';
 import './FridgeModal.scss';
+import { Kitchen } from '@mui/icons-material';
 
 const FridgeModal = () => {
     const [fridgeItems, setFridgeItems] = useState([]);
@@ -77,7 +78,7 @@ const FridgeModal = () => {
                         <Row>
                             {fridgeItems && fridgeItems.map( (fridgeItem) => {
                                 return (
-                                    <Col lg={4}>
+                                    <Col key={fridgeItem.FridgeID} lg={4}>
                                         <TagBox
                                             type="fridge"
                                             tag={{ Name: fridgeItem.IngredientName, TagID: fridgeItem.FridgeID }}
@@ -97,7 +98,7 @@ const FridgeModal = () => {
     return (
         <>
             <Button onClick={openModal} className="mangia-btn info">
-                Fridge
+                <Kitchen/> Fridge
             </Button>
             {modal}
         </>

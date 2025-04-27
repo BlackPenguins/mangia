@@ -2,8 +2,8 @@ import { Button } from 'reactstrap';
 
 const StoreFilters = ({ stores, selectedStore, setSelectedStore }) => {
 	return (
-		<div class="hero__categories">
-			<div class="hero__categories__all">
+		<div className="hero__categories">
+			<div className="hero__categories__all">
 				<span>Stores</span>
 			</div>
 			<ul>
@@ -16,7 +16,7 @@ const StoreFilters = ({ stores, selectedStore, setSelectedStore }) => {
 				{stores &&
 					stores.map((store) => {
 						return (
-							<li>
+							<li key={store.storeID}>
 								<Button className={selectedStore === store.storeID ? 'active' : 'non-active'} color="link" onClick={() => setSelectedStore(store.storeID)}>
 									{store.storeName}
 								</Button>

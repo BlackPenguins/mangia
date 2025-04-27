@@ -68,7 +68,7 @@ const ShoppingListTableRow = ({
 				{authContext.isAdmin && (
 					<Input
 						checked={isChecked}
-						onClick={() => {
+						onChange={() => {
 							setValue(!isChecked);
 						}}
 						type="checkbox"
@@ -93,7 +93,7 @@ const ShoppingListTableRow = ({
 					<Row>
 						{stores &&
 							stores.map((store) => {
-								return <PriceInput ingredientTagID={ingredient.ingredientTagID} store={store} prices={prices} tokenFromStorage={tokenFromStorage} />;
+								return <PriceInput key={store.storeID} ingredientTagID={ingredient.ingredientTagID} store={store} prices={prices} tokenFromStorage={tokenFromStorage} />;
 							})}
 					</Row>
 				</Col>

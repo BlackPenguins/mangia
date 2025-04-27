@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom';
 
 import './ConfigurationPage.scss';
+import { Col, Row } from 'reactstrap';
 
 const ConfigurationPage = () => {
 	return (
@@ -10,68 +11,69 @@ const ConfigurationPage = () => {
 					<h2>Configuration</h2>
 				</div>
 
-				<div class="row">
-					<div class="col-lg-3">
-						<div class="hero__categories">
-							<div class="hero__categories__all">
+				<Row>
+					<Col lg={3}>
+						<div className="hero__categories">
+							<div className="hero__categories__all">
 								<span>Manage</span>
 							</div>
 							<ul>
 								<li>
-									<NavLink to="audit" activeClassName="active">
+									<NavLink to="audit">
 										Audit
 									</NavLink>
 								</li>
 								<li>
-									<NavLink to="suggestions" activeClassName="active">
+									<NavLink to="suggestions">
 										Suggestions
 									</NavLink>
 								</li>
 								<li>
-									<NavLink to="import-failures" activeClassName="active">
+									<NavLink to="import-failures">
 										Import Failures
 									</NavLink>
 								</li>
 								<li>
-									<NavLink to="migration" activeClassName="active">
+									<NavLink to="migration">
 										Migration
 									</NavLink>
 								</li>
 							</ul>
 						</div>
 
-						<div class="hero__categories">
-							<div class="hero__categories__all">
+						<div className="hero__categories">
+							<div className="hero__categories__all">
 								<span>Edit</span>
 							</div>
 							<ul>
 								<li>
-									<NavLink to="ingredients" activeClassName="active">
+									<NavLink to="ingredients">
 										Ingredients
 									</NavLink>
 								</li>
 								<li>
-									<NavLink to="departments" activeClassName="active">
+									<NavLink to="departments">
 										Department
 									</NavLink>
 								</li>
 								<li>
-									<NavLink to="stores" activeClassName="active">
+									<NavLink to="stores">
 										Stores
 									</NavLink>
 								</li>
 								<li>
-									<NavLink to="books" activeClassName="active">
+									<NavLink to="books">
 										Books
 									</NavLink>
 								</li>
 							</ul>
 						</div>
-					</div>
-					<div class="col-lg-9">
+					</Col>
+					<Col lg={9}>
 						<Outlet />
-					</div>
-				</div>
+					</Col>
+
+				</Row>
 			</div>
 		</section>
 	);

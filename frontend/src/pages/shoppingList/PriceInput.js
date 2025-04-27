@@ -9,7 +9,7 @@ const MOBILE_STORE_PRICES_WIDTH = 4;
 
 export const PriceInput = ({ ingredientTagID, prices, store, tokenFromStorage }) => {
 	const authContext = useAuth();
-	const [price, setPrice] = useState(null);
+	const [price, setPrice] = useState('');
 	const [isLowest, setIsLowest] = useState(false);
 	const [ingredientTagPriceID, setIngredientTagPriceID] = useState(null);
 
@@ -29,7 +29,6 @@ export const PriceInput = ({ ingredientTagID, prices, store, tokenFromStorage })
 			IngredientTagPriceID: ingredientTagPriceID,
 		};
 
-		console.log('PR', body);
 		await fetch(`/api/stores/prices`, {
 			method: 'PATCH',
 			body: JSON.stringify(body),

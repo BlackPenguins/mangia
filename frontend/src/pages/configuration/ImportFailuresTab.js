@@ -29,7 +29,7 @@ const ImportFailuresTab = () => {
 		<div className="container book-list">
 			<h3>Import Failures</h3>
 			{urls &&
-				urls.map((url) => {
+				urls.map((url, i) => {
 					const date = new Date(url.Date);
 					const formattedDate = date.toLocaleDateString('en-US', {
 						year: 'numeric',
@@ -37,7 +37,7 @@ const ImportFailuresTab = () => {
 						day: 'numeric',
 					});
 					return (
-						<div>
+						<div key={i}>
 							{formattedDate} - <a href={url.URL}>{url.URL}</a>
 						</div>
 					);

@@ -72,8 +72,8 @@ const FilteredRecipes = ({ CardType, layoutClass, onClickHandler, categoryFilter
 				{filteredRecipes?.length > 0 && (
 					<Row className="recipes">
 						{filteredRecipes?.map((recipe) => (
-							<div className={`col-md-6 col-${layoutClass} ftco-animate fadeInUp ftco-animated`}>
-								<CardType key={recipe.RecipeID} recipe={recipe} onClickHandler={onClickHandler} />
+							<div key={recipe.RecipeID} className={`col-md-6 col-${layoutClass} ftco-animate fadeInUp ftco-animated`}>
+								<CardType recipe={recipe} onClickHandler={onClickHandler} />
 							</div>
 						))}
 					</Row>

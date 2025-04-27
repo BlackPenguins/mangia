@@ -56,9 +56,13 @@ const AuditTab = () => {
 				}
 
 				return (
-					<Row className={classes.join(' ')}>
+					<Row key={recipe.RecipeID} className={classes.join(' ')}>
 						<Col lg={1} className='data'>
-							<BeforeAfter label="" before={recipe.originalRanking} after={recipe.adjustedRanking}/>
+							<table>
+								<tbody>
+									<BeforeAfter label="" before={recipe.originalRanking} after={recipe.adjustedRanking}/>
+								</tbody>
+							</table>
 							{recipe.isAged}
 						</Col>
 						<Col lg={6}>
@@ -75,7 +79,11 @@ const AuditTab = () => {
 						
 
 						<Col lg={2} className='data'>
-							<BeforeAfter label="" before={recipe.originalWeight} after={recipe.adjustedWeight} />
+							<table>
+								<tbody>
+									<BeforeAfter label="" before={recipe.originalWeight} after={recipe.adjustedWeight} />
+								</tbody>
+							</table>
 						</Col>
 					</Row>
 				);

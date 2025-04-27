@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { Button, Col, FormGroup, Input, Label, Row } from 'reactstrap';
+import { Button, Col, Row } from 'reactstrap';
 import './MenuSection.scss';
 import RecipeCard, { DaysAgo } from '../Recipes/RecipeCard';
 import MenuNav from './MenuNav';
@@ -19,10 +19,10 @@ import MenuContext from 'authentication/menu-context';
 import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
 import DailyNotesButton from './RecipeButtons/DailyNotesButton';
 
-const MenuSection = ({ showAuditInformation }) => {
+const MenuSection = () => {
 	const [page, setPage] = useState(0);
 	const [currentRecipeIDs, setCurrentRecipeIDs] = useState([]);
-	const menuContext = useContext(MenuContext);
+	const { setMenuRecipeIDsHandler } = useContext(MenuContext);
 
 	const [menus, setMenus] = useState(null);
 	const [suggestions, setSuggestions] = useState([]);
@@ -38,12 +38,15 @@ const MenuSection = ({ showAuditInformation }) => {
 		const recipeIDs = menu.map((m) => m.recipe?.RecipeID);
 		const menuRecipeIDs = menu.filter((m) => m.isSkipped !== 1 && m.isLeftovers !== 1).map((m) => m.recipe?.RecipeID);
 		setCurrentRecipeIDs(recipeIDs);
-		menuContext.setMenuRecipeIDsHandler(menuRecipeIDs);
-	}, [menuContext]);
+		setMenuRecipeIDsHandler(menuRecipeIDs);
+	}, [setMenuRecipeIDsHandler]);
 
 	useEffect(() => {
 		fetchMenu(page);
 	}, [fetchMenu, page]);
+
+
+	const [showAuditInformation, setShowAuditInformation] = useState(false);
 
 	const [weekOfYear, setWeekOfYear] = useState(null);
 
@@ -65,10 +68,18 @@ const MenuSection = ({ showAuditInformation }) => {
 		return (
 			<section className="hero">
 				<div className="container">
-					<MenuNav menus={menus} weekOfYear={weekOfYear} page={page} setPage={setPage} fetchMenu={fetchMenu} />
+					<MenuNav
+						menus={menus}
+						weekOfYear={weekOfYear}
+						page={page}
+						setPage={setPage}
+						fetchMenu={fetchMenu}
+						setShowAuditInformation={setShowAuditInformation}
+						showAuditInformation={showAuditInformation}
+					/>
 					{menus?.length === 0 && <span>No menu found. This should not happen!</span>}
 					<SuggestionRow suggestions={suggestions} />
-					<MenuRow menus={menus} fetchMenu={fetchMenu} page={page} currentRecipeIDs={currentRecipeIDs} size={5} availableSwapDays={availableSwapDays} />
+					<MenuRow menus={menus} fetchMenu={fetchMenu} page={page} currentRecipeIDs={currentRecipeIDs} size={5} availableSwapDays={availableSwapDays} showAuditInformation={showAuditInformation} />
 				</div>
 			</section>
 		);
@@ -79,9 +90,9 @@ const SuggestionRow = ({ suggestions }) => {
 	return (
 		<Row className="menu---suggestion-list">
 			{suggestions &&
-				suggestions?.map((suggestion) => {
+				suggestions?.map((suggestion, i) => {
 					return (
-						<Col md={6}>
+						<Col key={i} md={6}>
 							<SuggestionCard suggestion={suggestion} />
 						</Col>
 					);
@@ -92,7 +103,7 @@ const SuggestionRow = ({ suggestions }) => {
 
 const SuggestionCard = ({ suggestion }) => {
 	return (
-		<div class="suggestion-card">
+		<div className="suggestion-card">
 			<Lightbulb />
 			<span className="name">{suggestion.Name}</span>
 			<span className="suggestion-expires">
@@ -102,9 +113,7 @@ const SuggestionCard = ({ suggestion }) => {
 	);
 };
 
-const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, availableSwapDays }) => {
-	const [showAuditInformation, setShowAuditInformation] = useState(false);
-
+const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, availableSwapDays, showAuditInformation }) => {
 	const authContext = useAuth();
 	const tokenFromStorage = authContext.tokenFromStorage;
 
@@ -141,19 +150,6 @@ const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, availableSwapDays }
 
 	return (
 		<>
-			<span class="hide-checked-items">
-				<FormGroup switch>
-					<Input
-						type="switch"
-						checked={showAuditInformation}
-						onClick={() => {
-							setShowAuditInformation(!showAuditInformation);
-						}}
-					/>
-					<Label check>Show Audit Information</Label>
-				</FormGroup>
-			</span>
-
 			<Row className="menu---list">
 				{menus?.map((menu, index) => {
 					const tomorrowsMenu = menus[index + 1];
@@ -179,13 +175,13 @@ const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, availableSwapDays }
 
 const NewMenuButton = ({ openAddExtraModal }) => {
 	return (
-		<div className="col-md-6 col-lg-3 new-menu-card menu-card">
-			<div class="menu-container">
+		<Col md={6} lg={3} className='new-menu-card menu-card'>
+			<div className="menu-container">
 				<Button className="mangia-btn success" onClick={openAddExtraModal}>
 					<PlusCircle />
 				</Button>
 			</div>
-		</div>
+		</Col>
 	);
 };
 
@@ -211,7 +207,7 @@ const MenuCard = ({ menu, fetchMenu, page, currentRecipeIDs, tomorrowsMenu, avai
 	}
 
 	return (
-		<div className="col-md-6 col-lg-3 ftco-animate fadeInUp ftco-animated recipe-card menu-card">
+		<Col md={6} lg={3} className="ftco-animate fadeInUp ftco-animated recipe-card menu-card">
 			<MenuContainer>
 				<div className={cardClasses.join(' ')}>
 					{authContext.isAdmin && <ChangeButton fetchMenu={fetchMenu} menu={menu} page={page} availableSwapDays={availableSwapDays} />}
@@ -243,7 +239,7 @@ const MenuCard = ({ menu, fetchMenu, page, currentRecipeIDs, tomorrowsMenu, avai
 				<DayPreparation tomorrowsMenu={tomorrowsMenu} />
 				<AuditInformation menu={menu} showAuditInformation={showAuditInformation} />
 			</MenuContainer>
-		</div>
+		</Col>
 	);
 };
 

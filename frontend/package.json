@@ -2,6 +2,9 @@
   "name": "mangia",
   "version": "0.1.0",
   "private": true,
+  "imports": {
+    "#root/*.js": "./src/*.js"
+  },
   "dependencies": {
     "@blackpenguins/penguinore-common-ext": "^1.0.43",
     "@date-fns/tz": "^1.2.0",

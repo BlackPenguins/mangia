@@ -76,13 +76,13 @@ const SuggestionsTab = () => {
 					</Button>
 				</Col>
 			</Row>
-			<div class="shoping__cart__table">
+			<div className="shoping__cart__table">
 				{suggestions == null && <LoadingText text={`Loading Suggestions`} />}
 				{suggestions && suggestions?.length === 0 && <div>No Suggestions found</div>}
 				<table>
 					<tbody>
 						{suggestions &&
-							suggestions.map((suggestion) => <SuggestionRow fetchSuggestions={fetchSuggestions} suggestion={suggestion} tokenFromStorage={tokenFromStorage} />)}
+							suggestions.map((suggestion, i) => <SuggestionRow key={i} fetchSuggestions={fetchSuggestions} suggestion={suggestion} tokenFromStorage={tokenFromStorage} />)}
 					</tbody>
 				</table>
 			</div>
@@ -221,7 +221,7 @@ const ExpirationDropdown = ({ label, setExpirationDays }) => {
 				<option value={0}>None</option>
 				{expirations &&
 					expirations.map((expiration) => {
-						return <option value={expiration.days}>{expiration.label}</option>;
+						return <option key={expiration.days} value={expiration.days}>{expiration.label}</option>;
 					})}
 			</Input>
 			<label htmlFor="edit-book-dropdown">{label}</label>

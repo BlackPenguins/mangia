@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth, LoginDisplay } from '@blackpenguins/penguinore-common-ext';
 import useAddRecipeModal from 'components/Settings/useAddRecipeModal';
 import useImportRecipeModal from 'components/Settings/ImportRecipeModal';
+import { Col, Row } from 'reactstrap';
 
 const Header = () => {
 	const authContext = useAuth();
@@ -106,22 +107,22 @@ const Header = () => {
 			<header className="header">
 				<div className={headerClasses.join(' ')}>
 					<div className="container">
-						<div className="row">
-							<div className="col-lg-12 col-md-12">
+						<Row>
+							<Col lg={12} md={12}>
 								<span className="header__top__left">{title}</span>
 								<span className="header__top__right">
 									<LoginDisplay />
 								</span>
-							</div>
-						</div>
+							</Col>
+						</Row>
 					</div>
 				</div>
 				<div className="container">
-					<div className="row">
-						<div className="col-lg-12">
+					<Row>
+						<Col lg={12}>
 							<nav className="header__menu">{links}</nav>
-						</div>
-					</div>
+						</Col>
+					</Row>
 					<div
 						className="humberger__open"
 						onClick={() => {

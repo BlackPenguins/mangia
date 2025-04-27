@@ -43,7 +43,7 @@ const ShoppingListTable = ({
 						}
 						return (
 							<div key={index} className="container">
-								<div class={classes.join(' ')}>
+								<div className={classes.join(' ')}>
 									<Row className="heading">
 										<Col className="col" lg={NAME_WIDTH + 1} sm={MOBILE_NAME_WIDTH} xs={MOBILE_NAME_WIDTH}>
 											{group.department}

@@ -1,20 +1,19 @@
-FROM node:18
-
+# Stage 1: Build dependencies
+FROM node:20-alpine AS builder
 WORKDIR /app
-
-COPY package*.json .npmrc ./
-
-RUN npm uninstall @blackpenguins/penguinore-common-ext
-
-RUN npm install @blackpenguins/penguinore-common-ext
-
+COPY package.json package-lock.json .npmrc ./
+# RUN rm -rf node_modules
+# RUN npm cache clean --force
 RUN npm install
+COPY src src
+COPY public public
 
-# Install dependencies
-# RUN npm ci
-
-# Copy the rest of the application code
-COPY ./src ./src
-COPY ./public ./public
-
+# Stage 2: Production image
+FROM node:20-alpine
+WORKDIR /app
+ENV NODE_PATH=/app/node_modules
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package*.json ./
 CMD ["npm", "start"]
