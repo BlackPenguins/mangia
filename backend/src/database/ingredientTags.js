@@ -14,9 +14,23 @@ export const selectAllIngredientTags = () => {
 	});
 };
 
+
+
 export const selectIngredientTagByName = (tagName) => {
 	return new Promise((resolve, reject) => {
 		pool.query('SELECT * FROM INGREDIENT_TAG where Name = ?', [tagName], (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve(result);
+			}
+		});
+	});
+};
+
+export const selectIngredientTagByReceiptLineMatch = (receiptLine) => {
+	return new Promise((resolve, reject) => {
+		pool.query("SELECT * FROM INGREDIENT_TAG WHERE ? LIKE CONCAT('%', LOWER(Name),'%')", [receiptLine.toLowerCase()], (error, result) => {
 			if (error) {
 				return reject(error.sqlMessage);
 			} else {

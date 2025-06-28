@@ -18,6 +18,8 @@ import StoreTab from 'pages/configuration/StoreTab';
 import { ToastProvider } from 'context/toast-context';
 import SuggestionsTab from 'pages/configuration/SuggestionsTab';
 import AuditTab from 'pages/configuration/AuditTab';
+import Receipts from 'pages/pricing/Receipts';
+import ReceiptDetails from 'pages/pricing/ReceiptDetails';
 
 function App() {
 	return (
@@ -30,6 +32,8 @@ function App() {
 						<Route path="home" element={<HomePage />} />
 						<Route path="menu" element={<MenuPage />} />
 						<Route path="shoppingList" element={<ShoppingList />} />
+						<Route path="receipts" element={<Receipts />} />
+						<Route path="receipts/:receiptID" element={<ReceiptDetails />} />
 						<Route path="configuration" element={<ConfigurationPage />}>
 							<Route path="audit" element={<AuditTab />} />
 							<Route path="suggestions" element={<SuggestionsTab />} />

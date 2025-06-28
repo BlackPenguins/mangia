@@ -71,6 +71,12 @@ const Header = () => {
 				</div>
 			</li>
 
+			<li>
+				<div className="nav-link" onClick={() => navigateTo('receipts')}>
+					<span>Pricing</span>
+				</div>
+			</li>
+
 			{authContext.isAdmin && (
 				<li>
 					<div className="nav-link" onClick={() => navigateTo('configuration')}>

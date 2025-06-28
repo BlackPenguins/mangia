@@ -1,50 +1,43 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import './RecipeEditPage.scss';
 import { TagBox } from '../../components/EditRecipes/Tag';
 import InputWithAutocomplete from '../../components/EditRecipes/InputWithAutocomplete';
+import useFetchTags, { clearTagCache } from './useFetchTags';
 
-const IngredientTagDropdown = ({ currentTagID, tagName, removeTagHandler, ingredientTagUpdateHandler, excludedTagIDs = [] }) => {
+const IngredientTagDropdown = ({ currentTagID, tagName, removeTagHandler, ingredientTagUpdateHandler, excludedTagIDs, showLabel = true}) => {
+
 	const [selectedValue, setSelectedValue] = useState('');
-    const [allResults, setAllResults] = useState([]);
-
+    const allResults = useFetchTags(excludedTagIDs);
 	const setTagHandler = async (value) => {
         await ingredientTagUpdateHandler(value);
 		setSelectedValue('');
+		if( value.isNewValue ) {
+			clearTagCache();
+		}
 	};
-
-	const fetchAllTags = useCallback( async () => {
-		const response = await fetch('/api/ingredientTags', {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
-		const data = await response.json();
-		let ingredients = data.ingredientsWithPrices;
-
-        ingredients = ingredients.filter( t => !excludedTagIDs.includes(t.IngredientTagID) )
-        setAllResults(ingredients.map((d) => d.Name));
-	}, [excludedTagIDs]);
-
-    useEffect( () => {
-        fetchAllTags()
-    }, [excludedTagIDs, fetchAllTags]);
 
 	if (tagName) {
 		return (
             <TagBox type="ingredient" tag={{ Name: tagName, TagID: currentTagID }} removeTagHandler={removeTagHandler} />
 		);
 	} else {
+		const tags = allResults && allResults.map( (r) => {
+			return {
+				id: r.IngredientTagID,
+				name: r.Name,
+			}
+		});
+
 		return (
 			<InputWithAutocomplete
 				id="ingredient-tag"
 				label="Search Tag"
-				allResults={allResults}
-                setAllResults={setAllResults}
+				showLabel={showLabel}
+				allResults={tags}
 				selectedValue={selectedValue}
 				setSelectedValue={setSelectedValue}
-				onkeyDownHandler={(value) => setTagHandler(value)}
+				selectionHandler={(value) => setTagHandler(value)}
 			/>
 		);
 	}

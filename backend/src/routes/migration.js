@@ -180,6 +180,21 @@ const migrationHandler = async (req, res) => {
 				res
 			);
 			break;
+		case 'addReceipts':
+			await simpleDBQuery(
+				'Create RECEIPTS',
+				'CREATE TABLE RECEIPTS (ReceiptID INT AUTO_INCREMENT PRIMARY KEY, StoreID INT, Date DATE, IsProcessed TINYINT, FOREIGN KEY (StoreID) REFERENCES STORE(StoreID))',
+				res
+			);
+			break;
+
+		case 'addPricingHistory':
+			await simpleDBQuery(
+				'Create PRICING HISTORY',
+				'CREATE TABLE PRICING_HISTORY (PricingHistoryID INT AUTO_INCREMENT PRIMARY KEY, ReceiptID INT, IngredientTagID INT, Price FLOAT NOT NULL, UpdateStamp DATE, FOREIGN KEY (ReceiptID) REFERENCES RECEIPTS(ReceiptID), FOREIGN KEY (IngredientTagID) REFERENCES INGREDIENT_TAG(IngredientTagID))',
+				res
+			);
+			break;
 		default:
 			console.error('Migration not found!');
 			res.status(200).json({ success: false });

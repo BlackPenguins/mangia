@@ -575,7 +575,7 @@ const IngredientLine = ({ index, singleIngredient, dirty, updateIngredientHandle
 
 	const removeTagHandler = async () => {
 		setTagName(null);
-		await updateIngredientHandler(singleIngredient.ingredientID, { tagName: null });
+		await updateIngredientHandler(singleIngredient.ingredientID, { ingredientTag: { id: null } });
 		fetchRecipe();
 	};
 
@@ -599,8 +599,8 @@ const IngredientLine = ({ index, singleIngredient, dirty, updateIngredientHandle
 	}
 
 	const ingredientTagUpdateHandler = async (value) => {
-		setTagName(value);
-		await updateIngredientHandler(singleIngredient.ingredientID, { tagName: value });
+		setTagName(value.name);
+		await updateIngredientHandler(singleIngredient.ingredientID, { ingredientTag: value });
 		fetchRecipe();
 	}
 

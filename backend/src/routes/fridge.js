@@ -17,29 +17,21 @@ const getFridgeHandler = (req, res) => {
 };
 
 const addToFridgeHandler = async (req, res) => {
-	// We need a middleman object so the person using the API can't change whichever columns they want
-	const tagName = req.body.tagName;
+	let tagID = req.body.id;
 
-	const foundTagResults = await selectIngredientTagByName(tagName);
 
-	if (foundTagResults.length === 0) {
-		// Tag should exist
-		return res.status(500).json({ message: "Tag should exist!!" });
-	} else {
-		const tagID = foundTagResults[0].IngredientTagID;
+	console.log("Incoming add to fridge", req.body)
+	// We can pass an object as long as the properties of the object match the column names in the DB table
+	const insertPromise = insertFridge({ IngredientTagID: tagID });
 
-		// We can pass an object as long as the properties of the object match the column names in the DB table
-		const insertPromise = insertFridge({ IngredientTagID: tagID });
-
-		insertPromise.then(
-			(result) => {
-				res.status(200).json({ success: true, result });
-			},
-			(error) => {
-				res.status(500).json({ message: error });
-			}
-		);
-	}
+	insertPromise.then(
+		(result) => {
+			res.status(200).json({ success: true, result });
+		},
+		(error) => {
+			res.status(500).json({ message: error });
+		}
+	);
 };
 
 const deleteFromFridgeHandler = async (req, res) => {

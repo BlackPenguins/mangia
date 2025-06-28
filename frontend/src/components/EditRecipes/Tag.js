@@ -19,7 +19,7 @@ const Tag = ({ recipeID }) => {
 			},
 		});
 		const data = await response.json();
-		setAllResults(data.map((d) => d.Name));
+		setAllResults(data);
 	};
 
 	const fetchRecipeTags = useCallback(async () => {
@@ -37,16 +37,17 @@ const Tag = ({ recipeID }) => {
 	const [recipeTags, setRecipeTags] = useState([]);
 	const [selectedValue, setSelectedValue] = useState('');
 
-	const addTagHandler = async (tagName) => {
+	const addTagHandler = async (value) => {
 		await fetch(`/api/recipes/${recipeID}/addTag`, {
 			method: 'POST',
-			body: JSON.stringify({ tagName }),
+			body: JSON.stringify(value),
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${tokenFromStorage}`,
 			},
 		});
+		
 		fetchRecipeTags();
 	};
 
@@ -66,17 +67,25 @@ const Tag = ({ recipeID }) => {
 
 	const addTag = () => addTagHandler(selectedValue);
 
+	console.log(allResults);
+	const tags = allResults && allResults.map( (r) => {
+		return {
+			id: r.TagID,
+			name: r.Name,
+		}
+	});
+
 	return (
 		<Row>
 			<Col lg={2}>
 				<InputWithAutocomplete
 					id="recipe-tag"
 					label="Tag"
-					allResults={allResults}
-					setAllResults={setAllResults}
+					allResults={tags}
 					selectedValue={selectedValue}
 					setSelectedValue={setSelectedValue}
-					onkeyDownHandler={(value) => addTagHandler(value)}
+					selectionHandler={addTagHandler}
+					showLabel={true}
 				/>
 			</Col>
 			<Col lg={2} className="recipe-edit-btn">

@@ -25,6 +25,8 @@ const MigrationTab = () => {
 
 	return (
 		<div>
+			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addPricingHistory" label="v2.1: Add PRICING_HISTORY" />
+			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addReceipts" label="v2.1: Add RECEIPTS" />
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addMatchedIngredients" label="v2.0: Add MatchedIngredients to MENU_DAY" />
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addFridge" label="v2.0: Add Fridge" />
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addDeptColor" label="v2.0: Add Dept Color" />

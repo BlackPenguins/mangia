@@ -285,37 +285,30 @@ const addRecipe = (req, res) => {
 	);
 };
 
-const addTagToRecipe = (req, res) => {
+const addTagToRecipe = async (req, res) => {
+	// Either isNewValue is true, and only a name is passed in
+	// Or isNewValue is false, and an id and name is passed in (then we only use the id)
 	const recipeID = req.params.recipeID;
-	const tagName = req.body.tagName;
+	const tagName = req.body.name;
+	const isNewValue = req.body.isNewValue;
+	let tagID = req.body.id;
+
 	console.log(`Incoming Add Tag Recipe for ${recipeID}`, req.body);
 
-	const foundTagPromise = selectTagByName(tagName);
+	if( isNewValue ) {
+		const createdTag = await insertTag({ Name: tagName });
+		tagID = createdTag.id;
+	}
 
-	foundTagPromise.then(
-		async (result) => {
-			let tagID;
-			if (result.length === 0) {
-				const createdTag = await insertTag({ Name: tagName });
-				tagID = createdTag.id;
-			} else {
-				tagID = result[0].TagID;
-			}
+	const recipeTags = await selectTags(recipeID);
+	const recipeTagExists = recipeTags.some((recipeTag) => recipeTag.TagID === tagID);
 
-			const recipeTags = await selectTags(recipeID);
-			const recipeTagExists = recipeTags.some((recipeTag) => recipeTag.TagID === tagID);
-
-			if (recipeTagExists) {
-				console.log('THIS ALREADY EXISTS');
-			} else {
-				await addTag(recipeID, tagID);
-			}
-			res.status(200).json(result);
-		},
-		(error) => {
-			res.status(500).json({ message: error });
-		}
-	);
+	if (recipeTagExists) {
+		console.log('THIS ALREADY EXISTS');
+	} else {
+		await addTag(recipeID, tagID);
+	}
+	res.status(200).json({ success: true });
 };
 
 const deleteThumbnailHandler = (req, res) => {
@@ -436,7 +429,7 @@ const updateIngredientProcessor = async (req, res) => {
 	console.log(`Incoming Update Ingredient for ${ingredientID}`, req.body);
 
 	const ingredientValue = req.body.value;
-	const tagName = req.body?.tagName;
+	const ingredientTag = req.body?.ingredientTag;
 
 	const updatedIngredient = {};
 
@@ -444,21 +437,23 @@ const updateIngredientProcessor = async (req, res) => {
 		updatedIngredient.Name = ingredientValue;
 	}
 
-	if (tagName) {
-		let tagID = null;
+	if (ingredientTag) {
+		// Either isNewValue is true, and only a name is passed in
+		// Or isNewValue is false, and an id and name is passed in (then we only use the id)
+		const tagName = ingredientTag.name;
+		const isNewValue = ingredientTag.isNewValue;
 
-		const foundTagResults = await selectIngredientTagByName(tagName);
-
-		if (foundTagResults.length === 0) {
+		let tagID;
+		if( isNewValue ) {
 			const createdTag = await insertIngredientTag({ Name: tagName.trim() });
 			tagID = createdTag.id;
+		} else if( ingredientTag.id == null ) {
+			tagID = null;
 		} else {
-			tagID = foundTagResults[0].IngredientTagID;
+			tagID = ingredientTag.id;
 		}
+		
 		updatedIngredient.IngredientTagID = tagID;
-	} else if (tagName !== undefined) {
-		// Remove the tag if its falsy but it was still included in the body
-		updatedIngredient.IngredientTagID = null;
 	}
 
 	// Update the ingredient with the tag

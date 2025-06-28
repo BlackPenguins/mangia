@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Input } from 'reactstrap';
 
-const InputWithAutocomplete = ({ selectedValue, setSelectedValue, onkeyDownHandler, label, id, allResults, setAllResults }) => {
+/**
+ * allResults should always be an array of { id, name }
+ */
+const InputWithAutocomplete = ({ selectedValue, setSelectedValue, selectionHandler, label, id, allResults, showLabel }) => {
 	const [filteredResults, setFilteredResults] = useState([]);
 	const [resultSuggestionIndex, setResultSuggestionIndex] = useState(0);
 	const [showSuggestions, setShowSuggestions] = useState(false);
@@ -13,7 +16,7 @@ const InputWithAutocomplete = ({ selectedValue, setSelectedValue, onkeyDownHandl
 			setFilteredResults([]);
 		} else {
 			const lowercaseSearchString = searchString.toLowerCase();
-			setFilteredResults(allResults.filter((result) => result.toLowerCase().indexOf(lowercaseSearchString) !== -1));
+			setFilteredResults(allResults.filter((result) => result.name.toLowerCase().indexOf(lowercaseSearchString) !== -1));
 		}
 	};
 
@@ -21,11 +24,13 @@ const InputWithAutocomplete = ({ selectedValue, setSelectedValue, onkeyDownHandl
 		if (e.key === 'Enter') {
 			if (showSuggestions && filteredResults.length && resultSuggestionIndex > 0) {
 				// Use the selected suggestion
-				onkeyDownHandler(filteredResults[resultSuggestionIndex - 1]);
+				selectionHandler(filteredResults[resultSuggestionIndex - 1]);
 			} else {
 				// There is no result, use the exact value in the input
-				onkeyDownHandler(selectedValue);
-				setAllResults( [...allResults, selectedValue]);
+				selectionHandler({
+					isNewValue: true,
+					name: selectedValue
+				}, true);
 			}
 
 			// Once we select something from dropodown, hide the suggestions until we type again
@@ -50,7 +55,7 @@ const InputWithAutocomplete = ({ selectedValue, setSelectedValue, onkeyDownHandl
 	};
 
 	const onKeyDownHandler = (selectionIndex) => {
-		onkeyDownHandler(filteredResults[selectionIndex]);
+		selectionHandler(filteredResults[selectionIndex]);
 
 		// Once we select something from dropodown, hide the suggestions until we type again
 		setResultSuggestionIndex(0);
@@ -65,14 +70,16 @@ const InputWithAutocomplete = ({ selectedValue, setSelectedValue, onkeyDownHandl
 		setFilteredResults([]);
 	}, []);
 
+	// form-floating is what puts the label in the left corner when focused
+	// If you want to save padding, set showLabel to false
 	return (
-		<div className="form-floating">
+		<div className={showLabel ? "form-floating" : ""}>
 			<Input
 				className="editInput"
 				autoComplete="off"
 				id={id}
 				type="text"
-				placeholder="Name"
+				placeholder={label}
 				maxLength={50}
 				onChange={(e) => {
 					setSelectedValue(e.target.value); // The current value of the input
@@ -84,7 +91,7 @@ const InputWithAutocomplete = ({ selectedValue, setSelectedValue, onkeyDownHandl
 				value={selectedValue}
 				onFocus={focusHandler}
 			></Input>
-			<label htmlFor={id}>{label}</label>
+			{showLabel && <label htmlFor={id}>{label}</label>}
 
 			{filteredResults.length > 0 && showSuggestions && (
 				<ul className="suggestions">
@@ -98,7 +105,7 @@ const InputWithAutocomplete = ({ selectedValue, setSelectedValue, onkeyDownHandl
 
 						return (
 							<li key={index} onClick={() => onKeyDownHandler(index)} selectionIndex={selectionIndex} className={className}>
-								{result}
+								{result.name}
 							</li>
 						);
 					})}

@@ -14,6 +14,18 @@ export const selectAllStores = () => {
 	});
 };
 
+export const selectStoreByName = (name) => {
+	return new Promise((resolve, reject) => {
+		pool.query('SELECT * FROM STORE WHERE Name = ?', name, (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve(result);
+			}
+		});
+	});
+};
+
 export const insertStore = (newStore) => {
 	return new Promise((resolve, reject) => {
 		pool.query('INSERT INTO STORE SET ?', newStore, (error, result) => {

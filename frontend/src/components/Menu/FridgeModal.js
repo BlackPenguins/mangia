@@ -17,16 +17,17 @@ const FridgeModal = () => {
         const data = await response.json();
         setFridgeItems(data);
         setExcludedTagsIDs(data.map(f => f.IngredientTagID));
+        console.log("F", data)
     }, []);
 
     useEffect(() => {
         fetchFridge();
     }, [fetchFridge]);
 
-    const updateFridgeHandler = async (tagName) => {
+    const updateFridgeHandler = async (value) => {
 		const response = await fetch(`/api/fridge`, {
 			method: 'PUT',
-			body: JSON.stringify({tagName}),
+			body: JSON.stringify(value),
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
 				'Content-Type': 'application/json',

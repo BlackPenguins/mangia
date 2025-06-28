@@ -16,6 +16,8 @@ import storeRoutes from  '#root/routes/store.js';
 import migrationRoutes from  '#root/routes/migration.js';
 import suggestionRoutes from  '#root/routes/suggestions.js';
 import fridgeRoutes from  '#root/routes/fridge.js';
+import pricingRoutes from  '#root/routes/pricing.js';
+import receiptRoutes from  '#root/routes/receipts.js';
 
 // We start the client-side by running: npm run start
 // We start the server-side by running: nodemon (something that runs an auto-updating nodejs)
@@ -50,6 +52,7 @@ app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
 app.use('/thumbs', express.static('./images/thumbnails'));
 app.use('/attachments', express.static('./images/attachments'));
+app.use('/receipts', express.static('./images/receipts'));
 
 // TODO: make /adminRoutes/adminBookRoutes
 // TODO: make /publicRoutes/bookRoutes
@@ -67,6 +70,8 @@ app.use(storeRoutes);
 app.use(migrationRoutes);
 app.use(suggestionRoutes);
 app.use(fridgeRoutes);
+app.use(pricingRoutes);
+app.use(receiptRoutes);
 
 app.listen(port, () => {
 	console.log(`Mangia-Server is now running on ${port}`);

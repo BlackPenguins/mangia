@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getThumbnailImage } from './RecipeCard';
 import './RecipeRow.scss';
 
@@ -16,6 +16,10 @@ const RecipeRow = ({ recipe, onClickHandler }) => {
 const Thumbnail = ( {recipe} ) => {
 	const thumbnailImageURL = getThumbnailImage(recipe, false);
 	const [imgSrc, setImgSrc] = useState(thumbnailImageURL);
+
+	useEffect( () => {
+		setImgSrc(thumbnailImageURL);
+	}, [recipe]);
 
 	return <img
 		alt="thumbnail"

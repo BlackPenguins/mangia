@@ -229,7 +229,7 @@ const rerollMenuItem = async (req, res) => {
 
 	let recipes = await selectAllRecipesByLastMadeOrder(excludedRecipeIDs);
 
-	const pickedRecipes = getRandomWeightedRecipe(recipes, 1);
+	const pickedRecipes = await getRandomWeightedRecipe(recipes, 1);
 
 	const updatedMenu = {
 		recipeID: pickedRecipes[0].RecipeID,
