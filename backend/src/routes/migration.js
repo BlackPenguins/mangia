@@ -199,7 +199,7 @@ const migrationHandler = async (req, res) => {
 			await simpleDBQuery('Add Column', 'ALTER TABLE SHOPPING_LIST_ITEM ADD COLUMN RecipeNames VARCHAR(200)', res);
 			break;
 		case 'addIsWishlist':
-			// await simpleDBQuery('Add Column', 'ALTER TABLE SHOPPING_LIST_EXTRA ADD COLUMN IsWishlist TINYINT', res);
+			await simpleDBQuery('Add Column', 'ALTER TABLE SHOPPING_LIST_EXTRA ADD COLUMN IsWishlist TINYINT', res);
 			await simpleDBQuery('Add Column', 'UPDATE SHOPPING_LIST_EXTRA SET IsWishlist = 0 WHERE IsWishlist IS NULL', res);
 			await simpleDBQuery('Add Column', 'UPDATE SHOPPING_LIST_EXTRA SET IsChecked = 0 WHERE IsChecked IS NULL', res);
 			break;
