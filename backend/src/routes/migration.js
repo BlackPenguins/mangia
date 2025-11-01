@@ -195,6 +195,20 @@ const migrationHandler = async (req, res) => {
 				res
 			);
 			break;
+		case 'addRecipeNames':
+			await simpleDBQuery('Add Column', 'ALTER TABLE SHOPPING_LIST_ITEM ADD COLUMN RecipeNames VARCHAR(200)', res);
+			break;
+		case 'addIsWishlist':
+			// await simpleDBQuery('Add Column', 'ALTER TABLE SHOPPING_LIST_EXTRA ADD COLUMN IsWishlist TINYINT', res);
+			await simpleDBQuery('Add Column', 'UPDATE SHOPPING_LIST_EXTRA SET IsWishlist = 0 WHERE IsWishlist IS NULL', res);
+			await simpleDBQuery('Add Column', 'UPDATE SHOPPING_LIST_EXTRA SET IsChecked = 0 WHERE IsChecked IS NULL', res);
+			break;
+		case 'convertForUnicode':
+			await simpleDBQuery('Add Column', 'ALTER TABLE RECIPE CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;', res);
+			await simpleDBQuery('Add Column', 'ALTER TABLE shopping_list_item CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;', res);
+			await simpleDBQuery('Add Column', 'ALTER TABLE shopping_list_extra CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;', res);
+			break;
+
 		default:
 			console.error('Migration not found!');
 			res.status(200).json({ success: false });

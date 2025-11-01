@@ -1,7 +1,6 @@
 import { useToast } from 'context/toast-context';
 import { useCallback, useEffect, useState } from 'react';
 import { Button, Col, Row } from 'reactstrap';
-import NewItemInput from './NewItemInput';
 
 import './ShoppingList.scss';
 import ShoppingListControls from './ShoppingListControls';
@@ -15,7 +14,6 @@ const ShoppingList = () => {
 	const tokenFromStorage = authContext.tokenFromStorage;
 
 	const [shoppingListItems, setShoppingListItems] = useState(null);
-	const [shoppingListExtras, setShoppingListExtras] = useState(null);
 	const [stores, setStores] = useState(null);
 
 	const fetchShoppingList = useCallback(async () => {
@@ -36,24 +34,9 @@ const ShoppingList = () => {
 		setStores(data.stores);
 	};
 
-	const fetchShoppingListExtras = useCallback(async () => {
-		const response = await fetch(`/api/shoppingListExtra`, {
-			method: 'GET',
-			headers: {
-				// This is required. NodeJS server won't know how to read it without it.
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${tokenFromStorage}`,
-			},
-		});
-		const data = await response.json();
-		const arr = data.result;
-		setShoppingListExtras(arr);
-	}, [tokenFromStorage]);
-
 	useEffect(() => {
 		fetchShoppingList();
-		fetchShoppingListExtras();
-	}, [fetchShoppingList, fetchShoppingListExtras]);
+	}, [fetchShoppingList]);
 
 	const showToast = useToast();
 
@@ -116,8 +99,8 @@ const ShoppingList = () => {
 							updateShoppingListWithServerData={updateShoppingListWithServerData}
 						/>
 
-						{authContext.isAdmin && <NewItemInput tokenFromStorage={tokenFromStorage} fetchShoppingListExtras={fetchShoppingListExtras} /> }
-						<ShoppingListExtraTable shoppingListExtras={shoppingListExtras} showCheckedItems={showCheckedItems} tokenFromStorage={tokenFromStorage} />
+						<ShoppingListExtraTable showCheckedItems={showCheckedItems} isWishlist={false} />
+						<ShoppingListExtraTable showCheckedItems={showCheckedItems} isWishlist={true} />
 					</Col>
 				</Row>
 			</div>

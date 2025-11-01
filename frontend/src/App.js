@@ -20,6 +20,7 @@ import SuggestionsTab from 'pages/configuration/SuggestionsTab';
 import AuditTab from 'pages/configuration/AuditTab';
 import Receipts from 'pages/pricing/Receipts';
 import ReceiptDetails from 'pages/pricing/ReceiptDetails';
+import AboutPage from 'pages/AboutPage';
 
 function App() {
 	return (
@@ -34,7 +35,8 @@ function App() {
 						<Route path="shoppingList" element={<ShoppingList />} />
 						<Route path="receipts" element={<Receipts />} />
 						<Route path="receipts/:receiptID" element={<ReceiptDetails />} />
-						<Route path="configuration" element={<ConfigurationPage />}>
+						<Route path="configuration" element={<ConfigurationPage />}/>
+						<Route path="about" element={<AboutPage />}>
 							<Route path="audit" element={<AuditTab />} />
 							<Route path="suggestions" element={<SuggestionsTab />} />
 							<Route path="books" element={<BooksTab />} />

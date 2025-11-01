@@ -33,10 +33,6 @@
 		border-top: 1px solid #ebebeb;
 		border-left: 1px solid #ebebeb;
 		border-right: 1px solid #ebebeb;
-
-		&.non-menu {
-			background-color: #46a8ae;
-		}
 		
 		.col {
 			display: flex;
@@ -65,7 +61,6 @@
 
 		.col {
 			vertical-align: middle;
-			border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
 			background-color: #f9f9f9;
 			font-size: 16px;
 
@@ -101,8 +96,33 @@
 				flex-direction: column;
 				justify-content: center;
 				align-items: flex-start;
+
+				@media only screen and (max-width: 992px) {
+					.recipeNames {
+						display: none;
+					}
+				}
+			}
+
+			.recipeNames {
+				margin: {
+					left: 15px;
+				}
+				font-size: 0.8em;
+				font-style: italic;
 			}
 		}
+
+		.col-border {
+			border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+
+			@media only screen and (min-width: 992px) {
+				.recipeNames {
+					display: none;
+				}
+			}
+		}
+
 
 		.lowest-price {
 			input {
@@ -110,6 +130,29 @@
 			}
 		}
 	}
+}
+
+.shopping-list-extra-section {
+
+	.add-item-button {
+		width: 100%;
+		height: 100%;
+	}
+
+	&.wish-list {
+		.heading,
+		.add-item-button {
+			background-color: #ae4646;
+		}
+	}
+
+	&.non-menu{
+		.heading,
+		.add-item-button {
+			background-color: #46a8ae;
+		}
+	}
+
 }
 
 
@@ -123,10 +166,4 @@
 		left: 0.75em;
 	};
 	font-size: 0.9em;
-}
-
-.add-item-button {
-	background-color: #46a8ae;
-	width: 100%;
-	height: 100%;
 }

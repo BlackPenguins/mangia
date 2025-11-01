@@ -30,6 +30,7 @@ const getCurrentShoppingList = async () => {
 			name: shoppingListItem.TagName,
 			isChecked: shoppingListItem.IsChecked,
 			recipeCount: shoppingListItem.RecipeCount,
+			recipeNames: shoppingListItem.RecipeNames,
 			isMissingUnits: shoppingListItem.IsMissingUnits,
 			shoppingListItemID: shoppingListItem.ShoppingListItemID,
 			ingredientTagID: shoppingListItem.IngredientTagID,
@@ -147,7 +148,13 @@ const buildShoppingListHandler = async (req, res) => {
 	let ingredientTotals = [];
 
 	if (recipes.length > 0) {
-		ingredients = recipes.flatMap((r) => r.ingredients);
+		ingredients = recipes
+		.flatMap((r) => r.ingredients
+			.map( i => ({
+				...i,
+				recipeName: r.Name
+			}))
+		);
 
 		ingredientTotals = sumIngredients(ingredients);
 
@@ -158,7 +165,8 @@ const buildShoppingListHandler = async (req, res) => {
 				IngredientTagID: ingredient.tagID,
 				IsChecked: 0,
 				RecipeCount: ingredient.recipeCount,
-				IsMissingUnits: ingredient.isMissingUnits
+				IsMissingUnits: ingredient.isMissingUnits,
+				RecipeNames: ingredient.recipeNames
 			};
 			await insertShoppingListItem(newShoppingListItem);
 		}
@@ -176,6 +184,7 @@ const sumIngredients = (ingredients) => {
 
 			const foundTotalIndex = finalIngredients.findIndex((i) => i.name === ingredient.tagName && i.wholeUnits === converted.wholeUnits);
 
+			console.log("INGERED", ingredient );
 			if (foundTotalIndex === -1) {
 				finalIngredients.push({
 					name: ingredient.tagName,
@@ -187,10 +196,12 @@ const sumIngredients = (ingredients) => {
 					recipeCount: 1,
 					ingredientDepartment: ingredient.ingredientDepartment,
 					ingredientDepartmentPosition: ingredient.ingredientDepartmentPosition,
+					recipeNames: ingredient.recipeName
 				});
 			} else {
 				finalIngredients[foundTotalIndex].value += converted.amount;
 				finalIngredients[foundTotalIndex].recipeCount++;
+				finalIngredients[foundTotalIndex].recipeNames += `, ${ingredient.recipeName}`
 			}
 		}
 	}

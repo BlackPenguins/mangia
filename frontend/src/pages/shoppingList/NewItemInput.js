@@ -2,14 +2,14 @@ import { useRef, useState } from 'react';
 import { PlusCircle } from 'react-feather';
 import { Button, Col, Input, Row } from 'reactstrap';
 
-export const NewItemInput = ({ tokenFromStorage, fetchShoppingListExtras }) => {
+export const NewItemInput = ({ tokenFromStorage, fetchShoppingListExtras, isWishlist }) => {
 	const [value, setValue] = useState('');
 	const inputRef = useRef(null);
 
 	const onAddHandler = async () => {
 		await fetch(`/api/shoppingListExtra`, {
 			method: 'PUT',
-			body: JSON.stringify({ name: value }),
+			body: JSON.stringify({ name: value, isWishlist }),
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
 				'Content-Type': 'application/json',

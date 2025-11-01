@@ -1,23 +1,44 @@
-import { useState } from 'react';
-import { Col, Input, Row } from 'reactstrap';
+import { useState, useEffect, useRef } from 'react';
+import { Col, Input, Row, Button } from 'reactstrap';
 import { useAuth } from '@blackpenguins/penguinore-common-ext';
+import { Edit } from 'react-feather';
 
-const ShoppingListExtraTableRow = ({ item, showCheckedItems, tokenFromStorage }) => {
+const ShoppingListExtraTableRow = ({ item, showCheckedItems, tokenFromStorage, fetchShoppingListExtras }) => {
 	const authContext = useAuth();
 	const [isChecked, setIsChecked] = useState(item.IsChecked);
+	const [name, setName] = useState(item.Name);
+	const [editMode, setEditMode] = useState(false);
+	const inputRef = useRef(null);
 
 	const setValue = (isChecked) => {
 		setIsChecked(isChecked);
-		updateShoppingList(item.ShoppingListExtraID, isChecked, tokenFromStorage);
+		updateShoppingList(item.ShoppingListExtraID, isChecked, name, tokenFromStorage);
 	};
 
 	const classes = ['list-row'];
+
+	useEffect( () => {
+		if (editMode && inputRef.current) {
+			inputRef.current.focus();
+			inputRef.current.select();
+		}
+	}, [editMode]);
 
 	if (isChecked) {
 		classes.push('checked');
 
 		if (!showCheckedItems) {
 			return null;
+		}
+	}
+
+	const handleEditButton = async () => {
+		if( !editMode ) {
+			setEditMode(true);
+		} else {
+			await updateShoppingList(item.ShoppingListExtraID, isChecked, name, tokenFromStorage);
+			setEditMode(false);
+			fetchShoppingListExtras();
 		}
 	}
 
@@ -34,18 +55,40 @@ const ShoppingListExtraTableRow = ({ item, showCheckedItems, tokenFromStorage })
 				/>
 			)}
 			</Col>
-			<Col className="name-col col" lg={11} sm={11} xs={11}>
-				{item.Name}
+			<Col className="name-col col" lg={10} sm={10} xs={10}>
+				{!editMode && item.Name}
+				{editMode && <Input
+						innerRef={inputRef}
+						className="editInput"
+						id="edit-name"
+						type="text"
+						onChange={(e) => {
+							setName(e.target.value);
+						}}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter') {
+								e.preventDefault();
+								handleEditButton();
+							}
+						}}
+						value={name}
+					/>
+				}
+			</Col>
+			<Col className="name-col col" lg={1} sm={1} xs={1}>
+				<Button color='link' inline onClick={() => handleEditButton()}>
+					<Edit />
+				</Button>
 			</Col>
 		</Row>
 	);
 };
 
-const updateShoppingList = async (shoppingListExtraID, isChecked, tokenFromStorage) => {
-	await fetch(`/api/shoppingListExtra/checked`, {
+const updateShoppingList = async (shoppingListExtraID, isChecked, name, tokenFromStorage) => {
+	await fetch(`/api/shoppingListExtra`, {
 		method: 'PATCH',
 
-		body: JSON.stringify({ shoppingListExtraID, isChecked }),
+		body: JSON.stringify({ shoppingListExtraID, isChecked, name }),
 		headers: {
 			// This is required. NodeJS server won't know how to read it without it.
 			'Content-Type': 'application/json',

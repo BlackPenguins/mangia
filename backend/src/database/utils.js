@@ -10,24 +10,10 @@ export const getPool = () => {
 		user: process.env.MYSQL_ROOT_USER,
 		password: process.env.MYSQL_ROOT_PASSWORD,
 		database: process.env.MYSQL_DATABASE,
+		charset: 'utf8mb4' // Allow emojis
 	});
 
 	return pool;
-
-	// var connection = mysql.createConnection({
-	// 	port: process.env.MYSQL_PORT,
-	// 	host: process.env.MYSQL_HOST,
-	// 	user: process.env.MYSQL_ROOT_USER,
-	// 	password: process.env.MYSQL_ROOT_PASSWORD,
-	// 	database: process.env.MYSQL_DATABASE,
-	// });
-
-	// connection.connect((error) => {
-	// 	if (error) throw error;
-	// 	query(connection);
-	// });
-
-	// connection.end();
 };
 
 export const getUpdateByObject = (object) => {

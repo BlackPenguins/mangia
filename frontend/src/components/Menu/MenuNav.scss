@@ -3,11 +3,9 @@
 	text-align: center;
 
 	.menu-buttons {
+		display: flex;
+		justify-content: space-evenly;
 		margin-bottom: 25px;
-
-		button {
-			margin-right: 50px;
-		}
 	}
 
 	.menu-nav {
@@ -25,4 +23,12 @@
 			}
 		}
 	}
+
+	@media only screen and (max-width: 767px) {
+		.non-mobile {
+			display: none;
+		}
+	}
 }
+
+

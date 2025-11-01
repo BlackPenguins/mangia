@@ -2772,6 +2772,14 @@ ol {
 	margin-top: 20px;
 }
 
+.about-link {
+	cursor: pointer;		
+}
+
+.about-link:hover {
+	color: blue;
+}
+
 .footer__copyright__text {
 	font-size: 14px;
 	color: #1c1c1c;

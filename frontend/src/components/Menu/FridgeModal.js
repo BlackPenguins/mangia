@@ -99,7 +99,7 @@ const FridgeModal = () => {
     return (
         <>
             <Button onClick={openModal} className="mangia-btn info">
-                <Kitchen/> Fridge
+                <Kitchen/> <span className='non-mobile'>Fridge</span>
             </Button>
             {modal}
         </>

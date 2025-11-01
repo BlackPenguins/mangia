@@ -313,7 +313,9 @@ const Notes = ({ title, notes }) => {
 			<h4>{title}</h4>
 			<ul>
 				{notesSplit.map((note, index) => {
-					return <li key={index}>{note}</li>;
+					if( note ) {
+						return <li key={index}>{note}</li>;
+					}
 				})}
 			</ul>
 		</div>

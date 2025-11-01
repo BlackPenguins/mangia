@@ -224,8 +224,6 @@ const ReceiptSection = ({receiptPackage, stagePrice, unStagePrice}) => {
 	)
 }
 
- bad
-
 //NEXT: create an edit and preview of the page
 // clean up the default view of the ing tags
 

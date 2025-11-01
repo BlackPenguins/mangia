@@ -1,12 +1,15 @@
 import { Heart } from 'react-feather';
+import { useNavigate } from 'react-router-dom';
 
 const Footer = () => {
+	const navigate = useNavigate();
+
 	return (
 		<footer className="footer spad">
 			<div className="container">
 				<div className="footer__copyright">
 					<div className="footer__copyright__text">
-						<p>Last Updated: Mar 9, 2025 (v1.10)</p>
+						<p><span className='about-link' onClick={() => navigate('about')}>Last Updated: Mar 9, 2025 (v1.10)</span></p>
 						<p>
 							Copyright &copy;{new Date().getFullYear()} All rights reserved | This template is made with <Heart /> by{' '}
 							<a href="https://colorlib.com" target="_blank" rel="noreferrer">

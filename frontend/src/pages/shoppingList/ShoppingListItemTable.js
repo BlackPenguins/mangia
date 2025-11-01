@@ -2,10 +2,10 @@ import LoadingText from 'components/Common/LoadingText';
 import { Col, Row } from 'reactstrap';
 import ShoppingListTableRow from './ShoppingListItemTableRow';
 
-const NAME_WIDTH = 5;
-const RECIPE_COUNT_WIDTH = 1;
+const NAME_WIDTH = 6;
+const RECIPE_COUNT_WIDTH = 6;
 
-const MOBILE_NAME_WIDTH = 9;
+const MOBILE_NAME_WIDTH = 10;
 const MOBILE_RECIPE_COUNT_WIDTH = 2;
 
 const ShoppingListTable = ({
@@ -45,7 +45,7 @@ const ShoppingListTable = ({
 							<div key={index} className="container">
 								<div className={classes.join(' ')}>
 									<Row className="heading">
-										<Col className="col" lg={NAME_WIDTH + 1} sm={MOBILE_NAME_WIDTH} xs={MOBILE_NAME_WIDTH}>
+										<Col className="col" lg={NAME_WIDTH} sm={MOBILE_NAME_WIDTH} xs={MOBILE_NAME_WIDTH}>
 											{group.department}
 										</Col>
 										<Col className="col" lg={RECIPE_COUNT_WIDTH} sm={MOBILE_RECIPE_COUNT_WIDTH} xs={MOBILE_RECIPE_COUNT_WIDTH}>

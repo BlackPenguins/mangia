@@ -2,9 +2,17 @@ import { getPool } from './utils.js';
 
 const pool = getPool();
 
-export const selectAllShoppingListExtra = () => {
+export const selectAllShoppingListExtra = (isWishlist) => {
+	let wishlistClause;
+
+	if( isWishlist === 'true' ) {
+		wishlistClause = "IsWishlist = 1";
+	} else {
+		wishlistClause = "IsWishlist = 0";
+	}
+
 	return new Promise((resolve, reject) => {
-		pool.query('SELECT * FROM SHOPPING_LIST_EXTRA ORDER BY IsChecked ASC, ShoppingListExtraID DESC', (error, result) => {
+		pool.query(`SELECT * FROM SHOPPING_LIST_EXTRA WHERE ${wishlistClause} ORDER BY IsChecked ASC, ShoppingListExtraID DESC`, (error, result) => {
 			if (error) {
 				return reject(error.sqlMessage);
 			} else {
@@ -29,21 +37,10 @@ export const insertShoppingListExtra = (newItem) => {
 	});
 };
 
-export const updateShoppingListExtra = (shoppingListExtraID, update) => {
-	return new Promise((resolve, reject) => {
-		pool.query('UPDATE SHOPPING_LIST_EXTRA SET ? WHERE ShoppingListExtraID = ?', [update, shoppingListExtraID], (error) => {
-			if (error) {
-				return reject(error.sqlMessage);
-			} else {
-				return resolve();
-			}
-		});
-	});
-};
-
-export const updateShoppingListExtraAsChecked = (shoppingListExtraID, isChecked) => {
+export const updateShoppingListExtra = (shoppingListExtraID, isChecked, name) => {
 	const update = {
 		IsChecked: isChecked ? 1 : 0,
+		Name: name
 	};
 
 	return new Promise((resolve, reject) => {

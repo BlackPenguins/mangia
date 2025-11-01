@@ -3,13 +3,19 @@ import { Col, Input, Row } from 'reactstrap';
 import PriceInput from './PriceInput';
 import { useAuth } from '@blackpenguins/penguinore-common-ext';
 
+// 6 header
 const CHECKBOX_WIDTH = 1;
 const NAME_WIDTH = 5;
+
+// 6 header
 const RECIPE_COUNT_WIDTH = 1;
 const STORE_PRICES_SECTION_WIDTH = 5;
 
-const MOBILE_CHECKBOX_WIDTH = 1;
-const MOBILE_NAME_WIDTH = 9;
+// 10 header
+const MOBILE_CHECKBOX_WIDTH = 2;
+const MOBILE_NAME_WIDTH = 8;
+
+// 2 header
 const MOBILE_RECIPE_COUNT_WIDTH = 2;
 const MOBILE_STORE_PRICES_SECTION_WIDTH = 12;
 
@@ -63,6 +69,7 @@ const ShoppingListTableRow = ({
 	}
 
 	return (
+		<>
 		<Row className={classes.join(' ')}>
 			<Col className="check-col col" lg={CHECKBOX_WIDTH} sm={MOBILE_CHECKBOX_WIDTH} xs={MOBILE_CHECKBOX_WIDTH}>
 				{authContext.isAdmin && (
@@ -85,7 +92,12 @@ const ShoppingListTableRow = ({
 				)}
 			</Col>
 			<Col className="count-col col" lg={countWidth} sm={mobileCountWidth} xs={mobileCountWidth}>
-				{ingredient.recipeCount}
+				{!showPrices && (
+					<div>
+						{ingredient.recipeCount}
+						<span className='recipeNames'>{ingredient.recipeNames}</span>
+					</div>
+				)}
 			</Col>
 			
 			{showPrices && (
@@ -99,6 +111,12 @@ const ShoppingListTableRow = ({
 				</Col>
 			)}
 		</Row>
+		<Row className='list-row'>
+			<Col className='col col-border' lg={12}>
+				<span className='recipeNames'>{ingredient.recipeNames}</span>
+			</Col>
+		</Row>
+		</>
 	);
 };
 
