@@ -35,8 +35,8 @@ function App() {
 						<Route path="shoppingList" element={<ShoppingList />} />
 						<Route path="receipts" element={<Receipts />} />
 						<Route path="receipts/:receiptID" element={<ReceiptDetails />} />
-						<Route path="configuration" element={<ConfigurationPage />}/>
-						<Route path="about" element={<AboutPage />}>
+						<Route path="about" element={<AboutPage />}/>
+						<Route path="configuration" element={<ConfigurationPage />}>
 							<Route path="audit" element={<AuditTab />} />
 							<Route path="suggestions" element={<SuggestionsTab />} />
 							<Route path="books" element={<BooksTab />} />
