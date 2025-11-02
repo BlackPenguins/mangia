@@ -74,8 +74,8 @@ const RecipePage = () => {
 								})}
 						</Col>
 					</Row>
-					<Notes title="Notes" notes={recipe?.Notes} />
-					<Notes title="Day Preparation" notes={recipe?.DayPrep} />
+					<Notes icon={<span className='section-icon'>&#128466;</span>} title="Notes" notes={recipe?.Notes} />
+					<Notes icon={<span className='section-icon'>&#128298;</span>} title="Day Preparation" notes={recipe?.DayPrep} />
 
 					<History history={recipe?.history} />
 
@@ -162,44 +162,44 @@ const Statistics = ({ recipe, book }) => {
 			<Description description={recipe?.Description} />
 			{recipe?.Category && (
 				<div>
-					<span className="label">Category:</span> {recipe.Category}
+					<span className="label"><span className='section-icon'>&#x1F4C2;</span> Category:</span> {recipe.Category}
 				</div>
 			)}
 			{recipe?.lastmade && (
 				<div>
-					<span className="label">Last Made:</span> {days}
+					<span className="label"><span className='section-icon'>&#x1F552;</span> Last Made:</span> {days}
 				</div>
 			)}
 			{book && (
 				<>
 					<div>
-						<span className="label">Book:</span> {book.Name} (Page {recipe.Page})
+						<span className="label"><span className='section-icon'>&#x1F4D6;</span> Book:</span> {book.Name} (Page {recipe.Page})
 					</div>
 				</>
 			)}
 			{recipe?.Protein && (
 				<div>
-					<span className="label">Protein:</span> {recipe.Protein}
+					<span className="label"><span className='section-icon'>&#127831;</span> Protein:</span> {recipe.Protein}
 				</div>
 			)}
 			{recipe?.Defrost && (
 				<div>
-					<span className="label">Defrost:</span> {recipe.Defrost}
+					<span className="label"><span className='section-icon'>&#129482;</span> Defrost:</span> {recipe.Defrost}
 				</div>
 			)}
 			{recipe?.PrepTime && (
 				<div>
-					<span className="label">Prep Time:</span> <PrepTimeLabel value={recipe.PrepTime} />
+					<span className="label"><span className='section-icon'>&#8987;</span> Prep Time:</span> <PrepTimeLabel value={recipe.PrepTime} />
 				</div>
 			)}
 			{recipe?.Preheat > 0 && (
 				<div>
-					<span className="label">Preheat Temp:</span> {recipe.Preheat}&deg;
+					<span className="label"><span className='section-icon'>&#128293;</span> Preheat Temp:</span> {recipe.Preheat}&deg;
 				</div>
 			)}
 			{recipe?.URL && (
 				<div>
-					<span className="label">URL:</span> <a href={recipe.URL}>{recipe.URL}</a>
+					<span className="label"><span className='section-icon'>&#x1F517;</span> URL:</span> <a href={recipe.URL}>{recipe.URL}</a>
 				</div>
 			)}
 		</div>
@@ -253,7 +253,7 @@ const Ingredients = ({ ingredients }) => {
 	}
 	return (
 		<div className="ingredients">
-			<h4>Ingredients</h4>
+			<h4><span className='section-icon'>&#x1F955;</span>Ingredients</h4>
 			<ul>
 				{ingredients &&
 					ingredients.map((ingredient, index) => {
@@ -286,7 +286,7 @@ const Steps = ({ steps }) => {
 
 	return (
 		<div className="steps">
-			<h4>Steps</h4>
+			<h4><span className='section-icon'>&#x1F4DD;</span>Steps</h4>
 			{steps.map((step) => {
 				return (
 					<div key={step.stepNumber} className="step">
@@ -301,7 +301,7 @@ const Steps = ({ steps }) => {
 	);
 };
 
-const Notes = ({ title, notes }) => {
+const Notes = ({ icon, title, notes }) => {
 	if (!notes) {
 		return null;
 	}
@@ -310,7 +310,7 @@ const Notes = ({ title, notes }) => {
 
 	return (
 		<div className="extraSection">
-			<h4>{title}</h4>
+			<h4>{icon}{title}</h4>
 			<ul>
 				{notesSplit.map((note, index) => {
 					if( note ) {
@@ -325,7 +325,7 @@ const Notes = ({ title, notes }) => {
 const History = ({ history }) => {
 	return (
 		<div className="extraSection history">
-			<h4>History</h4>
+			<h4><span className='section-icon'>&#x1F552;</span> History</h4>
 			<ul>
 				{history &&
 					history.map((historyItem, index) => {

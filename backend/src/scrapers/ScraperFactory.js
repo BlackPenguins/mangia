@@ -1,26 +1,32 @@
 import { scrapeGoogle } from './GoogleScraper.js';
 import { scrapeNatasha } from './NatashaScraper.js';
+import axios from 'axios';
 
 export const scrape = async (url) => {
-	console.log('Scraping URL', url);
+	console.log('Scraping URL...', url);
 
 	// Attempt the google scraper with all sites first
 	// Supported sites:
 	// - AllRecipes
 	// - SpruceEats
-	console.log('Scraping with Google first...');
-	let recipeObj = await scrapeGoogle(url);
+	
+	const response = await axios.get(url);
+	const html = response.data;
+	
+
+	console.log('=== Running through all scrapers...');
+	let recipeObj = await scrapeGoogle(html);
 
 	if (!isScrapeSuccessful(recipeObj)) {
-		console.error('The default scraper failed for this url, trying others:' + url);
 
 		if (url.indexOf('natashaskitchen.com') !== -1) {
-			recipeObj = await scrapeNatasha(url);
+			recipeObj = await scrapeNatasha(html);
 		}
 
 		console.log('Recipe Object', recipeObj);
 		recipeObj.success = isScrapeSuccessful(recipeObj);
 	} else {
+		console.log('Recipe Object', recipeObj);
 		console.log('RECIPE SCRAPE WAS A SUCCESS!');
 		recipeObj.success = true;
 	}

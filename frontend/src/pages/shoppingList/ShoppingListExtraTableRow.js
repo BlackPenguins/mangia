@@ -44,7 +44,7 @@ const ShoppingListExtraTableRow = ({ item, showCheckedItems, tokenFromStorage, f
 
 	return (
 		<Row className={classes.join(' ')}>
-			<Col className="check-col col" lg={1} sm={1} xs={1}>
+			<Col className="check-col col" lg={1} sm={2} xs={2}>
 			{authContext.isAdmin && (
 				<Input
 					checked={isChecked}
@@ -55,7 +55,7 @@ const ShoppingListExtraTableRow = ({ item, showCheckedItems, tokenFromStorage, f
 				/>
 			)}
 			</Col>
-			<Col className="name-col col" lg={10} sm={10} xs={10}>
+			<Col className="name-col col" lg={10} sm={8} xs={8}>
 				{!editMode && item.Name}
 				{editMode && <Input
 						innerRef={inputRef}
@@ -75,7 +75,7 @@ const ShoppingListExtraTableRow = ({ item, showCheckedItems, tokenFromStorage, f
 					/>
 				}
 			</Col>
-			<Col className="name-col col" lg={1} sm={1} xs={1}>
+			<Col className="name-col col" lg={1} sm={2} xs={2}>
 				<Button color='link' inline onClick={() => handleEditButton()}>
 					<Edit />
 				</Button>

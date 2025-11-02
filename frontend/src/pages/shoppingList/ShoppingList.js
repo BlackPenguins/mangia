@@ -57,11 +57,13 @@ const ShoppingList = () => {
 	const [showCheckedItems, setShowCheckedItems] = useState(false);
 	const [showPrices, setShowPrices] = useState(false);
 
+	const totalUncheckedShoppingItems = shoppingListItems?.flatMap( i => i.ingredients).filter(s => s.isChecked === 0 ).length || 0;
+	
 	return (
 		<section className="hero">
 			<div className="container">
 				<div className="section-title">
-					<h2>Shopping List</h2>
+					<h2>Shopping List ({totalUncheckedShoppingItems})</h2>
 				</div>
 
 				{authContext.isAdmin && (

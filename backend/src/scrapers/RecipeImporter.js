@@ -1,7 +1,11 @@
 import { deleteIngredientsByRecipeID, insertIngredient } from  '#root/database/ingredient.js';
 import { deleteRecipe, insertImportFailureURL, insertRecipe, selectRecipeByName, updateRecipe } from  '#root/database/recipes.js';
 import { deleteStepsByRecipeID, insertStep } from  '#root/database/step.js';
+import { resizeThumbnail, THUMBNAIL_DIRECTORY } from '#root/routes/recipes.js';
 import { scrape } from '#root/scrapers/ScraperFactory.js';
+import fs from "fs";
+import https from "https";
+import path from "path";
 
 export const INGREDIENT_REGEX = /([\d\/\s]+\s(?:cup|teaspoon|tablespoon|tbsp|pound|ounce|tsp|oz|lb|tb)?(?:s)?)(.*)/i;
 export const INGREDIENT_EXTRACT_REGEX = /([\d\/\s]+)\s*(cup|teaspoon|tablespoon|tbsp|pound|ounce|tsp|oz|lb|tb)?(?:s)?/i;
@@ -27,6 +31,7 @@ export const importRecipe = async (url) => {
 			const recipeToAdd = {
 				name: recipeObject.name,
 				description: recipeObject.description,
+				image: recipeObject.image
 			};
 
 			const recipeExists = await selectRecipeByName(recipeName);
@@ -54,7 +59,7 @@ export const importRecipe = async (url) => {
 				console.error(`SOMETHING BAD HAPPENED DURING IMPORT OF RECIPE #${recipeID}`, e);
 
 				// Cleanup the bad inserts
-				if (!currentRecipeID) {
+				if (!recipeID) {
 					deleteIngredientsByRecipeID(recipeID);
 					deleteStepsByRecipeID(recipeID);
 					deleteRecipe(recipeID);
@@ -84,9 +89,42 @@ const createRecipe = async (recipe, url) => {
 	};
 
 	const newRecipe = await insertRecipe(recipeToInsert);
+	const newID = newRecipe?.id;
+
+	if( recipe.image) {
+		fs.mkdirSync(THUMBNAIL_DIRECTORY, { recursive: true });
+
+		const newFileName = `download-${newID}.jpg`;
+		const afterName = `recipeDownloaded-${newID}.jpg`;
+		const filePath = path.join(THUMBNAIL_DIRECTORY, newFileName);
+		await downloadImage(recipe.image, filePath);
+		await resizeThumbnail(null, newID, THUMBNAIL_DIRECTORY, newFileName, afterName);
+	}
 
 	return newRecipe?.id;
 };
+
+const downloadImage = (url, filePath) => {
+  return new Promise((resolve, reject) => {
+    https.get(url, res => {
+      if (res.statusCode !== 200) {
+        reject(new Error(`Failed with status ${res.statusCode}`));
+        return;
+      }
+
+      const file = fs.createWriteStream(filePath);
+      res.pipe(file);
+
+      file.on("finish", () => {
+        file.close(() => resolve(filePath));
+      });
+
+      file.on("error", err => {
+        fs.unlink(filePath, () => reject(err));
+      });
+    }).on("error", reject);
+  });
+}
 
 export const breakdownIngredient = (ingredient) => {
 

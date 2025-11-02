@@ -182,6 +182,12 @@ ol {
 	border: none;
 }
 
+	.mangia-btn.reduced {
+		padding: 5px;
+		height: 100%;
+		width: 100%;
+	}
+	
 .mangia-btn.success {
 	background: #7fad39;
 }
@@ -3216,6 +3222,12 @@ ol {
 /* Wide Mobile = 480px */
 
 @media only screen and (max-width: 767px) {
+
+
+	.delete-button-col {
+		margin-top: 15px;
+	}
+
 	.hero__categories {
 		margin-bottom: 30px;
 	}

@@ -4,7 +4,7 @@ import FilteredRecipes, { HIDDEN_CATEGORY_FILTER, NEW_ARRIVAL_CATEGORY_FILTER } 
 import { Col, Row } from 'reactstrap';
 
 const HomePage = () => {
-	const [categoryFilter, setCategoryFilter] = useState('Dinner');
+	const [categoryFilter, setCategoryFilter] = useState(null);
 	return (
 		<>
 			<section>

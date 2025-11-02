@@ -1,16 +1,13 @@
-import axios from 'axios';
 import * as cheerio from 'cheerio';
 import Recipe from './Recipe.js';
 import { raw } from 'mysql';
 
 // https://github.com/julianpoy/RecipeClipper - Attempts to do a catch-all scraper for all websites using algorithms and AI learning
 // https://github.com/jadkins89/Recipe-Scraper - Scrapes by creating profiles for each website and CSS selectors
-export const scrapeNatasha = async (url) => {
+export const scrapeNatasha = async (html) => {
+	console.log( "SCRAPER: NatashaKitchen" );
+	
 	try {
-		// send request
-		const response = await axios.get(url);
-		const html = response.data;
-
 		const $ = cheerio.load(html);
 
 		const googleSchema = $('script[type=application/ld+json]').text();

@@ -9,6 +9,15 @@ const AboutPage = () => {
 					<h2>Change Log</h2>
 				</div>
 				<div className='change-log'>
+					<h3>Version 1.12</h3>
+					<ul>
+						<li>Improved importing of recipes</li>
+						<li>Save the image of the recipe import</li>
+						<li>Delete button for mobile</li>
+						<li>Default category is All</li>
+						<li>Add emojis to headers</li>
+						<li>Added totals to shopping lists</li>
+					</ul>
 					<h3>Version 1.11</h3>
 					<ul>
 						<li>Added support for emojis in inputs</li>

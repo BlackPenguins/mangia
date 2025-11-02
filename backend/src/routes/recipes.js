@@ -8,6 +8,8 @@ import Tesseract, { createWorker } from 'tesseract.js';
 import multer from 'multer';
 import Jimp from "jimp";
 
+import fileType from "file-type";
+
 import { deleteWithRecipeID, selectByRecipeID } from  '#root/database/menu.js';
 import { insertTag, selectTagByName } from  '#root/database/tags.js';
 
@@ -23,6 +25,8 @@ const LARGE_PREFIX = 'large_';
 
 const thumbnailStorageEngine = multer.diskStorage({
 	destination: (req, file, callback) => {
+
+		fs.mkdirSync(THUMBNAIL_DIRECTORY, { recursive: true });
 		callback(null, THUMBNAIL_DIRECTORY);
 	},
 	filename: (req, file, callback) => {
@@ -208,30 +212,47 @@ const uploadImage = async (req, res) => {
 };
 
 export const resizeThumbnail = async (res, recipeID, sourceDirectory, beforeImageFileName, afterImageFileName) => {
+	fs.mkdirSync(sourceDirectory, { recursive: true });
+	
 	const beforeImageFile = `${sourceDirectory}/${beforeImageFileName}`;
 	const afterImageFile = `${THUMBNAIL_DIRECTORY}/${afterImageFileName}`;
 
-	if (beforeImageFile === afterImageFile) {
-		console.error('Input and output of thumbnail resize was same path.');
+	const buffer = fs.readFileSync(beforeImageFile);
+	
+	if( buffer.length === 0) {
+		console.log("File had no content.")
 		return;
 	}
-	try {
-		const image = await Jimp.read(beforeImageFile);
-		image.resize(Jimp.AUTO, 320); // Resize to 500 px
-		await image.writeAsync(afterImageFile);
 
-		fs.unlink(beforeImageFile, (err) => {
-			if (err) {
-				console.error('Error deleting the file:', err);
-			}
-		});
+	const type = await fileType.fromBuffer(buffer);
 
-		await insertThumbnail(recipeID, afterImageFileName);
-		return true;
-	} catch( e ) {
-		console.log("Could not upload image: " + e);
-		res.status(500).json({ message: "An error has occurred during image upload! " + e.message });
-		return false;
+	if( !type) {
+		console.log("Could not get file type. Using the original image." );
+		await insertThumbnail(recipeID, beforeImageFile);
+	} else {
+		if (beforeImageFile === afterImageFile) {
+			console.error('Input and output of thumbnail resize was same path.');
+			return;
+		}
+
+		try {
+			const image = await Jimp.read(beforeImageFile);
+			image.resize(Jimp.AUTO, 320); // Resize to 500 px
+			await image.writeAsync(afterImageFile);
+
+			fs.unlink(beforeImageFile, (err) => {
+				if (err) {
+					console.error('Error deleting the file:', err);
+				}
+			});
+
+			await insertThumbnail(recipeID, afterImageFileName);
+			return true;
+		} catch( e ) {
+			console.log("Could not upload image: " + e);
+			res.status(500).json({ message: "An error has occurred during image upload! " + e.message });
+			return false;
+		}
 	}
 };
 

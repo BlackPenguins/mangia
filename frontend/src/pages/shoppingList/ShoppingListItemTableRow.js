@@ -4,7 +4,7 @@ import PriceInput from './PriceInput';
 import { useAuth } from '@blackpenguins/penguinore-common-ext';
 
 // 6 header
-const CHECKBOX_WIDTH = 1;
+const CHECKBOX_WIDTH = 1
 const NAME_WIDTH = 5;
 
 // 6 header
@@ -111,7 +111,7 @@ const ShoppingListTableRow = ({
 				</Col>
 			)}
 		</Row>
-		<Row className='list-row'>
+		<Row className={classes.join(' ')}>
 			<Col className='col col-border' lg={12}>
 				<span className='recipeNames'>{ingredient.recipeNames}</span>
 			</Col>

@@ -40,6 +40,7 @@ const ShoppingListExtraTable = ({ showCheckedItems, isWishlist }) => {
 		title= 'Non-Menu Items';
 	}
 
+	const totalUnchecked = shoppingListExtras?.filter( s => s.IsChecked === 0 ).length;
 	return (
 		<div className={classes.join(' ')}>
 			{authContext.isAdmin && <NewItemInput tokenFromStorage={tokenFromStorage} fetchShoppingListExtras={fetchShoppingListExtras} isWishlist={isWishlist} /> }
@@ -47,7 +48,7 @@ const ShoppingListExtraTable = ({ showCheckedItems, isWishlist }) => {
 				<div className="shopping-list">
 					<Row className='heading'>
 						<Col className="col" lg={12} sm={12} xs={12}>
-							{title}
+							<span>{title} ({totalUnchecked})</span>
 						</Col>
 					</Row>
 					{shoppingListExtras &&

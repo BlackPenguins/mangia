@@ -146,11 +146,11 @@ const IngredientRow = ({ fetchItems, item, tokenFromStorage, stores, departments
 					<Col lg={6} sm={12}>
 						<NameInput label={'Ingredient'} item={item} apiUpdate={'/api/ingredientTags'} idColumn={'IngredientTagID'} tokenFromStorage={tokenFromStorage} />
 					</Col>
-					<Col lg={4} sm={12}>
+					<Col lg={4} sm={10} xs={9}>
 						<DepartmentDropdown item={item} departments={departments} />
 					</Col>
-					<Col lg={2}>
-						<Button className="mangia-btn danger" onClick={() => openModal()}>
+					<Col className='delete-button-col' lg={2} xs={3}>
+						<Button className="mangia-btn reduced danger" onClick={() => openModal()}>
 							<Trash2 />
 						</Button>
 					</Col>
