@@ -9,6 +9,14 @@ const AboutPage = () => {
 					<h2>Change Log</h2>
 				</div>
 				<div className='change-log'>
+					<h3>Version 1.13</h3>
+					<ul>
+						<li>Clicking config redirects to ingredients tab</li>
+						<li>Checking list item updates the count</li>
+						<li>Mobile has numeric pad for price inputs</li>
+						<li>Hide recipe names that are skipped or leftovers in swap modal</li>
+						<li>When switching categories re-search with the current keyword</li>
+					</ul>
 					<h3>Version 1.12</h3>
 					<ul>
 						<li>Improved importing of recipes</li>

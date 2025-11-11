@@ -10,9 +10,10 @@ const ShoppingListExtraTableRow = ({ item, showCheckedItems, tokenFromStorage, f
 	const [editMode, setEditMode] = useState(false);
 	const inputRef = useRef(null);
 
-	const setValue = (isChecked) => {
+	const setValue = async (isChecked) => {
 		setIsChecked(isChecked);
-		updateShoppingList(item.ShoppingListExtraID, isChecked, name, tokenFromStorage);
+		await updateShoppingList(item.ShoppingListExtraID, isChecked, name, tokenFromStorage);
+		fetchShoppingListExtras();
 	};
 
 	const classes = ['list-row'];

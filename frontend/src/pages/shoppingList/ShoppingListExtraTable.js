@@ -37,10 +37,15 @@ const ShoppingListExtraTable = ({ showCheckedItems, isWishlist }) => {
 		title = 'Wish List';
 	} else {
 		classes.push('non-menu');
-		title= 'Non-Menu Items';
+		title = 'Non-Menu Items';
 	}
 
-	const totalUnchecked = shoppingListExtras?.filter( s => s.IsChecked === 0 ).length;
+	const [totalUnchecked, setTotalUnchecked] = useState(0);
+
+	useEffect(() => {
+		setTotalUnchecked(shoppingListExtras?.filter( s => s.IsChecked === 0 ).length);
+	}, [shoppingListExtras]);
+
 	return (
 		<div className={classes.join(' ')}>
 			{authContext.isAdmin && <NewItemInput tokenFromStorage={tokenFromStorage} fetchShoppingListExtras={fetchShoppingListExtras} isWishlist={isWishlist} /> }
@@ -53,7 +58,7 @@ const ShoppingListExtraTable = ({ showCheckedItems, isWishlist }) => {
 					</Row>
 					{shoppingListExtras &&
 						shoppingListExtras.map((item) => {
-							return <ShoppingListExtraTableRow key={item.ShoppingListExtraID} item={item} showCheckedItems={showCheckedItems} tokenFromStorage={tokenFromStorage} fetchShoppingListExtras={fetchShoppingListExtras}/>;
+							return <ShoppingListExtraTableRow key={item.ShoppingListExtraID} item={item} showCheckedItems={showCheckedItems} tokenFromStorage={tokenFromStorage} fetchShoppingListExtras={fetchShoppingListExtras} />;
 						})}
 				</div>
 			</div>

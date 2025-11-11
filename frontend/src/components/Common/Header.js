@@ -79,7 +79,7 @@ const Header = () => {
 
 			{authContext.isAdmin && (
 				<li>
-					<div className="nav-link" onClick={() => navigateTo('configuration')}>
+					<div className="nav-link" onClick={() => navigateTo('configuration/ingredients')}>
 						<span>Config</span>
 					</div>
 				</li>

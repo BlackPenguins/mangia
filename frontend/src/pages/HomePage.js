@@ -19,16 +19,16 @@ const HomePage = () => {
 									<li className={categoryFilter === null ? 'active' : ''} onClick={() => setCategoryFilter(null)}>
 										All
 									</li>
-									<li className={categoryFilter === 'Dinner' ? 'active' : ''} data-filter=".fresh-meat" onClick={() => setCategoryFilter('Dinner')}>
+									<li className={categoryFilter === 'Dinner' ? 'active' : ''} data-filter=".dinner" onClick={() => setCategoryFilter('Dinner')}>
 										Dinner
 									</li>
-									<li className={categoryFilter === 'Appetizer' ? 'active' : ''} data-filter=".vegetables" onClick={() => setCategoryFilter('Appetizer')}>
+									<li className={categoryFilter === 'Appetizer' ? 'active' : ''} data-filter=".appetizers" onClick={() => setCategoryFilter('Appetizer')}>
 										Appetizers
 									</li>
-									<li className={categoryFilter === 'Sidedish' ? 'active' : ''} data-filter=".fastfood" onClick={() => setCategoryFilter('Sidedish')}>
+									<li className={categoryFilter === 'Sidedish' ? 'active' : ''} data-filter=".sidedish" onClick={() => setCategoryFilter('Sidedish')}>
 										Sidedish
 									</li>
-									<li className={categoryFilter === 'Dessert' ? 'active' : ''} data-filter=".fastfood" onClick={() => setCategoryFilter('Dessert')}>
+									<li className={categoryFilter === 'Dessert' ? 'active' : ''} data-filter=".dessert" onClick={() => setCategoryFilter('Dessert')}>
 										Dessert
 									</li>
 									<li

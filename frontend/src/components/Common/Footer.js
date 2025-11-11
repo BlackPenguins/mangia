@@ -9,7 +9,7 @@ const Footer = () => {
 			<div className="container">
 				<div className="footer__copyright">
 					<div className="footer__copyright__text">
-						<p><span className='about-link' onClick={() => navigate('about')}>Last Updated: Nov 2, 2025 (v1.12)</span></p>
+						<p><span className='about-link' onClick={() => navigate('about')}>Last Updated: Nov 11, 2025 (v1.13)</span></p>
 						<p>
 							Copyright &copy;{new Date().getFullYear()} All rights reserved | This template is made with <Heart /> by{' '}
 							<a href="https://colorlib.com" target="_blank" rel="noreferrer">

@@ -88,7 +88,7 @@ export const PriceInput = ({ ingredientTagID, prices, store, tokenFromStorage })
 			<div className="form-floating store-price">
 				<Input
 					type="text"
-					id="store-name"
+					id="price-input"
 					value={price}
 					disabled={!authContext.isAdmin}
 					onChange={(e) => {
@@ -97,8 +97,10 @@ export const PriceInput = ({ ingredientTagID, prices, store, tokenFromStorage })
 					onBlur={(e) => {
 						priceHandler(e.target.value);
 					}}
+					inputMode="numeric"
+					pattern="[0-9]*"  
 				/>
-				<label htmlFor="store-name">{store.storeName}</label>
+				<label htmlFor="price-input">{store.storeName}</label>
 			</div>
 		</Col>
 	);

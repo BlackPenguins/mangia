@@ -62,6 +62,10 @@ const FilteredRecipes = ({ CardType, layoutClass, onClickHandler, categoryFilter
 		);
 	}, [categoryFilter, allRecipes, isFilteredByCategory]);
 
+	useEffect( () => {
+		filterRecipesHandler(search);
+	}, [categoryFilter])
+
 	return (
 		<section className="hero">
 			<div className="container">

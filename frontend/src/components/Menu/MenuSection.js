@@ -62,7 +62,7 @@ const MenuSection = () => {
 		const availableSwapDays = menus.map((m) => ({
 			dayOfWeek: m?.week,
 			menuID: m?.menuID,
-			recipeName: m?.recipe?.Name,
+			recipeName: m.isSkipped || m.isLeftovers ?  "" : m?.recipe?.Name,
 		}));
 
 		return (
