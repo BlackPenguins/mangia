@@ -300,7 +300,7 @@ const StepGroups = ({ stepGroups }) => {
 };
 
 const StepGroup = ({ stepGroup }) => {
-	if (stepGroup.steps?.length === 0) {
+	if (stepGroup.steps?.length === 0 || stepGroup.steps == null) {
 		return null;
 	}
 

@@ -256,7 +256,7 @@ const migrationHandler = async (req, res) => {
 				const joinedSteps = (allSteps.join("\n"));
 
 				if( joinedSteps ) {
-					await simpleDBQuery('Add Column', `UPDATE STEP_GROUP SET Steps = "${joinedSteps}" WHERE StepGroupID = ${stepGroupID}`, res);
+					await updateStep(joinedSteps,stepGroupID);
 				}
 				
 			}
@@ -269,6 +269,20 @@ const migrationHandler = async (req, res) => {
 	}
 
 	res.status(200).json({ success: true });
+};
+
+const pool = getPool();
+
+export const updateStep = (steps, stepGroupID) => {
+	return new Promise((resolve, reject) => {
+		pool.query(`UPDATE STEP_GROUP Set Steps = ? WHERE StepGroupID = ?`, [steps,stepGroupID], (error) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve();
+			}
+		});
+	});
 };
 
 const setWeekIDForAllMenuDays = async (pool) => {
