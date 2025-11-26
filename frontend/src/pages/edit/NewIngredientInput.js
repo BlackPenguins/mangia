@@ -25,7 +25,7 @@ export const NewIngredientInput = ({ fetchRecipe, recipeID }) => {
 	};
 
 	const onKeyDownHandler = (e) => {
-		if (e.key === 'Enter') {
+		if (e.key === 'Enter' || e.key === 'done') {
 			onAddHandler();
 		}
 	};
@@ -38,6 +38,7 @@ export const NewIngredientInput = ({ fetchRecipe, recipeID }) => {
 				</Button>
 				<div className="ingredient-input form-floating">
 					<Input
+						enterKeyHint="done"
 						className="editInput"
 						id="edit-name"
 						type="text"

@@ -25,6 +25,9 @@ const MigrationTab = () => {
 
 	return (
 		<div>
+			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="flattenSteps" label="v2.3: Flatten Steps" />
+			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="moveStepsToGroups" label="v2.3: Move steps to groups" />
+			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addStepGroup" label="v2.3: Add StepGroup Table" />
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addIsWishlist" label="v2.1: Add IsWishlist column" />
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="convertForUnicode" label="v2.1: Convert to Unicode" />
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addRecipeNames" label="v2.1: Add RecipeNames column" />

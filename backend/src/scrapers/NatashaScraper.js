@@ -35,9 +35,17 @@ export const scrapeNatasha = async (html) => {
 			recipeObj.image = json.image?.url;
 			recipeObj.ingredients = json.recipeIngredient;
 
+			const stepArray = [];
 			for (const instruction of json.recipeInstructions) {
-				recipeObj.steps.push(decodeHTMLEntities(instruction.text));
+				stepArray.push(decodeHTMLEntities(instruction.text));
 			}
+			recipeObj.stepGroups.push({
+				header: "Steps",
+				position: 1,
+				steps: stepArray.join("\n")
+			});
+
+
 			// for (const ingredient of ingredients) {
 			// 	const quantity = $(ingredient).find('span[data-ingredient-quantity]');
 			// 	const unit = $(ingredient).find('span[data-ingredient-unit]');

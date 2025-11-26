@@ -1,6 +1,8 @@
 import { deleteIngredientsByRecipeID, insertIngredient } from  '#root/database/ingredient.js';
 import { deleteRecipe, insertImportFailureURL, insertRecipe, selectRecipeByName, updateRecipe } from  '#root/database/recipes.js';
 import { deleteStepsByRecipeID, insertStep } from  '#root/database/step.js';
+import { deleteStepGroupByRecipeID, insertStepGroup } from '#root/database/stepGroup.js';
+import { deleteThumbnailsForRecipe } from '#root/database/thumbnails.js';
 import { resizeThumbnail, THUMBNAIL_DIRECTORY } from '#root/routes/recipes.js';
 import { scrape } from '#root/scrapers/ScraperFactory.js';
 import fs from "fs";
@@ -10,7 +12,8 @@ import path from "path";
 export const INGREDIENT_REGEX = /([\d\/\s]+\s(?:cup|teaspoon|tablespoon|tbsp|pound|ounce|tsp|oz|lb|tb)?(?:s)?)(.*)/i;
 export const INGREDIENT_EXTRACT_REGEX = /([\d\/\s]+)\s*(cup|teaspoon|tablespoon|tbsp|pound|ounce|tsp|oz|lb|tb)?(?:s)?/i;
 
-export const importRecipe = async (url) => {
+export const importRecipe = async (url, replaceRecipeID) => {
+
 	const importResponse = {};
 
 	let scrapeSuccess = false;
@@ -19,35 +22,46 @@ export const importRecipe = async (url) => {
 		const recipeObject = await scrape(url);
 		scrapeSuccess = recipeObject.success;
 
-		console.log(`Importing recipe for URL [${url}]`);
+		console.log(`Importing recipe for URL [${url}] for recipe ID [${replaceRecipeID}]`);
 
 		if (!scrapeSuccess) {
 			importResponse.success = false;
 			importResponse.status = `Failed to parse recipe from the URL "${url}"`;
 			await insertImportFailureURL(url);
 		} else {
-			const recipeName = recipeObject.name;
-
-			const recipeToAdd = {
-				name: recipeObject.name,
-				description: recipeObject.description,
-				image: recipeObject.image
-			};
-
-			const recipeExists = await selectRecipeByName(recipeName);
-
-			if (recipeExists) {
-				console.error(`Recipe with name [${recipeName}] already exists.`);
-				importResponse.success = false;
-				importResponse.status = `Recipe with name "${recipeName}" already exists.`;
-				return importResponse;
-			}
-
-			let recipeID = 0;
-
 			try {
-				recipeID = await createRecipe(recipeToAdd, url);
-				console.log(`Created a new recipe with ID [${recipeID}].`);
+				let recipeID = 0;
+
+				if( replaceRecipeID != null ) {
+					// Replacing an existing one (the Import button in the Edit page)
+					recipeID = replaceRecipeID;
+
+					deleteIngredientsByRecipeID(recipeID);
+					deleteStepsByRecipeID(recipeID);
+					deleteStepGroupByRecipeID(recipeID);
+					deleteThumbnailsForRecipe(recipeID);
+				} else {
+					// Adding a new recipe
+					const recipeName = recipeObject.name;
+
+					const recipeToAdd = {
+						name: recipeObject.name,
+						description: recipeObject.description,
+						image: recipeObject.image
+					};
+
+					const recipeExists = await selectRecipeByName(recipeName);
+
+					if (recipeExists) {
+						console.error(`Recipe with name [${recipeName}] already exists.`);
+						importResponse.success = false;
+						importResponse.status = `Recipe with name "${recipeName}" already exists.`;
+						return importResponse;
+					}
+
+					recipeID = await createRecipe(recipeToAdd, url);
+					console.log(`Created a new recipe with ID [${recipeID}].`);
+				}
 
 				await createIngredients(recipeID, recipeObject);
 				await createSteps(recipeID, recipeObject);
@@ -62,6 +76,8 @@ export const importRecipe = async (url) => {
 				if (!recipeID) {
 					deleteIngredientsByRecipeID(recipeID);
 					deleteStepsByRecipeID(recipeID);
+					deleteStepGroupByRecipeID(recipeID);
+					deleteThumbnailsForRecipe(recipeID);
 					deleteRecipe(recipeID);
 				}
 
@@ -97,18 +113,31 @@ const createRecipe = async (recipe, url) => {
 		const newFileName = `download-${newID}.jpg`;
 		const afterName = `recipeDownloaded-${newID}.jpg`;
 		const filePath = path.join(THUMBNAIL_DIRECTORY, newFileName);
-		await downloadImage(recipe.image, filePath);
-		await resizeThumbnail(null, newID, THUMBNAIL_DIRECTORY, newFileName, afterName);
+		const downloadedPath = await downloadImage(recipe.image, filePath);
+
+		if( downloadedPath != null ) {
+			await resizeThumbnail(null, newID, THUMBNAIL_DIRECTORY, newFileName, afterName);
+		}
 	}
 
 	return newRecipe?.id;
 };
 
 const downloadImage = (url, filePath) => {
-  return new Promise((resolve, reject) => {
-    https.get(url, res => {
+  return new Promise((resolve) => {
+	let parsedUrl;
+    try {
+      parsedUrl = new URL(url); // will throw on invalid URL
+    } catch (err) {
+      console.log(`Invalid URL: ${url}`);
+      resolve(null);
+      return;
+    }
+
+    https.get(url, (res) => {
       if (res.statusCode !== 200) {
-        reject(new Error(`Failed with status ${res.statusCode}`));
+        console.log(`Could not download image [${url}]. Status: ${res.statusCode}`);
+        resolve(null);
         return;
       }
 
@@ -119,12 +148,15 @@ const downloadImage = (url, filePath) => {
         file.close(() => resolve(filePath));
       });
 
-      file.on("error", err => {
-        fs.unlink(filePath, () => reject(err));
+      file.on("error", (err) => {
+        fs.unlink(filePath, () => resolve(null));
       });
-    }).on("error", reject);
+    }).on("error", (err) => {
+      console.log("HTTPS error:", err);
+      resolve(null);
+    });
   });
-}
+};
 
 export const breakdownIngredient = (ingredient) => {
 
@@ -148,41 +180,39 @@ export const breakdownIngredient = (ingredient) => {
 };
 export const createIngredients = async (recipeID, recipe, tagCache) => {
 	try {
-		for (const ingredient of recipe.ingredients) {
-			if (ingredient) {
-				let formattedIngredient = ingredient;
+		if( recipe.ingredients ) {
+			for (const ingredient of recipe.ingredients) {
+				if (ingredient) {
+					let formattedIngredient = ingredient;
 
-				// TODO: Remove unrelated words to create a record in ITEM table, which is used to aggregate the same ingredients and add them together
-				// Phase 1 will just be listing the ingredients in the shopping list though
-				const unrelatedWords = ['diced', 'crushed', 'finely', 'grated', 'beaten', 'sliced', 'freshly', 'ground'];
-				formattedIngredient = formattedIngredient.replace('0.25', '1/4');
-				formattedIngredient = formattedIngredient.replace('0.5', '1/2');
-				formattedIngredient = formattedIngredient.replace('0.75', '3/4');
-				formattedIngredient = formattedIngredient.replace('0.125', '1/8');
-				formattedIngredient = formattedIngredient.replace('½', '1/2');
-				formattedIngredient = formattedIngredient.replace('¼', '1/4');
-				formattedIngredient = formattedIngredient.replace('⅓', '1/3');
-				formattedIngredient = formattedIngredient.replace('⅓', '2/3');
-				formattedIngredient = formattedIngredient.replace('⅓', '2/3');
-				formattedIngredient = formattedIngredient.replace('⅓', '1/8');
-				formattedIngredient = formattedIngredient.replace('⅓', '3/4');
-				formattedIngredient = formattedIngredient.replace('▢', '');
+					// TODO: Remove unrelated words to create a record in ITEM table, which is used to aggregate the same ingredients and add them together
+					// Phase 1 will just be listing the ingredients in the shopping list though
+					const unrelatedWords = ['diced', 'crushed', 'finely', 'grated', 'beaten', 'sliced', 'freshly', 'ground'];
+					formattedIngredient = formattedIngredient.replace('0.25', '1/4');
+					formattedIngredient = formattedIngredient.replace('0.5', '1/2');
+					formattedIngredient = formattedIngredient.replace('0.75', '3/4');
+					formattedIngredient = formattedIngredient.replace('0.125', '1/8');
+					formattedIngredient = formattedIngredient.replace('½', '1/2');
+					formattedIngredient = formattedIngredient.replace('¼', '1/4');
+					formattedIngredient = formattedIngredient.replace('⅓', '1/3');
+					formattedIngredient = formattedIngredient.replace('▢', '');
 
-				const ingredientToInsert = {
-					Name: formattedIngredient,
-					recipeID,
-				};
+					const ingredientToInsert = {
+						Name: formattedIngredient,
+						recipeID,
+					};
 
-				if (tagCache) {
-					const cachedTagID = tagCache[formattedIngredient];
-					if (cachedTagID) {
-						ingredientToInsert.IngredientTagID = cachedTagID;
+					if (tagCache) {
+						const cachedTagID = tagCache[formattedIngredient];
+						if (cachedTagID) {
+							ingredientToInsert.IngredientTagID = cachedTagID;
+						}
 					}
+
+					await insertIngredient(ingredientToInsert);
+
+					console.log(`Insert ingredient with amount Name [${formattedIngredient}] for recipeID[${recipeID}]`);
 				}
-
-				await insertIngredient(ingredientToInsert);
-
-				console.log(`Insert ingredient with amount Name [${formattedIngredient}] for recipeID[${recipeID}]`);
 			}
 		}
 	} catch (e) {
@@ -194,18 +224,14 @@ export const createSteps = async (recipeID, recipe) => {
 	try {
 		const re = /([\d\/]+\s\w+)\s+(.*)/;
 
-		let stepNumber = 1;
-		for (const step of recipe.steps) {
-			if (step) {
-				const ingredientToInsert = {
-					stepNumber,
-					instruction: step,
-					recipeID,
-				};
-
-				await insertStep(ingredientToInsert);
-				console.log(`Insert step [${stepNumber}] with instruction [${step}]`);
-				stepNumber++;
+		for (const stepGroup of recipe.stepGroups) {
+			if (stepGroup) {
+				await insertStepGroup({
+					RecipeID: recipeID,
+					Position: stepGroup.position,
+					Header: stepGroup.header,
+					Steps: stepGroup.steps
+				});
 			}
 		}
 	} catch (e) {

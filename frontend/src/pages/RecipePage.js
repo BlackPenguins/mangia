@@ -6,6 +6,7 @@ import { Button, Col, Row } from 'reactstrap';
 import Rating from '../components/Settings/Rating';
 import { formatDistance } from 'date-fns';
 import { Edit, Trash2 } from 'react-feather';
+import useWakeLock from '../components/Common/useWakeLock';
 import LoadingText from '../components/Common/LoadingText';
 import { PrepTimeLabel, ThumbnailPreview } from './edit/RecipeEditPage';
 import NewArrivalTag from 'components/Recipes/NewArrivalTag';
@@ -15,6 +16,9 @@ import { useThumbnailBackgroundStyle } from 'components/Recipes/RecipeRow';
 import { TZDate } from '@date-fns/tz';
 
 const RecipePage = () => {
+	// Keep screen alive on mobile phones on this page
+	useWakeLock();
+
 	const params = useParams();
 	const recipeID = params.recipeID;
 	const [recipe, setRecipe] = useState(null);
@@ -38,6 +42,7 @@ const RecipePage = () => {
 		fetchRecipe();
 	}, [fetchRecipe]);
 
+	console.log("Recipe of Page", recipe);
 	if (recipe === null) {
 		return (
 			<div className="container">
@@ -62,7 +67,7 @@ const RecipePage = () => {
 							<Ingredients ingredients={recipe?.ingredients} />
 						</Col>
 						<Col lg={8}>
-							<Steps steps={recipe?.steps} />
+							<StepGroups stepGroups={recipe?.stepGroups} />
 							{recipe.thumbnails &&
 								recipe.thumbnails.map((thumbnail, index) => {
 									if (index === 0) {
@@ -279,24 +284,36 @@ const Ingredients = ({ ingredients }) => {
 	);
 };
 
-const Steps = ({ steps }) => {
-	if (steps?.length === 0) {
+const StepGroups = ({ stepGroups }) => {
+	if (stepGroups?.length === 0) {
 		return null;
 	}
 
+	return stepGroups.map( (stepGroup) => {
+		return (
+			<div className="steps">
+				<h4><span className='section-icon'>&#x1F4DD;</span>{stepGroup.header}</h4>
+				<StepGroup stepGroup={stepGroup}/>
+			</div>
+		);
+	});
+};
+
+const StepGroup = ({ stepGroup }) => {
+	if (stepGroup.steps?.length === 0) {
+		return null;
+	}
+
+	return stepGroup.steps.split("\n").filter( s => !!s).map((step, stepNumber) => <Step step={step} stepNumber={stepNumber + 1}/>);
+};
+
+const Step = ({ step, stepNumber }) => {
 	return (
-		<div className="steps">
-			<h4><span className='section-icon'>&#x1F4DD;</span>Steps</h4>
-			{steps.map((step) => {
-				return (
-					<div key={step.stepNumber} className="step">
-						<div className="number">
-							<div>{step.stepNumber}</div>
-						</div>
-						<div className="instruction">{step.instruction}</div>
-					</div>
-				);
-			})}
+		<div key={stepNumber} className="step">
+			<div className="number">
+				<div>{stepNumber}</div>
+			</div>
+			<div className="instruction">{step}</div>
 		</div>
 	);
 };

@@ -4,14 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import './ImportRecipeModal.scss';
 import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
 
-const useImportRecipeModal = () => {
+const useImportRecipeModal = (replaceRecipeID) => {
 	const authContext = useAuth();
 	const tokenFromStorage = authContext.tokenFromStorage;
 
 	const navigate = useNavigate();
 	const [importURL, setImportURL] = useState('');
 	const [status, setStatus] = useState('');
-	const [newRecipeID, setNewRecipeID] = useState(null);
+	const [newRecipeID, setNewRecipeID] = useState(replaceRecipeID);
 	const [statusClasses, setStatusClasses] = useState('status');
 
 	const [importFile, setImportFile] = useState('');
@@ -25,7 +25,7 @@ const useImportRecipeModal = () => {
 		const url = importURL;
 		const response = await fetch(`/api/recipes/import`, {
 			method: 'POST',
-			body: JSON.stringify({ url }),
+			body: JSON.stringify({ url, replaceRecipeID }),
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
 				'Content-Type': 'application/json',

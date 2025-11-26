@@ -9,7 +9,17 @@ const AboutPage = () => {
 					<h2>Change Log</h2>
 				</div>
 				<div className='change-log'>
-					<h3>Version 1.13</h3>
+					<h3>Version 2.3 (11/12/2025)</h3>
+					<ul>
+						<li>Added step groups</li>
+						<li>Fixed import for existing recipe</li>
+						<li>Fixed thumbnail download</li>
+						<li>Import with step groups</li>
+						<li>Added the wake lock (requires https to work)</li>
+						<li>Added submit on enter for mobile inputs (enterKeyHint)</li>
+						<li>Auto-focus on modal opens</li>
+					</ul>
+					<h3>Version 2.2 (11/11/2025)</h3>
 					<ul>
 						<li>Clicking config redirects to ingredients tab</li>
 						<li>Checking list item updates the count</li>

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, Fragment } from 'react';
 
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, FormGroup, FormText, Input, Label, Row } from 'reactstrap';
@@ -8,7 +8,7 @@ import { useToast } from '@blackpenguins/penguinore-common-ext';
 import './RecipeEditPage.scss';
 import Rating from '../../components/Settings/Rating';
 import Tag from '../../components/EditRecipes/Tag';
-import { ArrowUpCircle, Eye, Printer, Trash2 } from 'react-feather';
+import { ArrowUpCircle, Eye, Printer, Trash2, PlusCircle } from 'react-feather';
 import useScanModal from '../../components/Settings/useScanModal';
 import NewIngredientInput from './NewIngredientInput';
 import { useAuth } from '@blackpenguins/penguinore-common-ext';
@@ -64,7 +64,7 @@ const RecipeEditPage = () => {
 	const [prepTime, setPrepTime] = useState('');
 	const [defrost, setDefrost] = useState('');
 	const [description, setDescription] = useState('');
-	const [steps, setSteps] = useState('');
+	const [stepGroups, setStepGroups] = useState([]);
 	const [ingredients, setIngredients] = useState([]);
 	const [ingredientsBulk, setIngredientsBulk] = useState('');
 	const [bookID, setBookID] = useState(0);
@@ -99,13 +99,13 @@ const RecipeEditPage = () => {
 			setIsActive(recipe.IsActive === 1);
 			setAttachments(recipe.attachments);
 			setThumbnails(recipe.thumbnails);
-
-			const finalSteps = recipe.steps.map((step) => step.instruction).join('\n\n');
-			setSteps(finalSteps);
+			setStepGroups(recipe.stepGroups);
 
 			const ingredientsBulk = recipe.ingredients.map((ingredient) => ingredient.name).join('\n');
 			setIngredients(recipe.ingredients);
 			setIngredientsBulk(ingredientsBulk);
+
+			console.log("Recipe to Edit", recipe);
 		}
 	}, [recipeID]);
 
@@ -242,7 +242,7 @@ const RecipeEditPage = () => {
 		nameClasses.push('hidden');
 	}
 
-	const {modal, openModal} = useImportRecipeModal();
+	const {modal, openModal} = useImportRecipeModal(recipeID);
 
 
 	return (
@@ -291,11 +291,7 @@ const RecipeEditPage = () => {
 									</EditDropdown>
 								</Col>
 							</Row>
-							<Row>
-								<Col lg={12}>
-									<EditTextarea label='Steps' name='steps' value={steps} setValue={setSteps} stageChange={stageChange} dirty={dirty} rows={15} valueModifier={(value) => value.split("\n")}/>
-								</Col>
-							</Row>
+							<StepGroups stepGroups={stepGroups} setStepGroups={setStepGroups} stageChange={stageChange} dirty={dirty}/>
 						</Col>
 						<Col lg={3}>
 							<EditTextarea label='Notes' name='notes' value={notes} setValue={setNotes} stageChange={stageChange} dirty={dirty} rows={16}/>
@@ -365,6 +361,119 @@ const RecipeEditPage = () => {
 		</div>
 	);
 };
+
+const StepGroups = ({ stepGroups, setStepGroups, stageChange, dirty }) => {
+
+	/*
+		This will both update the state (so all the inputs get updated), and stage
+		the change (so it will be sent to the updateReceipt API when Save is pressed)
+		In both cases we send the same the array of stepGroup objects
+	 */
+	const updateStepGroup = (stepGroupID, header, steps, doDelete, doAdd) => {
+		setStepGroups( (prevState) => {
+
+			let updatedGroups;
+			if( doDelete ) {
+				// Only keep the groups that are NOT this one, deleting it
+				updatedGroups = prevState.filter((group) => group.id !== stepGroupID);
+			} else if( doAdd ) {
+				// Push a new group at the end
+				updatedGroups = prevState;
+				updatedGroups.push(
+					{
+						id: Math.floor(Date.now() / 1000), // Temporary, need an ID for the state to work, it's ignored on the recipe update
+						header : "",
+						steps: ""
+					}
+				);
+			} else {
+				// Create a copy of the array
+				updatedGroups = prevState.map((group) => {
+					// If this is not the one we want, return it unchanged
+					if (group.id !== stepGroupID) {
+						return group;
+					}
+
+					if( doDelete ) {
+						// Delete this group
+						return null;
+					}
+
+					// Otherwise, create a new object merging old + new data
+					const updatedGroup = { ...group };
+
+					if( header !== null ) {
+						updatedGroup.header = header;
+					}
+
+					if( steps !== null ) {
+						updatedGroup.steps = steps;
+					}
+
+					return updatedGroup;
+				});
+			}
+
+			// Return the new array to update state
+			stageChange("stepGroups", updatedGroups);
+			return updatedGroups;
+		});
+	}
+
+	return (
+		<>
+			{stepGroups.map( (stepGroup) => ( <StepGroup key={stepGroup.id} stepGroup={stepGroup} dirty={dirty} updateStepGroup={updateStepGroup}/> )) }
+			<Row>
+				<Col lg={12}>
+					<Button className="mangia-btn success step-group-delete-button" onClick={() => updateStepGroup(null, null, null, false, true)}>
+						<PlusCircle size={14}/> Add Step Group
+					</Button>
+				</Col>
+			</Row>
+		</>
+	);
+}
+
+const StepGroup = ({ stepGroup, updateStepGroup, dirty }) => {
+		const [headerValue, setHeaderValue] = useState(stepGroup == null ? "DELETED" : stepGroup.header);
+		const [stepsValue, setStepsValue] = useState(stepGroup == null ? "DELETED" : stepGroup.steps);
+
+		const setHeader = (value) => {
+			setHeaderValue(value);
+			updateStepGroup(stepGroup.id, value, null, false, false);
+		};
+
+		const setSteps = (value) => {
+			setStepsValue(value);
+			updateStepGroup(stepGroup.id, null, value, false, false);
+		};
+
+		const deleteGroup = () => {
+			updateStepGroup(stepGroup.id, null, null, true, false);
+		};
+
+		return (
+			<div className='step-group' key={stepGroup.id}>
+				<Row>
+					<Col lg={12}>
+						<EditTextInput label='Header' name='header' value={headerValue} setValue={setHeader} stageChange={null} dirty={dirty}/>
+					</Col>
+				</Row>
+				<Row>
+					<Col lg={12}>
+						<EditTextarea label='Steps' name='steps' value={stepsValue} setValue={setSteps} stageChange={null} dirty={dirty} rows={15}/>
+					</Col>
+				</Row>
+				<Row>
+					<Col lg={12}>
+						<Button className="mangia-btn danger step-group-delete-button" onClick={() => deleteGroup()}>
+							<Trash2 size={14}/> Delete Step Group
+						</Button>
+					</Col>
+				</Row>
+			</div>
+		);
+}
 
 const ThumbnailSection = ({ tokenFromStorage, fetchRecipe, thumbnails, setValue }) => {
 	const fileChangeHandler = (event) => {
@@ -491,12 +600,15 @@ const EditInput = ({ label, name, value, setValue, stageChange, dirty, type, row
 	const handleInput = (value) => {
 		setValue(value);
 
-		let newValue = value;
-		if( valueModifier ) {
-			newValue = valueModifier(value);
+		if( stageChange != null ) {
+			let newValue = value;
+			if( valueModifier ) {
+				newValue = valueModifier(value);
+			}
+
+			stageChange(name, newValue);
 		}
 
-		stageChange(name, newValue);
 		setDirtyInput(true);
 	}
 

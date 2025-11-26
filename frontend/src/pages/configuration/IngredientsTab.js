@@ -73,14 +73,29 @@ const IngredientsTab = () => {
 		fetchDepartments();
 	}, [fetchItems, fetchDepartments]);
 
+	const onKeyDownHandler = (e) => {
+		if (e.key === 'Enter' || e.key === 'done') {
+			onAddItemHandler();
+		}
+	};
+
+
 	return (
 		<div className="container book-list ingredient-list">
 			<h3>Ingredients</h3>
 			<Row className="add-config-button">
 				<Col lg={7}>
 					<div className="form-floating">
-						<Input id="item-name" type="text" placeholder="Item Name" innerRef={addItemInputRef}></Input>
-						<label htmlFor="item-name">Ingredient Name</label>
+						<Input
+
+							enterKeyHint="done"
+							id="item-name"
+							type="text"
+							placeholder="Item Name"
+							innerRef={addItemInputRef}
+							onKeyDown={onKeyDownHandler}
+						/>
+							<label htmlFor="item-name">Ingredient Name</label>
 					</div>
 				</Col>
 				<Col lg={5} className="recipe-edit-btn">

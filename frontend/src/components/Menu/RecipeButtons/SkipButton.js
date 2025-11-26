@@ -36,6 +36,7 @@ const SkipButton = ({ fetchMenu, menu, page }) => {
 		),
 		content: (closeModal) => (
 			<Input
+				enterKeyHint="done"
 				innerRef={inputRef}
 				autoFocus
 				name="text"
@@ -44,7 +45,7 @@ const SkipButton = ({ fetchMenu, menu, page }) => {
 					setSkipReason(e.target.value);
 				}}
 				onKeyDown={(e) => {
-					if (e.key === 'Enter') {
+					if (e.key === 'Enter' || e.key === 'done') {
 						e.preventDefault();
 						setSkipHandler(closeModal);
 					}

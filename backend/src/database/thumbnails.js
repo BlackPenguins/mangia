@@ -45,3 +45,15 @@ export const insertThumbnail = (recipeID, filename) => {
 		});
 	});
 };
+
+export const deleteThumbnailsForRecipe = (recipeID) => {
+	return new Promise((resolve, reject) => {
+		pool.query('DELETE FROM THUMBNAILS WHERE RecipeID = ?', [recipeID], (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve(result);
+			}
+		});
+	});
+};

@@ -3,7 +3,7 @@ class Recipe {
 		this.name = '';
 		this.description = '';
 		this.ingredients = [];
-		this.steps = [];
+		this.stepGroups = [];
 		this.time = '';
 		this.image = '';
 	}

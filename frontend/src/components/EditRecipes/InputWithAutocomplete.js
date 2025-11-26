@@ -21,7 +21,7 @@ const InputWithAutocomplete = ({ selectedValue, setSelectedValue, selectionHandl
 	};
 
 	const inputKeyDownHandler = (e) => {
-		if (e.key === 'Enter') {
+		if (e.key === 'Enter' || e.key === 'done') {
 			if (showSuggestions && filteredResults.length && resultSuggestionIndex > 0) {
 				// Use the selected suggestion
 				selectionHandler(filteredResults[resultSuggestionIndex - 1]);
@@ -75,6 +75,7 @@ const InputWithAutocomplete = ({ selectedValue, setSelectedValue, selectionHandl
 	return (
 		<div className={showLabel ? "form-floating" : ""}>
 			<Input
+				enterKeyHint="done"
 				className="editInput"
 				autoComplete="off"
 				id={id}

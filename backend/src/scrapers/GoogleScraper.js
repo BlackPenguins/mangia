@@ -38,17 +38,38 @@ export const scrapeGoogle = async (html) => {
 			recipeObj.ingredients = json.recipeIngredient;
 
 			if( json.recipeInstructions ) {
-				for (const instruction of json.recipeInstructions) {
-					if( instruction.text) {
-						recipeObj.steps.push(decodeHTMLEntities(instruction.text));
-					} else {
-						// Maybe it's split into sections
-						if( instruction.itemListElement) {
-							for (const itemList of instruction.itemListElement) {
-								if( itemList.text) {
-									recipeObj.steps.push(decodeHTMLEntities(itemList.text));
-								}
+				const nonGrouped = json.recipeInstructions?.[0].text;
+
+				if(nonGrouped) {
+					let stepArray = [];
+
+					for (const instruction of json.recipeInstructions) {
+						stepArray.push(decodeHTMLEntities(instruction.text));
+					}
+
+					recipeObj.stepGroups.push({
+						header: "Steps",
+						position: 1,
+						steps: stepArray.join("\n")
+					});
+
+				} else {
+					// Maybe it's split into sections
+					let position = 1;
+					for (const stepGroup of json.recipeInstructions) {
+						if(stepGroup.itemListElement) {
+							let stepArray = [];
+							for (const itemList of stepGroup.itemListElement) {
+								stepArray.push(decodeHTMLEntities(itemList.text));
 							}
+
+							recipeObj.stepGroups.push({
+								header: stepGroup?.name || "Steps",
+								position,
+								steps: stepArray.join("\n")
+							});
+
+							position++;
 						}
 					}
 				}

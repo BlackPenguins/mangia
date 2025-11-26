@@ -33,7 +33,7 @@ const useAddRecipeModal = () => {
 		}
 	};
 
-	const inputRef = useRef();
+	const inputRef = useRef(null);
 
 	const { modal, openModal } = useBetterModal({
 		title: 'Add Recipe',

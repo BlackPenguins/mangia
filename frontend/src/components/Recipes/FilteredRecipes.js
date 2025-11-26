@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, forwardRef } from 'react';
 import { Input, Row } from 'reactstrap';
 import LoadingText from '../Common/LoadingText';
 
 export const HIDDEN_CATEGORY_FILTER = 'Hidden';
 export const NEW_ARRIVAL_CATEGORY_FILTER = 'NewArrival';
 
-const FilteredRecipes = ({ CardType, layoutClass, onClickHandler, categoryFilter }) => {
+const FilteredRecipes = forwardRef(({ inputRef, CardType, layoutClass, onClickHandler, categoryFilter }, ref) => {
 	const fetchRecipes = async () => {
 		const response = await fetch('/api/recipes');
 		const data = await response.json();
@@ -69,7 +69,7 @@ const FilteredRecipes = ({ CardType, layoutClass, onClickHandler, categoryFilter
 	return (
 		<section className="hero">
 			<div className="container">
-				<SearchBox search={search} setSearch={setSearch} filteredRecipes={filteredRecipes} filterRecipesHandler={filterRecipesHandler} />
+				<SearchBox inputRef={inputRef} search={search} setSearch={setSearch} filteredRecipes={filteredRecipes} filterRecipesHandler={filterRecipesHandler} />
 
 				{filteredRecipes === null && <LoadingText text="Loading recipes" />}
 				{filteredRecipes?.length === 0 && <span>No recipes found</span>}
@@ -85,14 +85,15 @@ const FilteredRecipes = ({ CardType, layoutClass, onClickHandler, categoryFilter
 			</div>
 		</section>
 	);
-};
+});
 
-const SearchBox = ({ search, setSearch, filteredRecipes, filterRecipesHandler }) => {
+const SearchBox = forwardRef(({ inputRef, search, setSearch, filteredRecipes, filterRecipesHandler }, ref) => {
 	return (
 		<div className="hero__search">
 			<div className="search-container">
 				<form action="#">
 					<Input
+						innerRef={inputRef}
 						id="recipe-category"
 						type="text"
 						placeholder={!search && `Search all ${filteredRecipes?.length || ''} recipes...`}
@@ -106,6 +107,6 @@ const SearchBox = ({ search, setSearch, filteredRecipes, filterRecipesHandler })
 			</div>
 		</div>
 	);
-};
+});
 
 export default FilteredRecipes;

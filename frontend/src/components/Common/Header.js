@@ -13,7 +13,7 @@ const Header = () => {
 	const [showSidebar, setShowSidebar] = useState(false);
 
 	const { modal: addModal, openModal: openAddModal } = useAddRecipeModal();
-	const { modal: importModal, openModal: openImportModal } = useImportRecipeModal();
+	const { modal: importModal, openModal: openImportModal } = useImportRecipeModal(null);
 
 	const overlayClasses = ['humberger__menu__overlay'];
 	const sidebarClasses = ['humberger__menu__wrapper'];

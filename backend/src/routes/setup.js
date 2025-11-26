@@ -95,15 +95,15 @@ router.post('/api/setup/createTable/recipeTag', (req, res) => {
 	);
 });
 
-export const simpleDBQuery = (label, sql, res) => {
-	const pool = getPool();
+const pool = getPool();
 
+export const simpleDBQuery = (label, sql, res) => {
 	return new Promise((resolve, reject) => {
 		pool.query(sql, (error, result) => {
 			if (error) {
 				return reject(error.sqlMessage);
 			} else {
-				return resolve();
+				return resolve(result);
 			}
 		});
 	});

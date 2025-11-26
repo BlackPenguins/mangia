@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState, useRef } from 'react';
 import { Button, Col, Row } from 'reactstrap';
 import './MenuSection.scss';
 import RecipeCard, { DaysAgo } from '../Recipes/RecipeCard';
@@ -135,6 +135,7 @@ const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, availableSwapDays, 
 		closeModal();
 	};
 
+	const inputRef = useRef(null);
 	const { modal: extraModal, openModal: openAddExtraModal } = useBetterModal({
 		title: 'Add Menu Item',
 		size: 'md',
@@ -142,10 +143,11 @@ const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, availableSwapDays, 
 			<>
 				<h3>Add Recipe</h3>
 				<div className="change-recipe-container">
-					<FilteredRecipes CardType={RecipeRow} onClickHandler={(recipe) => addItemHandler(recipe, closeModal)} layoutClass="lg-12" />
+					<FilteredRecipes inputRef={inputRef} CardType={RecipeRow} onClickHandler={(recipe) => addItemHandler(recipe, closeModal)} layoutClass="lg-12" />
 				</div>
 			</>
 		),
+		inputRef
 	});
 
 	return (

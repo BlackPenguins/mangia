@@ -41,6 +41,7 @@ const DailyNotesButton = ({ fetchMenu, menu, page }) => {
 		),
 		content: (closeModal) => (
             <Input
+				enterKeyHint="done"
                 className="editInput"
                 id="recipe-steps"
 				innerRef={inputRef}
@@ -51,7 +52,7 @@ const DailyNotesButton = ({ fetchMenu, menu, page }) => {
 					setValue(e.target.value);
 				}}
 				onKeyDown={(e) => {
-					if (e.key === 'Enter') {
+					if (e.key === 'Enter' || e.key === 'done') {
 						e.preventDefault();
 						notesHandler(closeModal);
 					}

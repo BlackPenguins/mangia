@@ -18,9 +18,9 @@ export const insertStep = (newStep) => {
 	});
 };
 
-export const selectStepsByRecipeID = (recipeID) => {
+export const selectStepsByRecipeID = (recipeID, stepGroupID) => {
 	return new Promise((resolve, reject) => {
-		pool.query('SELECT * FROM STEP WHERE RecipeID = ? ORDER BY StepNumber ASC', [recipeID], (error, result) => {
+		pool.query('SELECT * FROM STEP WHERE RecipeID = ? AND StepGroupID = ? ORDER BY StepNumber ASC', [recipeID, stepGroupID], (error, result) => {
 			if (error) {
 				return reject(error.sqlMessage);
 			} else {

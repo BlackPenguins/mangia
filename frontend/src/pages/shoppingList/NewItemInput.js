@@ -32,6 +32,7 @@ export const NewItemInput = ({ tokenFromStorage, fetchShoppingListExtras, isWish
 			<Col lg={10}>
 				<div className="form-floating notes">
 					<Input
+						enterKeyHint="done"
 						innerRef={inputRef}
 						className="editInput"
 						id="edit-name"
@@ -41,7 +42,7 @@ export const NewItemInput = ({ tokenFromStorage, fetchShoppingListExtras, isWish
 							setValue(e.target.value);
 						}}
 						onKeyDown={(e) => {
-							if (e.key === 'Enter') {
+							if (e.key === 'Enter' || e.key === 'done') {
 								e.preventDefault();
 								onAddHandler();
 							}

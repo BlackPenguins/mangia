@@ -17,8 +17,9 @@ import fs from 'fs';
 import { checkAdminMiddleware } from './auth.js';
 import { insertIngredientTag, selectIngredientTagByName, selectIngredientTagsByRecipeID } from  '#root/database/ingredientTags.js';
 import { withDateDetails } from './menu.js';
-import { deleteThumbnail, insertThumbnail, selectAllThumbnails } from  '#root/database/thumbnails.js';
+import { deleteThumbnail, deleteThumbnailsForRecipe, insertThumbnail, selectAllThumbnails } from  '#root/database/thumbnails.js';
 import { convertToTeaspoons } from './shoppingListItem.js';
+import { deleteStepGroupByRecipeID, selectStepGroupsByRecipeID } from '#root/database/stepGroup.js';
 
 export const THUMBNAIL_DIRECTORY = './images/thumbnails';
 const LARGE_PREFIX = 'large_';
@@ -93,14 +94,16 @@ const buildFullRecipe = async (recipeID) => {
 		return null;
 	} else {
 		const recipeWithThumbnails = await addThumbnails(recipe);
-		const steps = await selectStepsByRecipeID(recipeID);
+		const stepGroups = await selectStepGroupsByRecipeID(recipeID);
 
-		recipeWithThumbnails.steps = [];
-		for (const step of steps) {
-			recipeWithThumbnails.steps.push({
-				stepNumber: step.StepNumber,
-				instruction: step.Instruction,
-			});
+		recipeWithThumbnails.stepGroups = [];
+		for (const stepGroup of stepGroups) {
+			const stepGroupID = stepGroup.StepGroupID;
+			const newStepGroup = {};
+			newStepGroup.id = stepGroupID;
+			newStepGroup.header = stepGroup.Header;
+			newStepGroup.steps = stepGroup.Steps;
+			recipeWithThumbnails.stepGroups.push(newStepGroup);
 		}
 
 		const history = await selectByRecipeID(recipeID);
@@ -181,8 +184,9 @@ const getAllRecipes = (req, res) => {
 
 const importRecipeProcessor = async (req, res) => {
 	let url = req.body.url;
+	let replaceRecipeID = req.body.replaceRecipeID;
 	try {
-		const importResponse = await importRecipe(url);
+		const importResponse = await importRecipe(url, replaceRecipeID);
 		res.status(200).json(importResponse);
 	} catch (e) {
 		res.status(200).json({ success: false });
@@ -547,9 +551,10 @@ const updateStepsAndIngredients = async (body, recipeID) => {
 		await createIngredients(recipeID, updatedRecipe, tagCache);
 	}
 
-	if (body.steps) {
-		updatedRecipe.steps = body.steps;
+	if (body.stepGroups) {
+		updatedRecipe.stepGroups = body.stepGroups;
 		await deleteStepsByRecipeID(recipeID);
+		await deleteStepGroupByRecipeID(recipeID);
 		await createSteps(recipeID, updatedRecipe);
 	}
 };
@@ -605,6 +610,8 @@ const deleteRecipeProcessor = async (req, res) => {
 	await deleteWithRecipeID(recipeID);
 	await deleteIngredientsByRecipeID(recipeID);
 	await deleteStepsByRecipeID(recipeID);
+	await deleteStepGroupByRecipeID(recipeID);
+	await deleteThumbnailsForRecipe(recipeID);
 	await deleteRecipe(recipeID);
 	res.status(200).json(recipeID);
 };

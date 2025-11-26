@@ -11,6 +11,7 @@ import { insertThumbnail } from  '#root/database/thumbnails.js';
 import { selectIngredientsByRecipeID, updateIngredient } from  '#root/database/ingredient.js';
 import { breakdownIngredient } from '#root/scrapers/RecipeImporter.js';
 import { convertToTeaspoons } from './shoppingListItem.js';
+import { insertStepGroup, updateStepGroup } from '#root/database/stepGroup.js';
 
 const router = express.Router();
 
@@ -208,6 +209,59 @@ const migrationHandler = async (req, res) => {
 			await simpleDBQuery('Add Column', 'ALTER TABLE shopping_list_item CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;', res);
 			await simpleDBQuery('Add Column', 'ALTER TABLE shopping_list_extra CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;', res);
 			break;
+		case 'addStepGroup':
+			await simpleDBQuery(
+				'Create STEP_GROUP',
+				'CREATE TABLE STEP_GROUP (StepGroupID INT AUTO_INCREMENT PRIMARY KEY, RecipeID INT, Position INT, Header VARCHAR(50), FOREIGN KEY (RecipeID) REFERENCES RECIPE(RecipeID))',
+				res
+			);
+			await simpleDBQuery('Add Column', 'ALTER TABLE STEP ADD COLUMN StepGroupID INT, ADD CONSTRAINT fk_step_stepgroup FOREIGN KEY (StepGroupID) REFERENCES STEP_GROUP(StepGroupID);', res);
+			break;
+		case 'moveStepsToGroups': {
+			const allRecipesSteps = await selectAllRecipes();
+			await simpleDBQuery('Add Column', 'UPDATE STEP Set StepGroupID = null;', res);
+			await simpleDBQuery('Add Column', 'DELETE FROM STEP_GROUP;', res);
+			
+			for (const recipe of allRecipesSteps) {
+				const id = recipe.RecipeID;
+
+				const stepGroup = await insertStepGroup({
+					RecipeID: id,
+					Position: 1,
+					Header: "Steps"
+				});
+
+				const stepGroupID = stepGroup.id;
+
+				console.log("StepsGroup", {id, stepGroupID});
+
+				await updateStepGroup(stepGroupID, id);
+			}
+			break;
+		}
+		case 'flattenSteps': {
+			await simpleDBQuery('Add Column', 'ALTER TABLE STEP_GROUP ADD COLUMN Steps VARCHAR(5000)', res);
+			await simpleDBQuery('Add Column', 'ALTER TABLE STEP_GROUP CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;', res);
+
+			const allStepGroups = await simpleDBQuery('Add Column', 'SELECT * FROM STEP_GROUP', res);
+			for (const stepGroup of allStepGroups) {
+				const stepGroupID = stepGroup.StepGroupID;
+
+				const stepsForGroup = await simpleDBQuery('Add Column', `SELECT * FROM STEP WHERE StepGroupID = ${stepGroupID} ORDER BY StepNumber ASC`, res);
+				const allSteps = [];
+				for (const step of stepsForGroup ) {
+					const instruction = step.Instruction;
+					allSteps.push( instruction );
+				}
+				const joinedSteps = (allSteps.join("\n"));
+
+				if( joinedSteps ) {
+					await simpleDBQuery('Add Column', `UPDATE STEP_GROUP SET Steps = "${joinedSteps}" WHERE StepGroupID = ${stepGroupID}`, res);
+				}
+				
+			}
+			break;
+		}
 
 		default:
 			console.error('Migration not found!');

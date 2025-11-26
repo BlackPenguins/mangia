@@ -45,6 +45,15 @@
 	}
 }
 
+.step-group {
+	margin-bottom: 50px;
+}
+.step-group-delete-button {
+	display: block;
+	width: 100%;
+	padding: 6px 10px;
+}
+
 .dirty-input {
 	background-color: #ffe9bf;
 }

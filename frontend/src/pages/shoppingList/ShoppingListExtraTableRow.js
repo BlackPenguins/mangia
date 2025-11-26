@@ -59,6 +59,7 @@ const ShoppingListExtraTableRow = ({ item, showCheckedItems, tokenFromStorage, f
 			<Col className="name-col col" lg={10} sm={8} xs={8}>
 				{!editMode && item.Name}
 				{editMode && <Input
+						enterKeyHint='done'
 						innerRef={inputRef}
 						className="editInput"
 						id="edit-name"
@@ -67,7 +68,7 @@ const ShoppingListExtraTableRow = ({ item, showCheckedItems, tokenFromStorage, f
 							setName(e.target.value);
 						}}
 						onKeyDown={(e) => {
-							if (e.key === 'Enter') {
+							if (e.key === 'Enter' || e.key === 'done') {
 								e.preventDefault();
 								handleEditButton();
 							}
