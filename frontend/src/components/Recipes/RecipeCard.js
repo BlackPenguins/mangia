@@ -16,7 +16,7 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 
 	const hideInformation = isSkipped || isLeftovers;
 
-	const thumbnailStyle = useThumbnailBackgroundStyle(recipe, hideInformation, '200px');
+	const thumbnailStyle = useThumbnailBackgroundStyle(recipe, hideInformation);
 
 	let thumbnail = (
 		<>
@@ -70,10 +70,10 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 };
 
 export const getThumbnailImage = (recipe, hideInformation) => {
-	const thumbnails = recipe?.thumbnails;
+	const thumbnail = recipe?.thumbnails.find( s => s.IsPrimary === 1);
 
 	return (
-		(thumbnails && thumbnails.length > 0 && !hideInformation && `http://${process.env.REACT_APP_HOST_NAME}:6200/thumbs/${thumbnails[0].FileName}`) ||
+		(thumbnail && !hideInformation && `http://${process.env.REACT_APP_HOST_NAME}:6200/thumbs/${thumbnail.FileName}`) ||
 		'/images/no-thumb.png'
 	);
 };

@@ -70,7 +70,7 @@ const RecipePage = () => {
 							<StepGroups stepGroups={recipe?.stepGroups} />
 							{recipe.thumbnails &&
 								recipe.thumbnails.map((thumbnail, index) => {
-									if (index === 0) {
+									if (thumbnail.IsPrimary === 1) {
 										// We already show it in the main thumbnail
 										return null;
 									} else {
@@ -238,13 +238,15 @@ const Controls = ({ recipe }) => {
 	);
 };
 const HeaderImage = ({ recipe }) => {
-	const thumbnailStyle = useThumbnailBackgroundStyle(recipe, false, '300px');
+	const thumbnailStyle = useThumbnailBackgroundStyle(recipe, false);
 
 	return (
-		<div style={thumbnailStyle} className="thumbnail-container">
-			<NewArrivalTag recipe={recipe} />
-			<Rating rating={recipe?.Rating} size="20" />
-		</div>
+		<a href={thumbnailStyle.thumbnailImageURL} target='_blank'>
+			<div style={thumbnailStyle} className="thumbnail-container">
+				<NewArrivalTag recipe={recipe} />
+				<Rating rating={recipe?.Rating} size="20" />
+			</div>
+		</a>
 	);
 };
 

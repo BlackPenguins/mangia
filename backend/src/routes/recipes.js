@@ -17,7 +17,7 @@ import fs from 'fs';
 import { checkAdminMiddleware } from './auth.js';
 import { insertIngredientTag, selectIngredientTagByName, selectIngredientTagsByRecipeID } from  '#root/database/ingredientTags.js';
 import { withDateDetails } from './menu.js';
-import { deleteThumbnail, deleteThumbnailsForRecipe, insertThumbnail, selectAllThumbnails } from  '#root/database/thumbnails.js';
+import { deletePrimaryThumbnail, deleteThumbnail, deleteThumbnailsForRecipe, insertThumbnail, selectAllThumbnails } from  '#root/database/thumbnails.js';
 import { convertToTeaspoons } from './shoppingListItem.js';
 import { deleteStepGroupByRecipeID, selectStepGroupsByRecipeID } from '#root/database/stepGroup.js';
 
@@ -195,6 +195,7 @@ const importRecipeProcessor = async (req, res) => {
 
 const uploadImage = async (req, res) => {
 	const recipeID = req.params.recipeID;
+	const isPrimary = req.body.isPrimary;
 	console.log(`Upload a thumbnail for recipe ${recipeID}]`);
 
 	let success = false;
@@ -202,10 +203,14 @@ const uploadImage = async (req, res) => {
 		const beforeImageFileName = req.file.filename;
 		const afterImageFileName = beforeImageFileName.replace(LARGE_PREFIX, '');
 
-		console.log(`Before Image Name [${beforeImageFileName}]`);
+		console.log(`Before Image Name [${beforeImageFileName}] Primary [${isPrimary}]`);
 		console.log(`After Image Name [${afterImageFileName}]`);
 
-		success = await resizeThumbnail(res, recipeID, THUMBNAIL_DIRECTORY, beforeImageFileName, afterImageFileName);
+		if( isPrimary == "true") {
+	 		await deletePrimaryThumbnail(recipeID);
+		}
+
+		success = await resizeThumbnail(res, recipeID, THUMBNAIL_DIRECTORY, beforeImageFileName, afterImageFileName, isPrimary);
 	} else {
 		console.log('No file was uploaded.');
 	}
@@ -215,7 +220,7 @@ const uploadImage = async (req, res) => {
 	}
 };
 
-export const resizeThumbnail = async (res, recipeID, sourceDirectory, beforeImageFileName, afterImageFileName) => {
+export const resizeThumbnail = async (res, recipeID, sourceDirectory, beforeImageFileName, afterImageFileName, isPrimary) => {
 	fs.mkdirSync(sourceDirectory, { recursive: true });
 	
 	const beforeImageFile = `${sourceDirectory}/${beforeImageFileName}`;
@@ -232,7 +237,7 @@ export const resizeThumbnail = async (res, recipeID, sourceDirectory, beforeImag
 
 	if( !type) {
 		console.log("Could not get file type. Using the original image." );
-		await insertThumbnail(recipeID, beforeImageFile);
+		await insertThumbnail(recipeID, beforeImageFile, isPrimary);
 	} else {
 		if (beforeImageFile === afterImageFile) {
 			console.error('Input and output of thumbnail resize was same path.');
@@ -241,7 +246,12 @@ export const resizeThumbnail = async (res, recipeID, sourceDirectory, beforeImag
 
 		try {
 			const image = await Jimp.read(beforeImageFile);
-			image.resize(Jimp.AUTO, 320); // Resize to 500 px
+
+			if( isPrimary == "true" ) {
+				// Lo-res the primary thumbnail
+				image.resize(Jimp.AUTO, 320);
+			}
+
 			await image.writeAsync(afterImageFile);
 
 			fs.unlink(beforeImageFile, (err) => {
@@ -250,7 +260,7 @@ export const resizeThumbnail = async (res, recipeID, sourceDirectory, beforeImag
 				}
 			});
 
-			await insertThumbnail(recipeID, afterImageFileName);
+			await insertThumbnail(recipeID, afterImageFileName, isPrimary);
 			return true;
 		} catch( e ) {
 			console.log("Could not upload image: " + e);

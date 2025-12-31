@@ -177,10 +177,11 @@ const RecipeEditPage = () => {
 		fetchRecipe();
 	};
 
-	const updateImage = async (imageFile) => {
+	const updateImage = async (imageFile, isPrimary) => {
 		if (imageFile) {
 			const imageData = new FormData();
 			imageData.append('imageFile', imageFile);
+			imageData.append('isPrimary', isPrimary);
 
 			fetch(`/api/recipes/image/${recipeID}`, {
 				method: 'POST',
@@ -226,8 +227,12 @@ const RecipeEditPage = () => {
 		setDirty(true);
 	};
 
+	const primaryThumbnailHandler = (value) => {
+		updateImage(value, true);
+	};
+
 	const thumbnailHandler = (value) => {
-		updateImage(value);
+		updateImage(value, false);
 	};
 
 	const ratingHandler = (value) => {
@@ -331,7 +336,7 @@ const RecipeEditPage = () => {
 					</Row>
 					<Row>
 						<Col>
-							<ThumbnailSection tokenFromStorage={tokenFromStorage} fetchRecipe={fetchRecipe} thumbnails={thumbnails} setValue={thumbnailHandler} />
+							<ThumbnailSection tokenFromStorage={tokenFromStorage} fetchRecipe={fetchRecipe} thumbnails={thumbnails} setPrimaryValue={primaryThumbnailHandler} setValue={thumbnailHandler} />
 						</Col>
 					</Row>
 
@@ -475,21 +480,34 @@ const StepGroup = ({ stepGroup, updateStepGroup, dirty }) => {
 		);
 }
 
-const ThumbnailSection = ({ tokenFromStorage, fetchRecipe, thumbnails, setValue }) => {
+const ThumbnailSection = ({ tokenFromStorage, fetchRecipe, thumbnails, setPrimaryValue, setValue }) => {
 	const fileChangeHandler = (event) => {
 		setValue(event.target.files[0]);
 	};
 
+	const primaryFileChangeHandler = (event) => {
+		setPrimaryValue(event.target.files[0]);
+	};
+
+	const primaryThumbnail = thumbnails.find(s => s.IsPrimary === 1)
+
 	return (
 		<FormGroup row>
-			<Col sm={12}>
-				<Input id="recipe-image" name="file" type="file" onChange={fileChangeHandler} />
+			<Col sm={6}>
+				<Input id="recipe-image" name="file" type="file" onChange={primaryFileChangeHandler} />
 				<FormText>The preview image for the recipe.</FormText>
+				{primaryThumbnail && <ThumbnailPreview key={primaryThumbnail.ThumbnailID} thumbnail={primaryThumbnail} tokenFromStorage={tokenFromStorage} fetchRecipe={fetchRecipe} canEdit={true} /> }
+			</Col>
+			<Col sm={6}>
+				<Input id="recipe-image" name="file" type="file" onChange={fileChangeHandler} />
+				<FormText>The attachment images for the recipe.</FormText>
 				{thumbnails &&
 					thumbnails.map((thumbnail) => {
-						return (
-							<ThumbnailPreview key={thumbnail.ThumbnailID} thumbnail={thumbnail} tokenFromStorage={tokenFromStorage} fetchRecipe={fetchRecipe} canEdit={true} />
-						);
+						if (thumbnail.IsPrimary !== 1) {
+							return (
+								<ThumbnailPreview key={thumbnail.ThumbnailID} thumbnail={thumbnail} tokenFromStorage={tokenFromStorage} fetchRecipe={fetchRecipe} canEdit={true} />
+							);
+						}
 					})}
 			</Col>
 		</FormGroup>

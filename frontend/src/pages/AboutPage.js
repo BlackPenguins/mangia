@@ -9,7 +9,15 @@ const AboutPage = () => {
 					<h2>Change Log</h2>
 				</div>
 				<div className='change-log'>
-					<h3>Version 2.3 (11/12/2025)</h3>
+					<h3>Version 2.4 (12/30/2025)</h3>
+					<ul>
+						<li>Add support for "c." for cups</li>
+						<li>Clickable thumbnail</li>
+						<li>Fix trim bug with recipe search</li>
+						<li>Divided up the primary thumbnail (low-res) vs the other thumbnails (hi-res)</li>
+						
+					</ul>
+					<h3>Version 2.3 (11/25/2025)</h3>
 					<ul>
 						<li>Added step groups</li>
 						<li>Fixed import for existing recipe</li>

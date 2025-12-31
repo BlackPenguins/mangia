@@ -184,7 +184,6 @@ const sumIngredients = (ingredients) => {
 
 			const foundTotalIndex = finalIngredients.findIndex((i) => i.name === ingredient.tagName && i.wholeUnits === converted.wholeUnits);
 
-			console.log("INGERED", ingredient );
 			if (foundTotalIndex === -1) {
 				finalIngredients.push({
 					name: ingredient.tagName,
@@ -291,6 +290,7 @@ export const convertToTeaspoons = (value) => {
 
 	switch (measurement) {
 		case 'cup':
+		case 'c':
 			baseTeaspoons = 48;
 			break;
 		case 'tb':
@@ -335,7 +335,7 @@ export const convertToTeaspoons = (value) => {
 		convert = { isMissingUnits: false, wholeUnits: false, amount: parseFloat(baseTeaspoons * totalBaseMultiplier) };
 	}
 
-	console.log(`IncomingValue [${value}] Amount [${amount}] Measurement [${measurement}] TotalMultipler[${totalBaseMultiplier}] Final [${convert.amount}]`);
+	// console.log(`IncomingValue [${value}] Amount [${amount}] Measurement [${measurement}] TotalMultipler[${totalBaseMultiplier}] Final [${convert.amount}]`);
 
 	return convert;
 };

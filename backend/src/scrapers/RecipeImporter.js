@@ -9,8 +9,8 @@ import fs from "fs";
 import https from "https";
 import path from "path";
 
-export const INGREDIENT_REGEX = /([\d\/\s]+\s(?:cup|teaspoon|tablespoon|tbsp|pound|ounce|tsp|oz|lb|tb)?(?:s)?)(.*)/i;
-export const INGREDIENT_EXTRACT_REGEX = /([\d\/\s]+)\s*(cup|teaspoon|tablespoon|tbsp|pound|ounce|tsp|oz|lb|tb)?(?:s)?/i;
+export const INGREDIENT_REGEX = /([\d\/\s]+\s(?:cup|c|teaspoon|tablespoon|tbsp|pound|ounce|tsp|oz|lb|tb)?(?:s)?)(.*)/i;
+export const INGREDIENT_EXTRACT_REGEX = /([\d\/\s]+)\s*(cup|c|teaspoon|tablespoon|tbsp|pound|ounce|tsp|oz|lb|tb)?(?:s)?/i;
 
 export const importRecipe = async (url, replaceRecipeID) => {
 
@@ -116,7 +116,7 @@ const createRecipe = async (recipe, url) => {
 		const downloadedPath = await downloadImage(recipe.image, filePath);
 
 		if( downloadedPath != null ) {
-			await resizeThumbnail(null, newID, THUMBNAIL_DIRECTORY, newFileName, afterName);
+			await resizeThumbnail(null, newID, THUMBNAIL_DIRECTORY, newFileName, afterName, true);
 		}
 	}
 
@@ -187,7 +187,7 @@ export const createIngredients = async (recipeID, recipe, tagCache) => {
 
 					// TODO: Remove unrelated words to create a record in ITEM table, which is used to aggregate the same ingredients and add them together
 					// Phase 1 will just be listing the ingredients in the shopping list though
-					const unrelatedWords = ['diced', 'crushed', 'finely', 'grated', 'beaten', 'sliced', 'freshly', 'ground'];
+					const unrelatedWords = ['diced', 'crushed', 'chopped', 'finely', 'grated', 'beaten', 'sliced', 'freshly', 'ground'];
 					formattedIngredient = formattedIngredient.replace('0.25', '1/4');
 					formattedIngredient = formattedIngredient.replace('0.5', '1/2');
 					formattedIngredient = formattedIngredient.replace('0.75', '3/4');
@@ -226,11 +226,12 @@ export const createSteps = async (recipeID, recipe) => {
 
 		for (const stepGroup of recipe.stepGroups) {
 			if (stepGroup) {
+				const cleanStep = stepGroup.steps.replaceAll("&nbsp;", "");
 				await insertStepGroup({
 					RecipeID: recipeID,
 					Position: stepGroup.position,
 					Header: stepGroup.header,
-					Steps: stepGroup.steps
+					Steps: cleanStep
 				});
 			}
 		}

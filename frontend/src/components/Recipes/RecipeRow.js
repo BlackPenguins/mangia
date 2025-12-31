@@ -29,7 +29,7 @@ const Thumbnail = ( {recipe} ) => {
 	/>
 }
 
-export const useThumbnailBackgroundStyle = (recipe, hideInformation, height) => {
+export const useThumbnailBackgroundStyle = (recipe, hideInformation) => {
 	const thumbnailImageURL = getThumbnailImage(recipe, hideInformation);
 	const [imgSrc, setImgSrc] = useState(thumbnailImageURL);
 
@@ -44,6 +44,7 @@ export const useThumbnailBackgroundStyle = (recipe, hideInformation, height) => 
 		backgroundImage: `url(${imgSrc})`,
 		backgroundSize: 'cover',
 		height: '200px',
+		thumbnailImageURL
 	};
 }
 

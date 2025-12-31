@@ -25,6 +25,7 @@ const MigrationTab = () => {
 
 	return (
 		<div>
+			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addIsMainThumbnail" label="v2.4: Add IsPrimary Thumb" />
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="flattenSteps" label="v2.3: Flatten Steps" />
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="moveStepsToGroups" label="v2.3: Move steps to groups" />
 			<MigrationButton migrationHandler={migrationHandler} migrationKeyword="addStepGroup" label="v2.3: Add StepGroup Table" />

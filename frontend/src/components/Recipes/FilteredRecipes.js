@@ -41,7 +41,7 @@ const FilteredRecipes = forwardRef(({ inputRef, CardType, layoutClass, onClickHa
 	);
 	const filterRecipesHandler = useCallback(
 		(searchString) => {
-			const lowercaseSearchString = searchString.toLowerCase();
+			const lowercaseSearchString = searchString.toLowerCase().trim();
 			setFilteredRecipes(
 				allRecipes &&
 					allRecipes.filter((recipe) => {
