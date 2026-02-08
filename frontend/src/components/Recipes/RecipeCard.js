@@ -6,6 +6,7 @@ import { differenceInDays, formatDistance } from 'date-fns';
 import NewArrivalTag from './NewArrivalTag';
 import { useThumbnailBackgroundStyle } from './RecipeRow';
 import { TZDate } from '@date-fns/tz';
+import { useEffect, useState } from 'react';
 
 const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottomButtons, isMenu }) => {
 	let recipeName = '';
@@ -69,13 +70,18 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 	);
 };
 
-export const getThumbnailImage = (recipe, hideInformation) => {
-	const thumbnail = recipe?.thumbnails.find( s => s.IsPrimary === 1);
+export const useThumbnailImage = (recipe, hideInformation) => {
+	const [thumbnail, setThumbnail] = useState('/images/no-thumb.png');
+	
+	useEffect(() => {
+		if( !hideInformation && recipe?.thumbnails ) {
+			const thumbnailFileName = recipe?.thumbnails.find( s => s.IsPrimary === 1)?.FileName;
+			const url = `http://${process.env.REACT_APP_HOST_NAME}:6200/thumbs/${thumbnailFileName}`;
+			setThumbnail(url);
+		}
+	}, [recipe]);
 
-	return (
-		(thumbnail && !hideInformation && `http://${process.env.REACT_APP_HOST_NAME}:6200/thumbs/${thumbnail.FileName}`) ||
-		'/images/no-thumb.png'
-	);
+	return [thumbnail, setThumbnail];
 };
 
 export const DaysAgo = ({ label, lastMade, recentDayThreshold }) => {

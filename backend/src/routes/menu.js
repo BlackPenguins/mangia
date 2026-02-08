@@ -362,7 +362,9 @@ const leftoversMenuItem = async (req, res) => {
 
 const auditHandler = async (req, res) => {
 	let recipes = await selectAllRecipesByLastMadeOrder();
-	const { sortedRecipes } = await getWeightedRecipes( recipes );
+
+	const recipesWithThumbnails = await Promise.all(recipes.map((r) => addThumbnails(r)));
+	const { sortedRecipes } = await getWeightedRecipes( recipesWithThumbnails );
 
 	res.status(200).json({sortedRecipes});
 };
@@ -386,7 +388,7 @@ const getWeightedRecipes = async (recipes) => {
 
 		const dayCount = differenceInDays(lastMadeDate, new Date());
 
-		console.log("DAY COUNT", dayCount);
+		// console.log("DAY COUNT", dayCount);
 
 		const ingredientTags = (await selectIngredientTagsByRecipeID(recipe.RecipeID)).map( i => i.IngredientTagID);
 
@@ -415,7 +417,7 @@ const getWeightedRecipes = async (recipes) => {
 			}
 		}
 
-		console.log(`ADD WEIGHT : RecipeID ${recipe.RecipeID}, ${recipe.Name}, ${recipe.lastmade}, Original Weight ${originalWeight} Weight ${adjustedWeight}`);
+		// console.log(`ADD WEIGHT : RecipeID ${recipe.RecipeID}, ${recipe.Name}, ${recipe.lastmade}, Original Weight ${originalWeight} Weight ${adjustedWeight}`);
 
 		recipe = {
 			originalRanking: filteredRecipes.length - itemIndex,
@@ -439,11 +441,11 @@ const getWeightedRecipes = async (recipes) => {
 		recipe.adjustedRanking = sortedRecipes.length - index;
 	});
 
-	sortedRecipes.forEach((recipe, index) => {
-		console.log(
-			`ADJUSTED WEIGHT : RecipeID ${recipe.RecipeID}, ${recipe.Name}, ${recipe.lastmade} | WEIGHTS ${recipe.originalWeight}, ${recipe.adjustedWeight} | RANKS ${recipe.originalRanking}, ${recipe.adjustedRanking}`
-		);
-	});
+	// sortedRecipes.forEach((recipe, index) => {
+	// 	console.log(
+	// 		`ADJUSTED WEIGHT : RecipeID ${recipe.RecipeID}, ${recipe.Name}, ${recipe.lastmade} | WEIGHTS ${recipe.originalWeight}, ${recipe.adjustedWeight} | RANKS ${recipe.originalRanking}, ${recipe.adjustedRanking}`
+	// 	);
+	// });
 
 	return { totalWeight, sortedRecipes };
 }

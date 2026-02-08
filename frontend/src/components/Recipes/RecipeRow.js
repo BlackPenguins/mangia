@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getThumbnailImage } from './RecipeCard';
+import { useThumbnailImage } from './RecipeCard';
 import './RecipeRow.scss';
 
 const RecipeRow = ({ recipe, onClickHandler }) => {
@@ -14,37 +14,31 @@ const RecipeRow = ({ recipe, onClickHandler }) => {
 };
 
 const Thumbnail = ( {recipe} ) => {
-	const thumbnailImageURL = getThumbnailImage(recipe, false);
-	const [imgSrc, setImgSrc] = useState(thumbnailImageURL);
-
-	useEffect( () => {
-		setImgSrc(thumbnailImageURL);
-	}, [recipe]);
+	const [thumbnail, setThumbnail] = useThumbnailImage(recipe, false);
 
 	return <img
 		alt="thumbnail"
 		className="thumbnail"
-		src={imgSrc}
-		onError={() => setImgSrc('/images/no-thumb.png')}
+		src={thumbnail}
+		onError={() => setThumbnail('/images/no-thumb.png')}
 	/>
 }
 
 export const useThumbnailBackgroundStyle = (recipe, hideInformation) => {
-	const thumbnailImageURL = getThumbnailImage(recipe, hideInformation);
-	const [imgSrc, setImgSrc] = useState(thumbnailImageURL);
+	const [thumbnail, setThumbnail] = useThumbnailImage(recipe, hideInformation);
 
 	let img = new Image();
-    img.src = thumbnailImageURL;
+    img.src = thumbnail;
     
     img.onerror = () => {
-		setImgSrc('/images/no-thumb.png');
+		setThumbnail('/images/no-thumb.png');
     };
 
 	return {
-		backgroundImage: `url(${imgSrc})`,
+		backgroundImage: `url(${thumbnail})`,
 		backgroundSize: 'cover',
 		height: '200px',
-		thumbnailImageURL
+		thumbnail
 	};
 }
 

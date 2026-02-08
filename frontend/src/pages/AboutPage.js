@@ -1,6 +1,9 @@
 
 import './AboutPage.scss';
 
+export const LATEST_VERSION = "2.5";
+export const LATEST_VERSION_DATE = "Feb 8, 2026";
+
 const AboutPage = () => {
 	return (
 		<section className="hero">
@@ -9,6 +12,14 @@ const AboutPage = () => {
 					<h2>Change Log</h2>
 				</div>
 				<div className='change-log'>
+					<h3>Version 2.5 (2/8/2026)</h3>
+					<ul>
+						<li>Fixed images from imported recipes not being the primary image</li>
+						<li>Added thumbnails to the Audit tab</li>
+						<li>Fixed thumbnails not updating in menu or page changes</li>
+						<li>Aligned the thumbnails with no-thumb in the recipe lists</li>
+						
+					</ul>
 					<h3>Version 2.4 (12/30/2025)</h3>
 					<ul>
 						<li>Add support for "c." for cups</li>

@@ -42,7 +42,7 @@ export const insertThumbnail = (recipeID, filename, isPrimary) => {
 	const newThumbnail = {
 		RecipeID: recipeID,
 		FileName: filename,
-		IsPrimary: isPrimary === "true" || isPrimary === 1 ? 1 : 0
+		IsPrimary: (isPrimary === "true" || isPrimary ===  true || isPrimary == 1) ? 1 : 0
 	};
 
 	return new Promise((resolve, reject) => {
