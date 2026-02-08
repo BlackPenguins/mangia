@@ -29,9 +29,8 @@ export const importRecipe = async (url, replaceRecipeID) => {
 			importResponse.status = `Failed to parse recipe from the URL "${url}"`;
 			await insertImportFailureURL(url);
 		} else {
+			let recipeID = 0;
 			try {
-				let recipeID = 0;
-
 				if( replaceRecipeID != null ) {
 					// Replacing an existing one (the Import button in the Edit page)
 					recipeID = replaceRecipeID;
@@ -42,10 +41,10 @@ export const importRecipe = async (url, replaceRecipeID) => {
 					deleteThumbnailsForRecipe(recipeID);
 				} else {
 					// Adding a new recipe
-					const recipeName = recipeObject.name;
+					const recipeName = recipeObject.name.substring(0,49).replaceAll("&amp;", "&");
 
 					const recipeToAdd = {
-						name: recipeObject.name,
+						name: recipeName,
 						description: recipeObject.description,
 						image: recipeObject.image
 					};
