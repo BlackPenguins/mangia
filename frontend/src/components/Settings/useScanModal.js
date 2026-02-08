@@ -75,7 +75,7 @@ const useScanModal = (fetchRecipe, attachments, recipeID) => {
 					{attachments.length === 0 && <div>No attachments found</div>}
 					{attachments &&
 						attachments.map((attachment, index) => {
-							const imageURL = `http://localhost:6200/attachments/${recipeID}/${attachment}`;
+							const imageURL = `http://${process.env.REACT_APP_HOST_NAME}:6200/attachments/${recipeID}/${attachment}`;
 							const clickHandler = () => {
 								parseText(attachment);
 							};
