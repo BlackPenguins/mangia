@@ -3,7 +3,7 @@ import { selectAllRecipes, selectAllRecipesByLastMadeOrder, selectRecipeByID, up
 import { deleteMenu, insertMenu, selectByWeekID, selectMenuByDay, selectMenuByMenuID, swapMenu, updateMenu } from  '#root/database/menu.js';
 import { checkAdminMiddleware } from './auth.js';
 import { addIngredientsToRecipe, addIngredientTags, addThumbnails } from './recipes.js';
-import { getOrInsertWeek } from  '#root/database/week.js';
+import { getOrInsertWeek, getWeekByID } from  '#root/database/week.js';
 import { selectAllSuggestions, selectTwoSuggestions } from  '#root/database/suggestions.js';
 import { selectAllFridge } from  '#root/database/fridge.js';
 import { selectIngredientTagsByRecipeID } from  '#root/database/ingredientTags.js';
@@ -48,7 +48,7 @@ export const getMenuForWeekOffset = async (weekID, startDate) => {
 				const recipeWithThumbnailsAndTags = await addIngredientTags(recipeWithThumbnails);
 				await addIngredientsToRecipe(recipeWithThumbnailsAndTags);
 				formattedDaysArray.push(
-					withDateDetails(new Date(menuDay.Day), {
+					await withDateDetails(new Date(menuDay.Day), {
 						menuID: menuDay.MenuID,
 						isMade: menuDay.IsMade,
 						isSkipped: menuDay.IsSkipped,
@@ -80,25 +80,29 @@ export const getMenuForWeekOffset = async (weekID, startDate) => {
 	};
 };
 
-export const withDateDetails = (day, data) => {
-	if (!day || day.getFullYear() <= 1970) {
-		return {
-			hasNoDate: true,
-			...data,
-		};
+export const withDateDetails = async (day, data) => {
+	let dateToUse = day;
+
+	let hasNoDate = false;
+	if (data.WeekID && (!dateToUse || dateToUse.getFullYear() <= 1970)) {
+		const weekDetails = await getWeekByID(data.WeekID);
+
+		hasNoDate = true;
+		dateToUse = weekDetails.StartDate;
 	}
 
 	const todaysDate = new Date();
-	const isToday = todaysDate.getDate() === day.getDate() && todaysDate.getMonth() === day.getMonth() && todaysDate.getFullYear() === day.getFullYear();
-	const dayOfWeek = DAYS_OF_WEEK[day.getDay()];
-	const monthOfYear = MONTHS_OF_YEAR[day.getMonth()];
+	const isToday = !hasNoDate && todaysDate.getDate() === dateToUse.getDate() && todaysDate.getMonth() === dateToUse.getMonth() && todaysDate.getFullYear() === dateToUse.getFullYear();
+	const dayOfWeek = DAYS_OF_WEEK[dateToUse.getDay()];
+	const monthOfYear = MONTHS_OF_YEAR[dateToUse.getMonth()];
 
 	return {
 		week: dayOfWeek,
-		date: monthOfYear + ' ' + day.getDate() + ', ' + day.getFullYear(),
-		year: day.getFullYear(),
+		date: monthOfYear + ' ' + dateToUse.getDate() + ', ' + dateToUse.getFullYear(),
+		year: dateToUse.getFullYear(),
 		isToday,
-		fullDate: day,
+		fullDate: dateToUse,
+		hasNoDate,
 		...data,
 	};
 };
@@ -398,13 +402,13 @@ const getWeightedRecipes = async (recipes) => {
 		// Once we reach the back half of the recipes, skew the weight even more so they are more likely
 		if (itemIndex > filteredRecipes.length / 2) {
 			// Extra weight for the back half
-			adjustedWeight = adjustedWeight * 1.1;
+			adjustedWeight = adjustedWeight * 10;
 			isAged = true;
 		}
 
 		if (recipe.IsNewArrival) {
 			// New arrivals are heavy weighted
-			adjustedWeight = adjustedWeight * 1.6;
+			adjustedWeight = adjustedWeight * 2.1;
 		}
 
 
@@ -568,6 +572,13 @@ export const getDaysForAWeek = (weekOffset) => {
 	return daysArray;
 };
 
+export const testAuditHandler = async (req, res) => {
+	let recipes = await selectAllRecipesByLastMadeOrder();
+	const pickedRecipes = await getRandomWeightedRecipe(recipes, 7);
+
+	res.status(200).json({ pickedRecipes });
+}
+
 const router = express.Router();
 
 /**
@@ -575,6 +586,7 @@ const router = express.Router();
  * However, the code used to get the week will be reused in /generateMenu
  * Always based on the current time, so if we check on friday it will show week 1, if we check on saturday it will show week 2
  */
+router.get('/api/menu/audit/test', testAuditHandler);
 router.get('/api/menu/audit', auditHandler);
 router.get('/api/menu/:weekOffset', getMenuForWeek);
 router.post('/api/menu/move/:menuID', [checkAdminMiddleware], moveMenuItem);

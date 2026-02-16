@@ -111,7 +111,7 @@ const buildFullRecipe = async (recipeID) => {
 		recipeWithThumbnails.history = [];
 		for (const historyItem of history) {
 			if (!historyItem.IsSkipped && !historyItem.IsLeftovers) {
-				recipeWithThumbnails.history.push(withDateDetails(historyItem.Day, historyItem));
+				recipeWithThumbnails.history.push(await withDateDetails(historyItem.Day, historyItem));
 			}
 		}
 

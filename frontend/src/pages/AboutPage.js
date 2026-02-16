@@ -1,8 +1,8 @@
 
 import './AboutPage.scss';
 
-export const LATEST_VERSION = "2.5";
-export const LATEST_VERSION_DATE = "Feb 8, 2026";
+export const LATEST_VERSION = "2.6";
+export const LATEST_VERSION_DATE = "Feb 15, 2026";
 
 const AboutPage = () => {
 	return (
@@ -12,6 +12,17 @@ const AboutPage = () => {
 					<h2>Change Log</h2>
 				</div>
 				<div className='change-log'>
+					<h3>Version 2.6 (2/15/2026)</h3>
+					<ul>
+						<li>Display number of linked recipes to delete button of ingredient tags</li>
+						<li>Show the history of extra items as the "Week of..."</li>
+						<li>Added Audit test board</li>
+						<li>Tweaked algorithm weights from 1.4 to 10 for aged recipes</li>
+						<li>Added uncategorized category</li>
+						<li>Marked Uncategorized red in preview and edit pages</li>
+						
+					</ul>
+
 					<h3>Version 2.5 (2/8/2026)</h3>
 					<ul>
 						<li>Fixed images from imported recipes not being the primary image</li>

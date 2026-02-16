@@ -1,6 +1,6 @@
 import RecipeContainer from 'components/Recipes/RecipeContainer';
 import { useState } from 'react';
-import FilteredRecipes, { HIDDEN_CATEGORY_FILTER, NEW_ARRIVAL_CATEGORY_FILTER } from '../components/Recipes/FilteredRecipes';
+import FilteredRecipes, { HIDDEN_CATEGORY_FILTER, NEW_ARRIVAL_CATEGORY_FILTER, UNCATEGORIZED_CATEGORY_FILTER } from '../components/Recipes/FilteredRecipes';
 import { Col, Row } from 'reactstrap';
 
 const HomePage = () => {
@@ -44,6 +44,13 @@ const HomePage = () => {
 										onClick={() => setCategoryFilter(HIDDEN_CATEGORY_FILTER)}
 									>
 										Hidden
+									</li>
+									<li
+										className={categoryFilter === UNCATEGORIZED_CATEGORY_FILTER ? 'active' : ''}
+										data-filter=".fastfood"
+										onClick={() => setCategoryFilter(UNCATEGORIZED_CATEGORY_FILTER)}
+									>
+										Uncategorized
 									</li>
 								</ul>
 							</div>

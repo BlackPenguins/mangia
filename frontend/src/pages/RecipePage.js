@@ -150,6 +150,8 @@ const Statistics = ({ recipe, book }) => {
 		fetchRecipeTags();
 	}, [fetchRecipeTags]);
 
+	const categoryLabel = !recipe.Category ? <span class='uncategorized'>Uncategorized</span> : recipe.Category;
+
 	return (
 		<div className="quick-facts">
 			{recipeTags.length > 0 && (
@@ -165,11 +167,9 @@ const Statistics = ({ recipe, book }) => {
 			)}
 
 			<Description description={recipe?.Description} />
-			{recipe?.Category && (
-				<div>
-					<span className="label"><span className='section-icon'>&#x1F4C2;</span> Category:</span> {recipe.Category}
-				</div>
-			)}
+			<div>
+				<span className='label'><span className='section-icon'>&#x1F4C2;</span> Category:</span> {categoryLabel}
+			</div>
 			{recipe?.lastmade && (
 				<div>
 					<span className="label"><span className='section-icon'>&#x1F552;</span> Last Made:</span> {days}
@@ -352,9 +352,17 @@ const History = ({ history }) => {
 						if (historyItem.IsMade) {
 							classes.push('made');
 						}
+						
+						let date;
+						if( historyItem.hasNoDate) {
+							date = `Week of ${historyItem.date}`;
+						} else {
+							date = historyItem.date;
+						}
+
 						return (
 							<li className={classes.join(' ')} key={index}>
-								{historyItem.date}
+								{date}
 							</li>
 						);
 					})}

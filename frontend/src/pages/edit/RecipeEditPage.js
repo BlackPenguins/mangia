@@ -249,6 +249,7 @@ const RecipeEditPage = () => {
 
 	const {modal, openModal} = useImportRecipeModal(recipeID);
 
+	const categoryClass = !category ? "uncategorized" : "";
 
 	return (
 		<div className="container recipe-edit-container">
@@ -279,7 +280,7 @@ const RecipeEditPage = () => {
 							<NameInput value={name} setValue={setName} filteredRecipes={filteredRecipes} filterRecipesHandler={filterRecipesHandler} stageChange={stageChange} dirty={dirty} />
 							<EditTextarea label='Description' name='description' value={description} setValue={setDescription} stageChange={stageChange} rows={2} dirty={dirty}/>
 							<Row>
-								<Col lg={4}>
+								<Col lg={4} className={categoryClass}>
 									<EditDropdown label='Category' name='category' value={category} setValue={setCategory} stageChange={stageChange} dirty={dirty}>
 										<option className="none" value="None">None</option>
 										<option className="dinner" value="Dinner">Dinner</option>

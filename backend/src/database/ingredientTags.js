@@ -14,6 +14,18 @@ export const selectAllIngredientTags = () => {
 	});
 };
 
+export const selectRecipesWithIngredientTags = (ingredientTagID) => {
+	return new Promise((resolve, reject) => {
+		pool.query('SELECT distinct r.Name FROM INGREDIENT t JOIN RECIPE r on t.RecipeID = r.RecipeID WHERE t.IngredientTagID = ? ORDER BY r.Name ASC', [ingredientTagID], (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve(result);
+			}
+		});
+	});
+};
+
 
 
 export const selectIngredientTagByName = (tagName) => {

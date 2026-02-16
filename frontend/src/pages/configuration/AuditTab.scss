@@ -1,17 +1,32 @@
+
 .audit-list {
+    &.quick-audit-list {
+        .picked {
+            background-color: rgb(240, 240, 28);
+        }
+    }
+
     .row {
-        color: rgb(140, 255, 245);
+        color: rgb(46, 46, 46);
         
         &:nth-child(even) {
-            background-color: #0d4452;
+            background-color: #ececec;
         }
 
         &:nth-child(odd) {
-            background-color: #0b3a46;
+            background-color: #dbdbdb;
         }
 
-        &.this-week {
-            background-color: rgb(117, 117, 6);
+        &.picked {
+            background-color: rgb(240, 240, 28);
+        }
+
+        &.never-made {
+            background-color: rgb(255, 177, 177);
+        }
+
+        &.new-arrival {
+            background-color: rgb(177, 255, 251);
         }
 
         .data {

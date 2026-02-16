@@ -52,3 +52,15 @@ const selectWeek = (startDate, endDate) => {
 		});
 	});
 };
+
+export const getWeekByID = (weekID) => {
+	return new Promise((resolve, reject) => {
+		pool.query('SELECT * FROM WEEK WHERE WeekID = ?', [weekID], (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve((result.length > 0 && result[0]) || null);
+			}
+		});
+	});
+};

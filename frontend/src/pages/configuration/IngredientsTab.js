@@ -135,6 +135,8 @@ const IngredientRow = ({ fetchItems, item, tokenFromStorage, stores, departments
 		closeModal();
 	};
 
+	const recipeNamesLinked = item?.recipeNames.map( (r) => r.Name).join(",") || "";
+
 	const { modal, openModal } = useBetterModal({
 		title: 'Delete Ingredient',
 		size: 'md',
@@ -150,9 +152,31 @@ const IngredientRow = ({ fetchItems, item, tokenFromStorage, stores, departments
 				</Button>
 			</>
 		),
-		content: (closeModal) => <div>Are you sure you want to delete this ingredient tag from all recipes?</div>,
+		content: (closeModal) => {
+			let linkedRecipeLists = "";
+
+			if( item?.recipeNames.length ) {
+				linkedRecipeLists = (
+					<div className='linked-recipes'>
+						It is being used in the following recipes:
+						<ul>
+							{item.recipeNames.map( (i) => {
+								return <li>{i.Name}</li>
+							})}
+						</ul>
+					</div>
+				);
+			}
+			return (
+				<div>
+					Are you sure you want to delete this ingredient tag from all recipes?
+					{linkedRecipeLists}
+				</div>
+			)
+		},
 	});
 
+	const deleteButtonColor = item.recipeNames.length === 0 ? "muted" : "danger"; 
 	return (
 		<tr key={item['IngredientTagID']}>
 			<td className="shoping__cart__item">
@@ -165,7 +189,7 @@ const IngredientRow = ({ fetchItems, item, tokenFromStorage, stores, departments
 						<DepartmentDropdown item={item} departments={departments} />
 					</Col>
 					<Col className='delete-button-col' lg={2} xs={3}>
-						<Button className="mangia-btn reduced danger" onClick={() => openModal()}>
+						<Button className={`mangia-btn reduced ${deleteButtonColor}`} onClick={() => openModal()}>
 							<Trash2 />
 						</Button>
 					</Col>

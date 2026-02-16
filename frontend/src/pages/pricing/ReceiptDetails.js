@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import IngredientTagDropdown from 'pages/edit/IngredientTagDropdown';
 import { Save } from 'react-feather';
-import { Rotate90DegreesCwRounded, TagSharp } from '@mui/icons-material';
+import { Rotate90DegreesCwRounded } from '@mui/icons-material';
 import { useToast } from 'context/toast-context';
 
 const ReceiptDetails = () => {

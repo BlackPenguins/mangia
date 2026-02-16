@@ -1,6 +1,6 @@
 import express from 'express';
 import { removeIngredientTagFromIngredient } from  '#root/database/ingredient.js';
-import { deleteIngredientTag, deleteIngredientTagPrice, insertIngredientTag, selectAllIngredientTags, updateIngredientTag } from  '#root/database/ingredientTags.js';
+import { deleteIngredientTag, deleteIngredientTagPrice, insertIngredientTag, selectAllIngredientTags, selectRecipesWithIngredientTags, updateIngredientTag } from  '#root/database/ingredientTags.js';
 import { deleteIngredientTagFromShoppingList } from  '#root/database/shoppingListItem.js';
 import { selectAllStores } from  '#root/database/store.js';
 import { checkAdminMiddleware } from './auth.js';
@@ -17,6 +17,7 @@ const getAllIngredientTagsHandler = (req, res) => {
 				ingredientsWithPrices.push({
 					...r,
 					prices: await getPricesForStore(r.IngredientTagID),
+					recipeNames: await selectRecipesWithIngredientTags(r.IngredientTagID),
 				});
 			}
 

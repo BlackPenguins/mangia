@@ -3,6 +3,7 @@ import { Input, Row } from 'reactstrap';
 import LoadingText from '../Common/LoadingText';
 
 export const HIDDEN_CATEGORY_FILTER = 'Hidden';
+export const UNCATEGORIZED_CATEGORY_FILTER = 'Uncategorized';
 export const NEW_ARRIVAL_CATEGORY_FILTER = 'NewArrival';
 
 const FilteredRecipes = forwardRef(({ inputRef, CardType, layoutClass, onClickHandler, categoryFilter }, ref) => {
@@ -34,8 +35,9 @@ const FilteredRecipes = forwardRef(({ inputRef, CardType, layoutClass, onClickHa
 			const matchesAll = !categoryFilter && recipe.IsActive;
 			const matchesCategory = categoryFilter && recipe.Category === categoryFilter && recipe.IsActive;
 			const matchesHidden = categoryFilter === HIDDEN_CATEGORY_FILTER && !recipe?.IsActive;
+			const matchesUncategorized = categoryFilter === UNCATEGORIZED_CATEGORY_FILTER && !recipe?.Category && recipe.IsActive;
 			const matchesNewArrival = categoryFilter === NEW_ARRIVAL_CATEGORY_FILTER && recipe?.IsNewArrival;
-			return matchesAll || matchesHidden || matchesCategory || matchesNewArrival;
+			return matchesAll || matchesHidden || matchesCategory || matchesNewArrival || matchesUncategorized;
 		},
 		[categoryFilter]
 	);

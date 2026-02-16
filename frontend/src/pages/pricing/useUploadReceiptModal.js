@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Button, Col, FormText, Input, Row } from 'reactstrap';
 import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
 

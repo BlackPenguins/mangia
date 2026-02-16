@@ -22,7 +22,7 @@ const ShoppingListExtraTable = ({ showCheckedItems, isWishlist }) => {
 		const data = await response.json();
 		const arr = data.result;
 		setShoppingListExtras(arr);
-	}, [tokenFromStorage]);
+	}, [tokenFromStorage, isWishlist]);
 
 	useEffect( () => {
 		fetchShoppingListExtras()
