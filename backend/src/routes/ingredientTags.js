@@ -7,7 +7,8 @@ import { checkAdminMiddleware } from './auth.js';
 import { getPricesForStore } from './shoppingListItem.js';
 
 const getAllIngredientTagsHandler = (req, res) => {
-	const selectPromise = selectAllIngredientTags();
+	const page = req.query.page;
+	const selectPromise = selectAllIngredientTags(page);
 
 	selectPromise.then(
 		async (result) => {

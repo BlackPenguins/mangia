@@ -67,6 +67,26 @@ export const getMenuForWeekOffset = async (weekID, startDate) => {
 						recipe: recipeWithThumbnailsAndTags,
 					})
 				);
+			} else {
+				formattedDaysArray.push(
+				await withDateDetails(new Date(menuDay.Day), {
+						menuID: menuDay.MenuID,
+						isMade: menuDay.IsMade,
+						isSkipped: menuDay.IsSkipped,
+						isLeftovers: menuDay.IsLeftovers,
+						skipReason: menuDay.skipReason,
+						weekID: menuDay.WeekID,
+						dailyNotes: menuDay.DailyNotes,
+						originalRanking: menuDay.OriginalRanking,
+						adjustedRanking: menuDay.AdjustedRanking,
+						originalWeight: menuDay.OriginalWeight,
+						adjustedWeight: menuDay.AdjustedWeight,
+						matchedIngredients: menuDay.MatchedIngredients,
+						totalRankings: menuDay.TotalRankings,
+						isAged: menuDay.IsAged,
+						isNewArrival: menuDay.IsNewArrival
+					})
+				);
 			}
 		}
 	}
@@ -84,11 +104,13 @@ export const withDateDetails = async (day, data) => {
 	let dateToUse = day;
 
 	let hasNoDate = false;
-	if (data.WeekID && (!dateToUse || dateToUse.getFullYear() <= 1970)) {
+	if (data?.WeekID && (!dateToUse || dateToUse.getFullYear() <= 1970)) {
 		const weekDetails = await getWeekByID(data.WeekID);
 
 		hasNoDate = true;
 		dateToUse = weekDetails.StartDate;
+	} else if( day == null) {
+		return data;
 	}
 
 	const todaysDate = new Date();
@@ -229,14 +251,15 @@ const generateMenu = async (req, res) => {
 
 const rerollMenuItem = async (req, res) => {
 	let menuID = req.params.menuID;
-	let excludedRecipeIDs = req.body.excludedRecipeIDs;
+	let excludedRecipeIDs = req.body.excludedRecipeIDs.filter(e => e != null);
 
 	let recipes = await selectAllRecipesByLastMadeOrder(excludedRecipeIDs);
 
 	const pickedRecipes = await getRandomWeightedRecipe(recipes, 1);
 
+
 	const updatedMenu = {
-		recipeID: pickedRecipes[0].RecipeID,
+		recipeID: pickedRecipes[0]?.RecipeID,
 		isSkipped: 0,
 		isMade: 0,
 		skipReason: '',

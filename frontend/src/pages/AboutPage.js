@@ -12,6 +12,17 @@ const AboutPage = () => {
 					<h2>Change Log</h2>
 				</div>
 				<div className='change-log'>
+					<h3>Version 2.7 (2/22/2026)</h3>
+					<ul>
+						<li>Fixed broken histories with no single dates or weeks</li>
+						<li>Include "None" category in Uncategorized filter</li>
+						<li>Don't show blank histories</li>
+						<li>Add support for ¾ amount</li>
+						<li>Handle a menu item that has their recipe deleted - don't hide the entire day in the menu</li>
+						<li>Paginated ingredients page to 20 results per page</li>
+						<li>Added support for webp thumbnails</li>
+					</ul>
+
 					<h3>Version 2.6 (2/15/2026)</h3>
 					<ul>
 						<li>Display number of linked recipes to delete button of ingredient tags</li>

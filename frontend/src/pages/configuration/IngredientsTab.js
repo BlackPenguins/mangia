@@ -9,6 +9,7 @@ import { Trash2 } from 'react-feather';
 import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
 
 const IngredientsTab = () => {
+	const [page, setPage] = useState(1);
 	const [items, setItems] = useState(null);
 	const [stores, setStores] = useState(null);
 
@@ -40,7 +41,7 @@ const IngredientsTab = () => {
 	};
 
 	const fetchItems = useCallback(async () => {
-		const response = await fetch('/api/ingredientTags', {
+		const response = await fetch(`/api/ingredientTags?page=${page}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -50,7 +51,7 @@ const IngredientsTab = () => {
 		const fetchedItems = data;
 		setItems(fetchedItems.ingredientsWithPrices);
 		setStores(fetchedItems.stores);
-	}, []);
+	}, [page]);
 
 	const [departments, setDepartments] = useState(null);
 	const fetchDepartments = useCallback(async () => {
@@ -79,6 +80,19 @@ const IngredientsTab = () => {
 		}
 	};
 
+	const changePage = (isNext) => {
+		if( !isNext && page === 1 ) {
+			return null;
+		}
+
+		setPage( (prev) => {
+			if( isNext) {
+				return prev + 1;
+			} else {
+				return prev - 1;
+			}
+		});
+	}
 
 	return (
 		<div className="container book-list ingredient-list">
@@ -115,6 +129,11 @@ const IngredientsTab = () => {
 							))}
 					</tbody>
 				</table>
+			</div>
+			<div className='page-controls'>
+				<span className='prev' onClick={() => changePage(false)}>Prev</span>
+				<span className='page-label'>Page {page}</span>
+				<span className='next' onClick={() => changePage(true)}>Next</span>
 			</div>
 		</div>
 	);

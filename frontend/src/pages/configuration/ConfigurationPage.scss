@@ -62,3 +62,21 @@
         }
     }
 }
+
+.page-controls {
+    display: flex;
+    justify-content: space-around;
+    flex-direction: row;
+    align-items: center;
+
+    .page {
+        font-weight: bold;
+    }
+
+    .prev, .next {
+        &:hover {
+            cursor: pointer;
+            color: blue;
+        }
+    }
+}

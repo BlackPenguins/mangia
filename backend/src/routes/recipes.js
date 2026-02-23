@@ -235,13 +235,16 @@ export const resizeThumbnail = async (res, recipeID, sourceDirectory, beforeImag
 
 	const type = await fileType.fromBuffer(buffer);
 
-	if( !type) {
+	console.log("TYP", {type, beforeImageFile, afterImageFile, isPrimary});
+
+	if( !type || type?.ext === 'webp') {
 		console.log("Could not get file type. Using the original image." );
-		await insertThumbnail(recipeID, beforeImageFile, isPrimary);
+		await insertThumbnail(recipeID, beforeImageFileName, isPrimary);
+		return true;
 	} else {
 		if (beforeImageFile === afterImageFile) {
 			console.error('Input and output of thumbnail resize was same path.');
-			return;
+			return false;
 		}
 
 		try {

@@ -35,7 +35,7 @@ const FilteredRecipes = forwardRef(({ inputRef, CardType, layoutClass, onClickHa
 			const matchesAll = !categoryFilter && recipe.IsActive;
 			const matchesCategory = categoryFilter && recipe.Category === categoryFilter && recipe.IsActive;
 			const matchesHidden = categoryFilter === HIDDEN_CATEGORY_FILTER && !recipe?.IsActive;
-			const matchesUncategorized = categoryFilter === UNCATEGORIZED_CATEGORY_FILTER && !recipe?.Category && recipe.IsActive;
+			const matchesUncategorized = categoryFilter === UNCATEGORIZED_CATEGORY_FILTER && recipe.IsActive && (recipe?.Category === "None" || !recipe?.Category);
 			const matchesNewArrival = categoryFilter === NEW_ARRIVAL_CATEGORY_FILTER && recipe?.IsNewArrival;
 			return matchesAll || matchesHidden || matchesCategory || matchesNewArrival || matchesUncategorized;
 		},

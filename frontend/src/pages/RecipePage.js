@@ -360,11 +360,15 @@ const History = ({ history }) => {
 							date = historyItem.date;
 						}
 
-						return (
-							<li className={classes.join(' ')} key={index}>
-								{date}
-							</li>
-						);
+						if( !date ) {
+							return null;
+						} else {
+							return (
+								<li className={classes.join(' ')} key={index}>
+									{date}
+								</li>
+							);
+						}
 					})}
 			</ul>
 		</div>

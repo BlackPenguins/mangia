@@ -193,6 +193,7 @@ export const createIngredients = async (recipeID, recipe, tagCache) => {
 					formattedIngredient = formattedIngredient.replace('0.125', '1/8');
 					formattedIngredient = formattedIngredient.replace('½', '1/2');
 					formattedIngredient = formattedIngredient.replace('¼', '1/4');
+					formattedIngredient = formattedIngredient.replace('¾', '3/4');
 					formattedIngredient = formattedIngredient.replace('⅓', '1/3');
 					formattedIngredient = formattedIngredient.replace('▢', '');
 
