@@ -104,29 +104,42 @@ const RecipeTitle = ({ recipe }) => {
 	const isMenuRecipe = menuContext.isMenuRecipeHandler(recipeID);
 
 	return (
-		<div className={nameClasses.join(' ')}>
-			
-			<MenuButton isMenuRecipe={isMenuRecipe} label="Prev" labelMobile="<" action={() => menuContext.redirectToPreviousRecipeHandler(recipeID)} />
-			<span className="desktop">
-				<h2>{recipe.Name}</h2>
-			</span>
-			<span className="mobile">
-				<h2>{recipe.Name}</h2>
-			</span>
-			<MenuButton isMenuRecipe={isMenuRecipe} label="Next" labelMobile=">" action={() => menuContext.redirectToNextRecipeHandler(recipeID)} />
-		</div>
+		<>
+			<div className={nameClasses.join(' ')}>
+				<MenuButton isMenuRecipe={isMenuRecipe} label="Prev" action={() => menuContext.redirectToPreviousRecipeHandler(recipeID)} />
+				<span className="desktop">
+					<h2>{recipe.Name}</h2>
+				</span>
+				<span className="mobile">
+					<h2>{recipe.Name}</h2>
+				</span>
+				<MenuButton isMenuRecipe={isMenuRecipe} label="Next" action={() => menuContext.redirectToNextRecipeHandler(recipeID)} />
+			</div>
+
+			<div className='recipe-menu-buttons'>
+				<MenuButton isMenuRecipe={isMenuRecipe} isMobile label="<" action={() => menuContext.redirectToPreviousRecipeHandler(recipeID)} />
+				<MenuButton isMenuRecipe={isMenuRecipe} isMobile label=">" action={() => menuContext.redirectToPreviousRecipeHandler(recipeID)} />
+			</div>
+		</>
 	);
 };
 
-const MenuButton = ({ isMenuRecipe, label, labelMobile, action }) => {
+const MenuButton = ({ isMenuRecipe, label, isMobile, action }) => {
 	if (!isMenuRecipe) {
 		return null;
 	}
 
+	const classes = ["mangia-btn", "muted recipe-menu-button"];
+
+	if( isMobile ) {
+		classes.push("mobile");
+	} else {
+		classes.push("desktop");
+	}
+
 	return (
-		<Button className="mangia-btn muted recipe-menu-button" onClick={action}>
-			<span className="desktop">{label}</span>
-			<span className="mobile">{labelMobile}</span>
+		<Button className={classes.join(" ")} onClick={action}>
+			<span>{label}</span>
 		</Button>
 	);
 };

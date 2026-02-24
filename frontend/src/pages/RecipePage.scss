@@ -27,7 +27,15 @@
 		}
 
 		.recipe-menu-button {
-			display: inline-block;
+			&.desktop {
+				display: inline-block;
+			}
+		}
+	}
+
+	.recipe-menu-button {
+		&.mobile {
+			display: none;
 		}
 	}
 
@@ -36,10 +44,11 @@
 			.mobile {
 				display: inline-block;
 				margin: {
-					top: 40px;
+					top: 0px;
 					bottom: 40px;
 				}
 			}
+
 			.desktop {
 				display: none;
 			}
@@ -48,13 +57,22 @@
 				margin: 0px 10px;
 				padding: 8px;
 
-				.mobile {
-					display: inline-block;
-					margin: 0;
+				&.desktop {
+					display: none;
 				}
 			}
 		}
+
+		.recipe-menu-button {
+			&.mobile {
+				display: inline-block;
+			}
+		}
 	}
+}
+.recipe-menu-buttons {
+	display: flex;
+	justify-content: space-between;
 }
 
 .section-icon {

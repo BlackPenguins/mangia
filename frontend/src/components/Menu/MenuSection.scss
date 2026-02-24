@@ -1,5 +1,6 @@
 .menu-card {
 	.day-header {
+		min-height: 50px;
 		width: 100%;
 		text-align: center;
 		background-color: #82ae46;
@@ -195,6 +196,7 @@
 	}
 	.page-button-mobile-label {
 		display: block;
+		font-size: 2em;
 	}
 }
 

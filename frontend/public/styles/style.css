@@ -112,8 +112,16 @@ ol {
 -----------------------*/
 
 .section-title {
+	margin-top: 20px;
 	margin-bottom: 50px;
 	text-align: center;
+}
+
+
+@media only screen and (max-width: 767px) {
+	.recipe-details-container .section-title {
+		margin-bottom: 0px;
+	}
 }
 
 .section-title h2 {
@@ -3031,6 +3039,7 @@ ol {
 		margin-bottom: 25px;
 	}
 	.humberger__open {
+		background-color: white;
 		display: block;
 		font-size: 22px;
 		color: #1c1c1c;
@@ -3296,12 +3305,11 @@ ol {
 		margin-bottom: 25px;
 	}
 	.humberger__open {
+		background-color: white;
 		display: block;
-		font-size: 22px;
 		color: #1c1c1c;
-		height: 35px;
-		width: 35px;
 		line-height: 33px;
+		width: 35px;
 		text-align: center;
 		border: 1px solid #1c1c1c;
 		cursor: pointer;

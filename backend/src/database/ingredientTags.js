@@ -4,11 +4,11 @@ const pool = getPool();
 
 export const selectAllIngredientTags = (page) => {
 	const resultsPerPage = 20;
-	const limit = "";
+	let limit = "";
 	if( page ) {
 		limit = ` LIMIT ${resultsPerPage} OFFSET ${(page - 1) * resultsPerPage} `;
 	}
-	
+
 	return new Promise((resolve, reject) => {
 		pool.query(`SELECT * FROM INGREDIENT_TAG ORDER BY CASE WHEN IngredientDepartmentID IS NULL THEN 0 ELSE 1 END, Name ASC ${limit}`, (error, result) => {
 			if (error) {

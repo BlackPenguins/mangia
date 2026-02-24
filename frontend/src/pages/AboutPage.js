@@ -1,8 +1,8 @@
 
 import './AboutPage.scss';
 
-export const LATEST_VERSION = "2.6";
-export const LATEST_VERSION_DATE = "Feb 15, 2026";
+export const LATEST_VERSION = "2.8";
+export const LATEST_VERSION_DATE = "Feb 23, 2026";
 
 const AboutPage = () => {
 	return (
@@ -12,7 +12,12 @@ const AboutPage = () => {
 					<h2>Change Log</h2>
 				</div>
 				<div className='change-log'>
-					<h3>Version 2.7 (2/22/2026)</h3>
+					<h3>Version 2.8 (2/23/2026)</h3>
+					<ul>
+						<li>Improving mobile design</li>
+					</ul>
+
+					<h3>Version 2.7 (02/22/2026)</h3>
 					<ul>
 						<li>Fixed broken histories with no single dates or weeks</li>
 						<li>Include "None" category in Uncategorized filter</li>
@@ -23,7 +28,7 @@ const AboutPage = () => {
 						<li>Added support for webp thumbnails</li>
 					</ul>
 
-					<h3>Version 2.6 (2/15/2026)</h3>
+					<h3>Version 2.6 (02/15/2026)</h3>
 					<ul>
 						<li>Display number of linked recipes to delete button of ingredient tags</li>
 						<li>Show the history of extra items as the "Week of..."</li>
@@ -34,7 +39,7 @@ const AboutPage = () => {
 						
 					</ul>
 
-					<h3>Version 2.5 (2/8/2026)</h3>
+					<h3>Version 2.5 (02/08/2026)</h3>
 					<ul>
 						<li>Fixed images from imported recipes not being the primary image</li>
 						<li>Added thumbnails to the Audit tab</li>

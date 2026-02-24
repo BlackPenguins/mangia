@@ -130,6 +130,15 @@
 	color: #b3b3b3;
 	font-size: 0.8em;
 }
+
+@media (max-width: 767.98px) {
+	.d-flex .pricing {
+		opacity: 0;
+		height: 45px;
+	}
+}
+
+
 .v-product .text p.price span.price-sale {
 	color: #82ae46;
 }
