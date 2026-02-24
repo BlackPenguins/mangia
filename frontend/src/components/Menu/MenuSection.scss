@@ -1,6 +1,6 @@
 .menu-card {
 	.day-header {
-		min-height: 50px;
+		min-height: 78px;
 		width: 100%;
 		text-align: center;
 		background-color: #82ae46;
@@ -186,8 +186,19 @@
 .page-button-label {
 	display: block;
 }
+
 .page-button-mobile-label {
 	display: none;
+}
+
+.blank-menu {
+	.category-label {
+		display: none;
+	}
+
+	.last-made {
+		display: none;
+	}
 }
 
 @media only screen and (max-width: 767px) {

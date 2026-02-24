@@ -1,7 +1,7 @@
 
 import './AboutPage.scss';
 
-export const LATEST_VERSION = "2.8";
+export const LATEST_VERSION = "2.8.1";
 export const LATEST_VERSION_DATE = "Feb 23, 2026";
 
 const AboutPage = () => {

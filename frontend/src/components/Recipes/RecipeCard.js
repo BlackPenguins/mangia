@@ -38,29 +38,31 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 	if (isMenu) {
 		classes.push('menu');
 	}
+
+	const cardClasses = ["text", "py-3", "pb-4", "px-3", "text-center"];
+
+	if( hideInformation ) {
+		cardClasses.push("blank-menu");
+	}
 	return (
 		<div className={classes.join(' ')}>
-			<NewArrivalTag recipe={recipe} />
+			{!hideInformation && <NewArrivalTag recipe={recipe} />}
 			<CardStatus isSkipped={isSkipped} skipReason={skipReason} recipe={recipe} isMade={isMade} isLeftovers={isLeftovers} />
 			<span className="img-prod">
 				{thumbnail}
 			</span>
-			<div className="text py-3 pb-4 px-3 text-center">
-				{!hideInformation && (
-					<>
-						<h3 className={`category-label ${categoryClass}`}>
-							<span>{recipeName}</span>
-						</h3>
-						<DaysAgo label="Last Made:" lastMade={recipe?.lastmade} recentDayThreshold={21} />
-						<div className="d-flex">
-							<div className="pricing">
-								<p className="price">
-									<span className="mr-2 price-dc">{recipe?.Description}</span>
-								</p>
-							</div>
-						</div>
-					</>
-				)}
+			<div className={cardClasses.join(" ")}>
+				<h3 className={`category-label ${categoryClass}`}>
+					<span>{recipeName}</span>
+				</h3>
+				<DaysAgo label="Last Made:" lastMade={recipe?.lastmade} recentDayThreshold={21} />
+				<div className="d-flex">
+					<div className="pricing">
+						<p className="price">
+							<span className="mr-2 price-dc">{recipe?.Description}</span>
+						</p>
+					</div>
+				</div>
 
 				<div className="bottom-area d-flex px-3">
 					<div className="m-auto d-flex">{bottomButtons}</div>
