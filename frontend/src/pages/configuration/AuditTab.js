@@ -78,8 +78,6 @@ const AuditTab = () => {
 				</Row>
 
 				{weightedRecipes?.map((recipe) => {
-
-					console.log("rec", recipe)
 					const classes = [];
 
 					if( recipeIDs && recipeIDs.includes(recipe.RecipeID)) {

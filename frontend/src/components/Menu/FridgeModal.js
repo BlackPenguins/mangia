@@ -17,7 +17,6 @@ const FridgeModal = () => {
         const data = await response.json();
         setFridgeItems(data);
         setExcludedTagsIDs(data.map(f => f.IngredientTagID));
-        console.log("F", data)
     }, []);
 
     useEffect(() => {

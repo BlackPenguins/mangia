@@ -1,5 +1,5 @@
 # Stage 1: Build dependencies
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN rm -rf node_modules
@@ -8,7 +8,7 @@ RUN npm install
 COPY src src
 
 # Stage 2: Production image
-FROM node:20-alpine
+FROM node:24-alpine
 WORKDIR /app
 ENV NODE_PATH=/app/node_modules
 COPY --from=builder /app/node_modules ./node_modules
