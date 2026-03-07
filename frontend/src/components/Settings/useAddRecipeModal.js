@@ -42,7 +42,7 @@ const useAddRecipeModal = () => {
 				Add Recipe
 			</Button>
 		),
-		content: (closeModal) => (
+		content: () => (
 			<Input
 				innerRef={inputRef}
 				name="text"

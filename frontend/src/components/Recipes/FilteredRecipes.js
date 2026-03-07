@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, forwardRef } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Input, Row } from 'reactstrap';
 import LoadingText from '../Common/LoadingText';
 
@@ -6,7 +6,7 @@ export const HIDDEN_CATEGORY_FILTER = 'Hidden';
 export const UNCATEGORIZED_CATEGORY_FILTER = 'Uncategorized';
 export const NEW_ARRIVAL_CATEGORY_FILTER = 'NewArrival';
 
-const FilteredRecipes = forwardRef(({ inputRef, CardType, layoutClass, onClickHandler, categoryFilter }, ref) => {
+const FilteredRecipes = (({ inputRef, CardType, layoutClass, onClickHandler, categoryFilter }) => {
 	const fetchRecipes = async () => {
 		const response = await fetch('/api/recipes');
 		const data = await response.json();
@@ -89,7 +89,7 @@ const FilteredRecipes = forwardRef(({ inputRef, CardType, layoutClass, onClickHa
 	);
 });
 
-const SearchBox = forwardRef(({ inputRef, search, setSearch, filteredRecipes, filterRecipesHandler }, ref) => {
+const SearchBox = (({ inputRef, search, setSearch, filteredRecipes, filterRecipesHandler }) => {
 	return (
 		<div className="hero__search">
 			<div className="search-container">

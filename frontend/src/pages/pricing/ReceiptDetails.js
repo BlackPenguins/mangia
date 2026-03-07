@@ -159,7 +159,7 @@ const ReceiptDetails = () => {
 					>
 						<option value={0}>Select</option>
 						{stores && stores.map((s) => {
-							return <option value={s.StoreID}>{s.Name}</option>;
+							return <option key={s.StoreID} value={s.StoreID}>{s.Name}</option>;
 						})}
 					</Input>
 					<label htmlFor='store'>Store</label>
@@ -195,6 +195,7 @@ const ReceiptSection = ({receiptPackage, stagePrice, unStagePrice}) => {
 
 	console.log("AB", receiptPackage);
 	const imagePath = receiptPackage.imagePath.replace("images/receipts/", "");
+	// eslint-disable-next-line no-undef
 	const image = `http://${process.env.REACT_APP_HOST_NAME}:6200/receipts/${imagePath}`
 
 	return (
@@ -206,8 +207,8 @@ const ReceiptSection = ({receiptPackage, stagePrice, unStagePrice}) => {
 					{image && <img alt='receipt' src={image}/>}
 					<div className='parsed-receipt'>
 						<div className='title'>Parsed Text</div>
-						{receiptPackage.textLines && receiptPackage.textLines.map((t) => {
-							return <div>{t}</div>
+						{receiptPackage.textLines && receiptPackage.textLines.map((t, index) => {
+							return <div key={index}>{t}</div>
 						})}
 					</div>
 				</Col>
@@ -215,8 +216,8 @@ const ReceiptSection = ({receiptPackage, stagePrice, unStagePrice}) => {
 					<div className='store-line'>
 						{receiptPackage.store?.Name || "Unknown Store"}
 					</div>
-					{receiptPackage.receiptLines && receiptPackage.receiptLines.map((t) => (
-						<ReceiptLine t={t} stagePrice={stagePrice} unStagePrice={unStagePrice} />
+					{receiptPackage.receiptLines && receiptPackage.receiptLines.map((t, index) => (
+						<ReceiptLine key={index} t={t} stagePrice={stagePrice} unStagePrice={unStagePrice} />
 					))}
 				</Col>
 			</Row>
@@ -233,7 +234,9 @@ const ReceiptPreview = ({receiptID, currentPricingData}) => {
 	if( !currentPricingData ) {
 		return <div>Loading...</div>;
 	}
+	// eslint-disable-next-line no-undef
 	const image = `http://${process.env.REACT_APP_HOST_NAME}:6200/receipts/${receiptID}`
+	// eslint-disable-next-line no-undef
 	const imageProcessed = `http://${process.env.REACT_APP_HOST_NAME}:6200/receipts/processed/${receiptID}`
 
 	return (
@@ -247,8 +250,8 @@ const ReceiptPreview = ({receiptID, currentPricingData}) => {
 			</Col>
 
 			<Col lg={4}>
-				{currentPricingData?.pricingHistory?.map((t) => (
-					<div>{t.Name} {t.Price}</div>
+				{currentPricingData?.pricingHistory?.map((t, index) => (
+					<div key={index}>{t.Name} {t.Price}</div>
 				))}
 			</Col>
 		</Row>

@@ -129,7 +129,7 @@ export const NameInput = ({ label, item, apiUpdate, idColumn, tokenFromStorage }
 				onChange={(e) => {
 					setValue(e.target.value);
 				}}
-				onBlur={(e) => {
+				onBlur={() => {
 					onUpdateHandler();
 				}}
 				value={value}

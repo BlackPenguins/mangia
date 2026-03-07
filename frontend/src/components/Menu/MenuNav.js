@@ -40,7 +40,7 @@ const MenuNav = ({ menus, weekOfYear, page, setPage, fetchMenu, showAuditInforma
 				</Button>
 			</>
 		),
-		content: (closeModal) => <div>Are you sure you want to re-build this menu? Your previous recipes will be lost for this week.</div>,
+		content: () => <div>Are you sure you want to re-build this menu? Your previous recipes will be lost for this week.</div>,
 	});
 
 	const generateButtonHandler = useCallback(() => {

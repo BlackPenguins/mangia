@@ -1,8 +1,8 @@
 
 import './AboutPage.scss';
 
-export const LATEST_VERSION = "2.8.2";
-export const LATEST_VERSION_DATE = "Mar 2, 2026";
+export const LATEST_VERSION = "2.8.3";
+export const LATEST_VERSION_DATE = "Mar 6, 2026";
 
 const AboutPage = () => {
 	return (
@@ -12,7 +12,11 @@ const AboutPage = () => {
 					<h2>Change Log</h2>
 				</div>
 				<div className='change-log'>
-					<h3>Version 2.8 (2/23/2026)</h3>
+					<h3>Version 2.8.3 (03/06/2026)</h3>
+					<ul>
+						<li>Lint fixes</li>
+					</ul>
+					<h3>Version 2.8 (02/23/2026)</h3>
 					<ul>
 						<li>Improving mobile design</li>
 					</ul>
@@ -20,10 +24,10 @@ const AboutPage = () => {
 					<h3>Version 2.7 (02/22/2026)</h3>
 					<ul>
 						<li>Fixed broken histories with no single dates or weeks</li>
-						<li>Include "None" category in Uncategorized filter</li>
-						<li>Don't show blank histories</li>
+						<li>Include &quot;None&quot; category in Uncategorized filter</li>
+						<li>Don&apos;t show blank histories</li>
 						<li>Add support for ¾ amount</li>
-						<li>Handle a menu item that has their recipe deleted - don't hide the entire day in the menu</li>
+						<li>Handle a menu item that has their recipe deleted - don&apos;t hide the entire day in the menu</li>
 						<li>Paginated ingredients page to 20 results per page</li>
 						<li>Added support for webp thumbnails</li>
 					</ul>
@@ -31,7 +35,7 @@ const AboutPage = () => {
 					<h3>Version 2.6 (02/15/2026)</h3>
 					<ul>
 						<li>Display number of linked recipes to delete button of ingredient tags</li>
-						<li>Show the history of extra items as the "Week of..."</li>
+						<li>Show the history of extra items as the &quot;Week of...&quot;</li>
 						<li>Added Audit test board</li>
 						<li>Tweaked algorithm weights from 1.4 to 10 for aged recipes</li>
 						<li>Added uncategorized category</li>
@@ -49,7 +53,7 @@ const AboutPage = () => {
 					</ul>
 					<h3>Version 2.4 (12/30/2025)</h3>
 					<ul>
-						<li>Add support for "c." for cups</li>
+						<li>Add support for &quot;c.&quot; for cups</li>
 						<li>Clickable thumbnail</li>
 						<li>Fix trim bug with recipe search</li>
 						<li>Divided up the primary thumbnail (low-res) vs the other thumbnails (hi-res)</li>
@@ -89,7 +93,7 @@ const AboutPage = () => {
 						<li>Added recipe names to shopping list</li>
 						<li>Added this About page</li>
 						<li>Better mobile support of Fridge, Menu</li>
-						<li>Bug Fix: Don't display blank notes in Details</li>
+						<li>Bug Fix: Don&apos;t display blank notes in Details</li>
 						<li>Keep the focus after entering a shopping item</li>
 						<li>Use ENTER key to enter the shopping item</li>
 						<li>Ability to edit shopping items</li>

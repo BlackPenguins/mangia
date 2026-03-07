@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { useThumbnailImage } from './RecipeCard';
 import './RecipeRow.scss';
 

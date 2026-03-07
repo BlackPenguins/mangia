@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState } from 'react';
 import { Button, Col, FormText, Input, Row } from 'reactstrap';
 import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
@@ -19,7 +20,7 @@ const useUploadReceiptModal = (fetchReceipts) => {
 	};
 
 
-	const uploadHandler = async (clsoeModal) => {
+	const uploadHandler = async () => {
 		if (imageFile) {
 			const imageData = new FormData();
 			imageData.append('imageFile', imageFile);
@@ -39,19 +40,21 @@ const useUploadReceiptModal = (fetchReceipts) => {
 				fetchReceipts();
 			}
 
-			// const image = `http://${process.env.REACT_APP_HOST_NAME}:6200/receipts/${data.image}`;
-			// const preProcessedImage = `http://${process.env.REACT_APP_HOST_NAME}:6200/receipts/${data.preProcessedImage}`;
+			// eslint-disable-next-line no-undef
+			const image = `http://${process.env.REACT_APP_HOST_NAME}:6200/receipts/${data.image}`;
+			// eslint-disable-next-line no-undef
+			const preProcessedImage = `http://${process.env.REACT_APP_HOST_NAME}:6200/receipts/${data.preProcessedImage}`;
 
-			// setPreProcessedImageFile(preProcessedImage);
-			// setImageFile(image);
-			// setTextLines(data.text.split("\n"));
-			// setPreProcessedTextLines(data.preProcessedText.split("\n"));
+			setPreProcessedImageFile(preProcessedImage);
+			setImageFile(image);
+			setTextLines(data.text.split("\n"));
+			setPreProcessedTextLines(data.preProcessedText.split("\n"));
 		}
 	};
 
-	const { modal, openModal, closeModal, isOpen } = useBetterModal({
+	const { modal, openModal, closeModal } = useBetterModal({
 		title: 'Upload Receipt',
-		content: (closeModal) => (
+		content: () => (
 			<Row>
 				<Col>
 					<Input id="recipe-image" name="file" type="file" onChange={fileChangeHandler} />

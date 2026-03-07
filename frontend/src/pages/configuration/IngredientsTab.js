@@ -154,8 +154,6 @@ const IngredientRow = ({ fetchItems, item, tokenFromStorage, stores, departments
 		closeModal();
 	};
 
-	const recipeNamesLinked = item?.recipeNames.map( (r) => r.Name).join(",") || "";
-
 	const { modal, openModal } = useBetterModal({
 		title: 'Delete Ingredient',
 		size: 'md',
@@ -171,7 +169,7 @@ const IngredientRow = ({ fetchItems, item, tokenFromStorage, stores, departments
 				</Button>
 			</>
 		),
-		content: (closeModal) => {
+		content: () => {
 			let linkedRecipeLists = "";
 
 			if( item?.recipeNames.length ) {
@@ -179,8 +177,8 @@ const IngredientRow = ({ fetchItems, item, tokenFromStorage, stores, departments
 					<div className='linked-recipes'>
 						It is being used in the following recipes:
 						<ul>
-							{item.recipeNames.map( (i) => {
-								return <li>{i.Name}</li>
+							{item.recipeNames.map( (i, index) => {
+								return <li key={index}>{i.Name}</li>
 							})}
 						</ul>
 					</div>

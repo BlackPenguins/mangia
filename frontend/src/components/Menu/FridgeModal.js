@@ -67,7 +67,7 @@ const FridgeModal = () => {
     const { modal, openModal } = useBetterModal({
         title: 'The Fridge',
         size: 'lg',
-        content: (closeModal) => {
+        content: () => {
             return (
                 <>
                     <IngredientTagDropdown

@@ -147,7 +147,7 @@ const SuggestionRow = ({ fetchSuggestions, suggestion, tokenFromStorage }) => {
 				</Button>
 			</>
 		),
-		content: (closeModal) => <div>Are you sure you want to make this suggestion?</div>,
+		content: () => <div>Are you sure you want to make this suggestion?</div>,
 	});
 
 	const classes = [];

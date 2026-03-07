@@ -15,6 +15,11 @@ const ShoppingList = () => {
 
 	const [shoppingListItems, setShoppingListItems] = useState(null);
 	const [stores, setStores] = useState(null);
+	
+	const updateShoppingListWithServerData = useCallback((data) => {
+		setShoppingListItems(data.departments);
+		setStores(data.stores);
+	}, []);
 
 	const fetchShoppingList = useCallback(async () => {
 		const response = await fetch(`/api/shoppingListItem`, {
@@ -27,12 +32,7 @@ const ShoppingList = () => {
 		});
 		const data = await response.json();
 		updateShoppingListWithServerData(data);
-	}, [tokenFromStorage]);
-
-	const updateShoppingListWithServerData = (data) => {
-		setShoppingListItems(data.departments);
-		setStores(data.stores);
-	};
+	}, [tokenFromStorage, updateShoppingListWithServerData]);
 
 	useEffect(() => {
 		fetchShoppingList();
@@ -97,7 +97,6 @@ const ShoppingList = () => {
 							stores={stores}
 							tokenFromStorage={tokenFromStorage}
 							selectedStore={selectedStore}
-							fetchShoppingList={fetchShoppingList}
 							updateShoppingListWithServerData={updateShoppingListWithServerData}
 						/>
 

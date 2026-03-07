@@ -1,8 +1,10 @@
-import js from "@eslint/js";
-import react from "eslint-plugin-react";
-import globals from "globals";
+const js =  require("@eslint/js");
+const react =  require("eslint-plugin-react");
+const globals =  require("globals");
+const reactHooks = require("eslint-plugin-react-hooks");
 
-export default [
+
+module.exports = [
   {
     files: ["**/*.js"],
     ignores: ["node_modules/**", "src/prototype/**"],
@@ -20,12 +22,16 @@ export default [
     },
     plugins: {
       react,
+      "react-hooks": reactHooks,
+
     },
     rules: {
       ...js.configs.recommended.rules,
       ...react.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
 
-      "react/jsx-uses-react": "off",
+
+      "react/jsx-uses-react": "warn",
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
       "array-callback-return": "warn",

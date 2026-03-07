@@ -62,7 +62,9 @@ const AuditTab = () => {
 						}
 
 						return (
-							<Col className={classes.join(' ')} lg={1}>{recipe.adjustedWeight}</Col>
+							<Col key={recipe.RecipeID} className={classes.join(' ')} lg={1}>
+								{recipe.adjustedWeight}
+							</Col>
 						);
 					})}
 				</Row>

@@ -38,6 +38,7 @@ const Tag = ({ recipeID }) => {
 	const [selectedValue, setSelectedValue] = useState('');
 
 	const addTagHandler = async (value) => {
+
 		await fetch(`/api/recipes/${recipeID}/addTag`, {
 			method: 'POST',
 			body: JSON.stringify(value),
@@ -84,7 +85,7 @@ const Tag = ({ recipeID }) => {
 					allResults={tags}
 					selectedValue={selectedValue}
 					setSelectedValue={setSelectedValue}
-					selectionHandler={addTagHandler}
+					selectionHandler={(value) => addTagHandler(value)}
 					showLabel={true}
 				/>
 			</Col>
@@ -97,7 +98,7 @@ const Tag = ({ recipeID }) => {
 				{recipeTags.length > 0 && (
 					<>
 						{recipeTags.map((tag) => {
-							return <TagBox type="recipe" tag={tag} removeTagHandler={removeTagHandler} />;
+							return <TagBox key={1} type="recipe" tag={tag} removeTagHandler={removeTagHandler} />;
 						})}
 					</>
 				)}

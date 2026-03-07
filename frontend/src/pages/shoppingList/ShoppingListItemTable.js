@@ -15,7 +15,6 @@ const ShoppingListTable = ({
 	stores,
 	tokenFromStorage,
 	selectedStore,
-	fetchShoppingList,
 	updateShoppingListWithServerData,
 }) => {
 	return (
@@ -61,7 +60,6 @@ const ShoppingListTable = ({
 											tokenFromStorage={tokenFromStorage}
 											stores={stores}
 											selectedStore={selectedStore}
-											fetchShoppingList={fetchShoppingList}
 											storeHasLowestPrice={storeHasLowestPrice}
 											updateShoppingListWithServerData={updateShoppingListWithServerData}
 										/>

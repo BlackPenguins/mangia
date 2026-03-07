@@ -63,7 +63,7 @@ const useImportRecipeModal = (replaceRecipeID) => {
 
 	const { modal, openModal, closeModal, isOpen } = useBetterModal({
 		title: 'Import Recipe',
-		content: (closeModal) => (
+		content: () => (
 			<>
 				<div>Provide a URL to import a recipe. Not all websites can be imported.</div>
 				<div>
@@ -80,7 +80,7 @@ const useImportRecipeModal = (replaceRecipeID) => {
 				<div className={statusClasses}>{status}</div>
 			</>
 		),
-		footer: (closeModal) => (
+		footer: () => (
 			<>
 				{!newRecipeID && (
 					<Button className="mangia-btn muted" onClick={importRecipeFile}>

@@ -302,7 +302,7 @@ const DayPreparation = ({ tomorrowsMenu }) => {
 
 	return (
 		<div className="menu-footer prep">
-			<div className="menu-footer-title">Tomorrow's Prep</div>
+			<div className="menu-footer-title">Tomorrow&apos;s Prep</div>
 			<div>
 				{defrostSplit.map((defrost, index) => {
 					return (

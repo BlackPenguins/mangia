@@ -49,14 +49,14 @@ const Receipts = () => {
 							});
 
 							return (
-								<Row className="add-config-button">
-								<Col lg={2}>
-									{receipt.IsProcessed}
-								</Col>
-								<Col lg={10} className="recipe-edit-btn">
-									<Button onClick={() => navigate(`${receipt.ReceiptID}`)}>{receipt.ReceiptID} {receipt.StoreID} {formattedDate}</Button>
-								</Col>
-							</Row>
+								<Row key={receipt.ReceiptID} className="add-config-button">
+									<Col lg={2}>
+										{receipt.IsProcessed}
+									</Col>
+									<Col lg={10} className="recipe-edit-btn">
+										<Button onClick={() => navigate(`${receipt.ReceiptID}`)}>{receipt.ReceiptID} {receipt.StoreID} {formattedDate}</Button>
+									</Col>
+								</Row>
 							)
 						})}
 					</div>

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useCallback } from 'react';
+import { createContext, useState, useContext, useCallback } from 'react';
 import { Toast, ToastBody, ToastHeader } from 'reactstrap';
 
 import './toast-context.scss';

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, Fragment } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, FormGroup, FormText, Input, Label, Row } from 'reactstrap';
@@ -508,6 +508,8 @@ const ThumbnailSection = ({ tokenFromStorage, fetchRecipe, thumbnails, setPrimar
 							return (
 								<ThumbnailPreview key={thumbnail.ThumbnailID} thumbnail={thumbnail} tokenFromStorage={tokenFromStorage} fetchRecipe={fetchRecipe} canEdit={true} />
 							);
+						} else {
+							return null;
 						}
 					})}
 			</Col>
@@ -516,6 +518,7 @@ const ThumbnailSection = ({ tokenFromStorage, fetchRecipe, thumbnails, setPrimar
 };
 
 export const ThumbnailPreview = ({ tokenFromStorage, fetchRecipe, thumbnail, canEdit }) => {
+	// eslint-disable-next-line no-undef
 	const imageSource = `http://${process.env.REACT_APP_HOST_NAME}:6200/thumbs/${thumbnail.FileName}`;
 
 	const removeHandler = async () => {
@@ -593,15 +596,21 @@ const NameInput = ({ value, setValue, filteredRecipes, filterRecipesHandler, sta
 };
 
 const EditTextInput = ({ label, name, value, setValue, stageChange, dirty, children }) => {
-	return <EditInput label={label} name={name} value={value} setValue={setValue} stageChange={stageChange} dirty={dirty} type='text' children={children} />
+	return <EditInput label={label} name={name} value={value} setValue={setValue} stageChange={stageChange} dirty={dirty} type='text'>
+		{children}
+		</EditInput>
 }
 
 const EditTextarea = ({ label, name, value, setValue, stageChange, dirty, rows, valueModifier, children }) => {
-	return <EditInput label={label} name={name} value={value} setValue={setValue} stageChange={stageChange} dirty={dirty} type='textarea' rows={rows} valueModifier={valueModifier} children={children}/>
+	return <EditInput label={label} name={name} value={value} setValue={setValue} stageChange={stageChange} dirty={dirty} type='textarea' rows={rows} valueModifier={valueModifier}>
+		{children}
+		</EditInput>
 }
 
 const EditDropdown = ({ label, name, value, setValue, stageChange, dirty, rows, valueModifier, children }) => {
-	return <EditInput label={label} name={name} value={value} setValue={setValue} stageChange={stageChange} dirty={dirty} type='select' rows={rows} valueModifier={valueModifier} children={children}/>
+	return <EditInput label={label} name={name} value={value} setValue={setValue} stageChange={stageChange} dirty={dirty} type='select' rows={rows} valueModifier={valueModifier}>
+		{children}
+		</EditInput>
 }
 
 const EditInput = ({ label, name, value, setValue, stageChange, dirty, type, rows, valueModifier, children }) => {

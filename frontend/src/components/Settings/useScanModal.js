@@ -68,13 +68,14 @@ const useScanModal = (fetchRecipe, attachments, recipeID) => {
 	const { modal, openModal } = useBetterModal({
 		title: 'Scan Reference Images',
 		size: 'lg',
-		content: (closeModal) => (
+		content: () => (
 			<div className="container book-list">
 				<h3>Scanned Files</h3>
 				<ul>
 					{attachments.length === 0 && <div>No attachments found</div>}
 					{attachments &&
 						attachments.map((attachment, index) => {
+							// eslint-disable-next-line no-undef
 							const imageURL = `http://${process.env.REACT_APP_HOST_NAME}:6200/attachments/${recipeID}/${attachment}`;
 							const clickHandler = () => {
 								parseText(attachment);
@@ -97,7 +98,7 @@ const useScanModal = (fetchRecipe, attachments, recipeID) => {
 				</div>
 			</div>
 		),
-		footer: (closeModal) => (
+		footer: () => (
 			<Button size="sm" className="mangia-btn success" onClick={importFile}>
 				Add Attachment
 			</Button>

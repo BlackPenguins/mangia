@@ -78,6 +78,7 @@ export const useThumbnailImage = (recipe, hideInformation) => {
 	useEffect(() => {
 		if( !hideInformation && recipe?.thumbnails ) {
 			const thumbnailFileName = recipe?.thumbnails.find( s => s.IsPrimary === 1)?.FileName;
+			// eslint-disable-next-line no-undef
 			const url = `http://${process.env.REACT_APP_HOST_NAME}:6200/thumbs/${thumbnailFileName}`;
 			setThumbnail(url);
 		}
@@ -127,7 +128,7 @@ const CardStatus = ({ isSkipped, skipReason, recipe, isMade, isLeftovers }) => {
 	}
 
 	let statusText = null;
-	if (!!isSkipped) {
+	if (isSkipped) {
 		statusText = skipReason || 'SKIPPED';
 	} else if (!recipe) {
 		// No recipe yet

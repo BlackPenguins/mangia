@@ -2,7 +2,7 @@ import { Col, Row } from 'reactstrap';
 import ShoppingListExtraTableRow from './ShoppingListExtraTableRow';
 import NewItemInput from './NewItemInput';
 import { useAuth } from '@blackpenguins/penguinore-common-ext';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 const ShoppingListExtraTable = ({ showCheckedItems, isWishlist }) => {
 	const authContext = useAuth();
@@ -40,11 +40,9 @@ const ShoppingListExtraTable = ({ showCheckedItems, isWishlist }) => {
 		title = 'Non-Menu Items';
 	}
 
-	const [totalUnchecked, setTotalUnchecked] = useState(0);
-
-	useEffect(() => {
-		setTotalUnchecked(shoppingListExtras?.filter( s => s.IsChecked === 0 ).length);
-	}, [shoppingListExtras]);
+	const totalUnchecked = useMemo(
+		() => shoppingListExtras?.filter( s => s.IsChecked === 0 ).length ?? 0
+	,[shoppingListExtras]);
 
 	return (
 		<div className={classes.join(' ')}>

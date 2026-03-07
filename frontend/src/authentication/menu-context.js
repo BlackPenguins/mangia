@@ -6,7 +6,7 @@ const MenuContext = React.createContext({
 	menuRecipeIDs: [],
 	redirectToPreviousRecipeHandler: () => {},
 	redirectToNextRecipeHandler: () => {},
-	isMenuRecipeHandler: (currentRecipeID) => {},
+	isMenuRecipeHandler: () => {},
 	setMenuRecipeIDsHandler: () => {},
 });
 

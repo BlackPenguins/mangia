@@ -26,7 +26,6 @@ const ShoppingListTableRow = ({
 	tokenFromStorage,
 	stores,
 	selectedStore,
-	fetchShoppingList,
 	storeHasLowestPrice,
 	updateShoppingListWithServerData,
 }) => {

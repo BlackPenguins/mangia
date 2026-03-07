@@ -105,7 +105,7 @@ const InputWithAutocomplete = ({ selectedValue, setSelectedValue, selectionHandl
 						}
 
 						return (
-							<li key={index} onClick={() => onKeyDownHandler(index)} selectionIndex={selectionIndex} className={className}>
+							<li key={index} onClick={() => onKeyDownHandler(index)} className={className}>
 								{result.name}
 							</li>
 						);

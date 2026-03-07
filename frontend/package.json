@@ -30,7 +30,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lint:all": "npx eslint 'src/**/*.{js,jsx}'"
   },
   "eslintConfig": {
     "extends": [
@@ -52,6 +53,7 @@
   "devDependencies": {
     "eslint": "^9.39.3",
     "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^17.4.0"
   }
 }

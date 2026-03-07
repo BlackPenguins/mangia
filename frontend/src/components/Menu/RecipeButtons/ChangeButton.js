@@ -104,7 +104,7 @@ const SwapDaysButtons = ({ week, availableSwapDays, menuID, fetchMenu, closeModa
 			<Row>
 				{availableSwapDays &&
 					availableSwapDays.map((day) => {
-						return <SwapButton dayID={day.menuID} dayOfWeek={day.dayOfWeek} recipeName={day.recipeName} currentDay={week} swapHandler={swapHandler} />;
+						return <SwapButton key={day.menuID} dayID={day.menuID} dayOfWeek={day.dayOfWeek} recipeName={day.recipeName} currentDay={week} swapHandler={swapHandler} />;
 					})}
 			</Row>
 		</div>

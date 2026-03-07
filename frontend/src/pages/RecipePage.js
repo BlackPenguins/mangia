@@ -69,7 +69,7 @@ const RecipePage = () => {
 						<Col lg={8}>
 							<StepGroups stepGroups={recipe?.stepGroups} />
 							{recipe.thumbnails &&
-								recipe.thumbnails.map((thumbnail, index) => {
+								recipe.thumbnails.map((thumbnail) => {
 									if (thumbnail.IsPrimary === 1) {
 										// We already show it in the main thumbnail
 										return null;
@@ -163,7 +163,7 @@ const Statistics = ({ recipe, book }) => {
 		fetchRecipeTags();
 	}, [fetchRecipeTags]);
 
-	const categoryLabel = !recipe.Category ? <span class='uncategorized'>Uncategorized</span> : recipe.Category;
+	const categoryLabel = !recipe.Category ? <span className='uncategorized'>Uncategorized</span> : recipe.Category;
 
 	return (
 		<div className="quick-facts">
@@ -254,7 +254,7 @@ const HeaderImage = ({ recipe }) => {
 	const thumbnailStyle = useThumbnailBackgroundStyle(recipe, false);
 
 	return (
-		<a href={thumbnailStyle.thumbnailImageURL} target='_blank'>
+		<a href={thumbnailStyle.thumbnailImageURL} target='_blank' rel="noreferrer">
 			<div style={thumbnailStyle} className="thumbnail-container">
 				<NewArrivalTag recipe={recipe} />
 				<Rating rating={recipe?.Rating} size="20" />
@@ -306,7 +306,7 @@ const StepGroups = ({ stepGroups }) => {
 
 	return stepGroups.map( (stepGroup) => {
 		return (
-			<div className="steps">
+			<div key={stepGroup.id} className="steps">
 				<h4><span className='section-icon'>&#x1F4DD;</span>{stepGroup.header}</h4>
 				<StepGroup stepGroup={stepGroup}/>
 			</div>
@@ -319,7 +319,7 @@ const StepGroup = ({ stepGroup }) => {
 		return null;
 	}
 
-	return stepGroup.steps.split("\n").filter( s => !!s).map((step, stepNumber) => <Step step={step} stepNumber={stepNumber + 1}/>);
+	return stepGroup.steps.split("\n").filter( s => !!s).map((step, stepNumber) => <Step key={stepNumber} step={step} stepNumber={stepNumber + 1}/>);
 };
 
 const Step = ({ step, stepNumber }) => {
@@ -347,6 +347,8 @@ const Notes = ({ icon, title, notes }) => {
 				{notesSplit.map((note, index) => {
 					if( note ) {
 						return <li key={index}>{note}</li>;
+					} else {
+						return null;
 					}
 				})}
 			</ul>
@@ -408,8 +410,8 @@ const useConfirmDeleteModal = (recipeID) => {
 
 	const { modal, openModal } = useBetterModal({
 		title: 'Delete this Recipe',
-		content: (closeModal) => <div>Are you sure you want to delete this recipe?</div>,
-		footer: (closeModal) => (
+		content: () => <div>Are you sure you want to delete this recipe?</div>,
+		footer: () => (
 			<>
 				<Button className="mangia-btn danger" onClick={deleteHandler}>
 					Yes, Delete
