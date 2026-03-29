@@ -271,7 +271,6 @@ const migrationHandler = async (req, res) => {
 				break;
 
 			case 'addLinkedRecipes':
-				await simpleDBQuery('Add Column', 'DROP TABLE LINKED_RECIPES', res);
 				await simpleDBQuery(
 					'Create SUGGESTIONS',
 					'CREATE TABLE LINKED_RECIPES (LinkedRecipesID INT AUTO_INCREMENT PRIMARY KEY, Recipe1ID INT, Recipe2ID INT, FOREIGN KEY (Recipe1ID) REFERENCES RECIPE(RecipeID), FOREIGN KEY (Recipe2ID) REFERENCES RECIPE(RecipeID))',

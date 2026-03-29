@@ -1,7 +1,7 @@
 
 import './AboutPage.scss';
 
-export const LATEST_VERSION = "2.10";
+export const LATEST_VERSION = "2.9.1";
 export const LATEST_VERSION_DATE = "Mar 29, 2026";
 
 const AboutPage = () => {
@@ -12,7 +12,7 @@ const AboutPage = () => {
 					<h2>Change Log</h2>
 				</div>
 				<div className='change-log'>
-					<h3>Version 2.10 (03/06/2026)</h3>
+					<h3>Version 2.9 (03/06/2026)</h3>
 					<ul>
 						<li>Added linked recipes</li>
 						<li>Added swap button to shopping lists</li>
