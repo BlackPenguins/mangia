@@ -6,7 +6,7 @@ import { differenceInDays, formatDistance } from 'date-fns';
 import NewArrivalTag from './NewArrivalTag';
 import { useThumbnailBackgroundStyle } from './RecipeRow';
 import { TZDate } from '@date-fns/tz';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottomButtons, isMenu }) => {
 	let recipeName = '';
@@ -73,18 +73,31 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 };
 
 export const useThumbnailImage = (recipe, hideInformation) => {
-	const [thumbnail, setThumbnail] = useState('/images/no-thumb.png');
+	const [thumbnailError, setThumbnailError] = useState(false);
 	
-	useEffect(() => {
+	// Avoid a use effect, a memo instead will change the underlying final object
+	// And if we want something upstream to trigger something to happen to this thumb, like an error, we can pass
+	// it a state that it can set to true, and this memo will listen for that and react accordingly
+	const thumbnail = useMemo( () => {
+
+		// Something upstream trigger an error with this thumb
+		if( thumbnailError ) {
+			return '/images/no-thumb.png';
+		}
+
 		if( !hideInformation && recipe?.thumbnails ) {
 			const thumbnailFileName = recipe?.thumbnails.find( s => s.IsPrimary === 1)?.FileName;
-			// eslint-disable-next-line no-undef
-			const url = `http://${process.env.REACT_APP_HOST_NAME}:6200/thumbs/${thumbnailFileName}`;
-			setThumbnail(url);
+			if( thumbnailFileName ) {
+				// eslint-disable-next-line no-undef
+				return `http://${process.env.REACT_APP_HOST_NAME}:6200/thumbs/${thumbnailFileName}`;
+			}
 		}
-	}, [recipe]);
 
-	return [thumbnail, setThumbnail];
+		// Recipe has no thumb, or information is hidden (leftovers, skipped)
+		return '/images/no-thumb.png';
+	}, [recipe, thumbnailError, hideInformation]);
+
+	return [thumbnail, setThumbnailError];
 };
 
 export const DaysAgo = ({ label, lastMade, recentDayThreshold }) => {

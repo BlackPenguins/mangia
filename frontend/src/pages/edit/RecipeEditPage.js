@@ -3,17 +3,17 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, FormGroup, FormText, Input, Label, Row } from 'reactstrap';
 import { Bookmark, Save } from '@mui/icons-material';
-import { useToast } from '@blackpenguins/penguinore-common-ext';
-
+import { useToast, useBetterModal, useAuth } from '@blackpenguins/penguinore-common-ext';
 import './RecipeEditPage.scss';
 import Rating from '../../components/Settings/Rating';
 import Tag from '../../components/EditRecipes/Tag';
-import { ArrowUpCircle, Eye, Printer, Trash2, PlusCircle } from 'react-feather';
+import { ArrowUpCircle, Eye, Printer, Trash2, PlusCircle, Link } from 'react-feather';
 import useScanModal from '../../components/Settings/useScanModal';
 import NewIngredientInput from './NewIngredientInput';
-import { useAuth } from '@blackpenguins/penguinore-common-ext';
 import useImportRecipeModal from '../../components/Settings/ImportRecipeModal';
 import IngredientTagDropdown from './IngredientTagDropdown';
+import FilteredRecipes from 'components/Recipes/FilteredRecipes';
+import RecipeRow from 'components/Recipes/RecipeRow';
 
 const RecipeEditPage = () => {
 	const [dirty, setDirty] = useState(false);
@@ -29,6 +29,10 @@ const RecipeEditPage = () => {
 		navigate('/home');
 	}
 
+	const [allRecipes, setAllRecipes] = useState([]);
+
+	const [filteredRecipes, setFilteredRecipes] = useState([]);
+
 	const fetchRecipes = useCallback(async () => {
 		const response = await fetch('/api/recipes');
 		const data = await response.json();
@@ -40,10 +44,6 @@ const RecipeEditPage = () => {
 	useEffect(() => {
 		fetchRecipes();
 	}, [fetchRecipes]);
-
-	const [allRecipes, setAllRecipes] = useState([]);
-
-	const [filteredRecipes, setFilteredRecipes] = useState([]);
 
 	const filterRecipesHandler = (searchString) => {
 		if (!searchString.trim()) {
@@ -74,6 +74,7 @@ const RecipeEditPage = () => {
 	const [dayPrep, setDayPrep] = useState('');
 	const [rating, setRating] = useState(1);
 	const [url, setURL] = useState('');
+	const [links, setLinks] = useState([]);
 	const [attachments, setAttachments] = useState([]);
 	const [thumbnails, setThumbnails] = useState([]);
 
@@ -100,6 +101,7 @@ const RecipeEditPage = () => {
 			setAttachments(recipe.attachments);
 			setThumbnails(recipe.thumbnails);
 			setStepGroups(recipe.stepGroups);
+			setLinks(recipe.links);
 
 			const ingredientsBulk = recipe.ingredients.map((ingredient) => ingredient.name).join('\n');
 			setIngredients(recipe.ingredients);
@@ -351,6 +353,8 @@ const RecipeEditPage = () => {
 
 					<EditTextarea label='Bulk Ingredients' name='ingredients' value={ingredientsBulk} setValue={setIngredientsBulk} stageChange={stageChange} dirty={dirty} rows={15} valueModifier={(value) => value.split("\n")} />
 
+					<LinkedRecipes recipeID={recipeID} tokenFromStorage={tokenFromStorage} fetchRecipe={fetchRecipe} links={links}/>
+					
 					<div className="bottom-buttons">
 						<Button className="mangia-btn muted" onClick={previewAction}>
 							<Eye /> Preview
@@ -368,6 +372,70 @@ const RecipeEditPage = () => {
 	);
 };
 
+const LinkedRecipes = ({recipeID, tokenFromStorage, fetchRecipe, links}) => {
+
+	const createLinkHandler = async (recipe, closeModal) => {
+		const linkRecipeID = recipe.RecipeID;
+
+		await fetch(`/api/recipes/${recipeID}/link`, {
+			method: 'POST',
+			body: JSON.stringify({ linkRecipeID }),
+			headers: {
+				// This is required. NodeJS server won't know how to read it without it.
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
+			},
+		});
+		closeModal();
+		fetchRecipe();
+	};
+
+	const deleteLinkHandler = async (linkRecipeID) => {
+		await fetch(`/api/recipes/${recipeID}/link`, {
+			method: 'DELETE',
+			body: JSON.stringify({ linkRecipeID }),
+			headers: {
+				// This is required. NodeJS server won't know how to read it without it.
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
+			},
+		});
+		fetchRecipe();
+	};
+
+
+	const { modal, openModal } = useBetterModal({
+		title: 'Link Recipe',
+		size: 'lg',
+		content: (closeModal) => (
+			<>
+				<FilteredRecipes CardType={RecipeRow} onClickHandler={(recipe) => createLinkHandler(recipe, closeModal)} layoutClass="lg-12" />
+			</>
+		),
+	});
+
+	return (
+		<div className='linked-recipes-section'>
+			{modal}
+
+			<Button className="mangia-btn muted" onClick={openModal}>
+				<Link size={18}/> Add Recipe Link
+			</Button>
+
+			{links && links.map( (link) => {
+				return (
+					<div className='link-row' key={link.recipeID}>
+						<Button tabIndex={-1} className="mangia-btn danger delete-btn" size="small" onClick={() => deleteLinkHandler(link.recipeID)}>
+							<Trash2 size={16}/>
+						</Button>
+						<a href={`/recipe/${link.recipeID}`}>{link.name}</a>
+					</div>
+				)
+			})}
+		</div>
+	)
+
+}
 const StepGroups = ({ stepGroups, setStepGroups, stageChange, dirty }) => {
 
 	/*

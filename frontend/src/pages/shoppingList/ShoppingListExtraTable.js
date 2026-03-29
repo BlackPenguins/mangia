@@ -2,31 +2,11 @@ import { Col, Row } from 'reactstrap';
 import ShoppingListExtraTableRow from './ShoppingListExtraTableRow';
 import NewItemInput from './NewItemInput';
 import { useAuth } from '@blackpenguins/penguinore-common-ext';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
-const ShoppingListExtraTable = ({ showCheckedItems, isWishlist }) => {
+const ShoppingListExtraTable = ({ rows, showCheckedItems, isWishlist, fetch, handleSwapButton }) => {
 	const authContext = useAuth();
 	const tokenFromStorage = authContext.tokenFromStorage;
-
-	const [shoppingListExtras, setShoppingListExtras] = useState(null);
-
-	const fetchShoppingListExtras = useCallback(async () => {
-		const response = await fetch(`/api/shoppingListExtra?isWishlist=${isWishlist}`, {
-			method: 'GET',
-			headers: {
-				// This is required. NodeJS server won't know how to read it without it.
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${tokenFromStorage}`,
-			},
-		});
-		const data = await response.json();
-		const arr = data.result;
-		setShoppingListExtras(arr);
-	}, [tokenFromStorage, isWishlist]);
-
-	useEffect( () => {
-		fetchShoppingListExtras()
-	}, [fetchShoppingListExtras]);
 
 
 	const classes = ['shopping-list-extra-section'];
@@ -41,12 +21,12 @@ const ShoppingListExtraTable = ({ showCheckedItems, isWishlist }) => {
 	}
 
 	const totalUnchecked = useMemo(
-		() => shoppingListExtras?.filter( s => s.IsChecked === 0 ).length ?? 0
-	,[shoppingListExtras]);
+		() => rows?.filter( s => s.IsChecked === 0 ).length ?? 0
+	,[rows]);
 
 	return (
 		<div className={classes.join(' ')}>
-			{authContext.isAdmin && <NewItemInput tokenFromStorage={tokenFromStorage} fetchShoppingListExtras={fetchShoppingListExtras} isWishlist={isWishlist} /> }
+			{authContext.isAdmin && <NewItemInput tokenFromStorage={tokenFromStorage} fetchShoppingListExtras={fetch} isWishlist={isWishlist} /> }
 			<div className="container">
 				<div className="shopping-list">
 					<Row className='heading'>
@@ -54,9 +34,9 @@ const ShoppingListExtraTable = ({ showCheckedItems, isWishlist }) => {
 							<span>{title} ({totalUnchecked})</span>
 						</Col>
 					</Row>
-					{shoppingListExtras &&
-						shoppingListExtras.map((item) => {
-							return <ShoppingListExtraTableRow key={item.ShoppingListExtraID} item={item} showCheckedItems={showCheckedItems} tokenFromStorage={tokenFromStorage} fetchShoppingListExtras={fetchShoppingListExtras} />;
+					{rows &&
+						rows.map((item) => {
+							return <ShoppingListExtraTableRow key={item.ShoppingListExtraID} item={item} showCheckedItems={showCheckedItems} tokenFromStorage={tokenFromStorage} fetchShoppingListExtras={fetch} handleSwapButton={handleSwapButton} />;
 						})}
 				</div>
 			</div>

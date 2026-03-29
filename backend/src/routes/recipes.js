@@ -20,6 +20,7 @@ import { withDateDetails } from './menu.js';
 import { deletePrimaryThumbnail, deleteThumbnail, deleteThumbnailsForRecipe, insertThumbnail, selectAllThumbnails } from  '#root/database/thumbnails.js';
 import { convertToTeaspoons } from './shoppingListItem.js';
 import { deleteStepGroupByRecipeID, selectStepGroupsByRecipeID } from '#root/database/stepGroup.js';
+import { deleteLink, insertLink, selectAllLinks } from '#root/database/linkedRecipes.js';
 
 export const THUMBNAIL_DIRECTORY = './images/thumbnails';
 const LARGE_PREFIX = 'large_';
@@ -94,7 +95,10 @@ const buildFullRecipe = async (recipeID) => {
 		return null;
 	} else {
 		const recipeWithThumbnails = await addThumbnails(recipe);
+		const links = await addLinks(recipe);
 		const stepGroups = await selectStepGroupsByRecipeID(recipeID);
+
+		recipeWithThumbnails.links = links; 
 
 		recipeWithThumbnails.stepGroups = [];
 		for (const stepGroup of stepGroups) {
@@ -154,6 +158,27 @@ export const addThumbnails = async (recipe) => {
 		thumbnails,
 		...recipe,
 	};
+};
+
+export const addLinks = async (recipe) => {
+	const recipeID = recipe.RecipeID;
+
+	const linksFromDB = await selectAllLinks(recipeID);
+
+	const links = [];
+	for( const link of linksFromDB ) {
+		const otherRecipeID = recipeID == link.Recipe1ID ? link.Recipe2ID : link.Recipe1ID;
+
+		const otherRecipe = await selectRecipeByID(otherRecipeID);
+
+		links.push({
+			recipeID: otherRecipeID,
+			name: otherRecipe.Name
+		});
+
+	}
+
+	return links;
 };
 
 export const addIngredientTags = async (recipe) => {
@@ -344,6 +369,25 @@ const addTagToRecipe = async (req, res) => {
 	} else {
 		await addTag(recipeID, tagID);
 	}
+	res.status(200).json({ success: true });
+};
+
+const createLink = async (req, res) => {
+	const recipeID = req.params.recipeID;
+	const linkRecipeID = req.body.linkRecipeID;
+
+	await insertLink(recipeID, linkRecipeID);
+
+	res.status(200).json({ success: true });
+};
+
+
+const deleteLinkHandler = async (req, res) => {
+	const recipeID = req.params.recipeID;
+	const linkRecipeID = req.body.linkRecipeID; 
+
+	await deleteLink(recipeID, linkRecipeID);
+
 	res.status(200).json({ success: true });
 };
 
@@ -641,6 +685,8 @@ router.post('/api/recipes/image/:recipeID', [checkAdminMiddleware, upload.single
 router.post('/api/recipes/attachments/:recipeID', [checkAdminMiddleware, uploadAttachments.single('imageFile')], uploadAttachment);
 router.put('/api/recipes', [checkAdminMiddleware], addRecipe);
 router.post('/api/recipes/:recipeID/addTag', [checkAdminMiddleware], addTagToRecipe);
+router.post('/api/recipes/:recipeID/link', [checkAdminMiddleware], createLink);
+router.delete('/api/recipes/:recipeID/link', [checkAdminMiddleware], deleteLinkHandler);
 router.post('/api/recipes/:recipeID/removeTag', [checkAdminMiddleware], removeTagFromRecipe);
 router.patch('/api/recipes/:recipeID', [checkAdminMiddleware], updateRecipeProcessor);
 router.patch('/api/recipes/:recipeID/ingredient/:ingredientID', [checkAdminMiddleware], updateIngredientProcessor);

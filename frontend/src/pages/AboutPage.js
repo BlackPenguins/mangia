@@ -1,8 +1,8 @@
 
 import './AboutPage.scss';
 
-export const LATEST_VERSION = "2.8.4";
-export const LATEST_VERSION_DATE = "Mar 6, 2026";
+export const LATEST_VERSION = "2.10";
+export const LATEST_VERSION_DATE = "Mar 29, 2026";
 
 const AboutPage = () => {
 	return (
@@ -12,6 +12,13 @@ const AboutPage = () => {
 					<h2>Change Log</h2>
 				</div>
 				<div className='change-log'>
+					<h3>Version 2.10 (03/06/2026)</h3>
+					<ul>
+						<li>Added linked recipes</li>
+						<li>Added swap button to shopping lists</li>
+						<li>Changed daily notes from yellow to green in menu</li>
+						<li>Fixed bug where the thumbnail of menu would not change when using skip or leftovers</li>
+					</ul>
 					<h3>Version 2.8.3 (03/06/2026)</h3>
 					<ul>
 						<li>Lint fixes</li>

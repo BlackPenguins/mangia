@@ -13,24 +13,24 @@ const RecipeRow = ({ recipe, onClickHandler }) => {
 };
 
 const Thumbnail = ( {recipe} ) => {
-	const [thumbnail, setThumbnail] = useThumbnailImage(recipe, false);
+	const [thumbnail, setThumbnailError] = useThumbnailImage(recipe, false);
 
 	return <img
 		alt="thumbnail"
 		className="thumbnail"
 		src={thumbnail}
-		onError={() => setThumbnail('/images/no-thumb.png')}
+		onError={() => setThumbnailError(true)}
 	/>
 }
 
 export const useThumbnailBackgroundStyle = (recipe, hideInformation) => {
-	const [thumbnail, setThumbnail] = useThumbnailImage(recipe, hideInformation);
+	const [thumbnail, setThumbnailError] = useThumbnailImage(recipe, hideInformation);
 
 	let img = new Image();
     img.src = thumbnail;
     
     img.onerror = () => {
-		setThumbnail('/images/no-thumb.png');
+		setThumbnailError(true);
     };
 
 	return {

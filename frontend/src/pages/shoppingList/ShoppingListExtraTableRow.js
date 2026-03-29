@@ -2,8 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { Col, Input, Row, Button } from 'reactstrap';
 import { useAuth } from '@blackpenguins/penguinore-common-ext';
 import { Edit } from 'react-feather';
+import { SwapVert } from '@mui/icons-material';
 
-const ShoppingListExtraTableRow = ({ item, showCheckedItems, tokenFromStorage, fetchShoppingListExtras }) => {
+const ShoppingListExtraTableRow = ({ item, showCheckedItems, tokenFromStorage, fetchShoppingListExtras, handleSwapButton }) => {
 	const authContext = useAuth();
 	const [isChecked, setIsChecked] = useState(item.IsChecked);
 	const [name, setName] = useState(item.Name);
@@ -56,7 +57,7 @@ const ShoppingListExtraTableRow = ({ item, showCheckedItems, tokenFromStorage, f
 				/>
 			)}
 			</Col>
-			<Col className="name-col col" lg={10} sm={8} xs={8}>
+			<Col className="name-col col" lg={9} sm={6} xs={6}>
 				{!editMode && item.Name}
 				{editMode && <Input
 						enterKeyHint='done'
@@ -82,6 +83,11 @@ const ShoppingListExtraTableRow = ({ item, showCheckedItems, tokenFromStorage, f
 					<Edit />
 				</Button>
 			</Col>
+			<Col className="name-col col" lg={1} sm={2} xs={2}>
+				<Button color='link' inline onClick={() => handleSwapButton(item.ShoppingListExtraID)}>
+					<SwapVert />
+				</Button>
+			</Col>
 		</Row>
 	);
 };
@@ -89,7 +95,6 @@ const ShoppingListExtraTableRow = ({ item, showCheckedItems, tokenFromStorage, f
 const updateShoppingList = async (shoppingListExtraID, isChecked, name, tokenFromStorage) => {
 	await fetch(`/api/shoppingListExtra`, {
 		method: 'PATCH',
-
 		body: JSON.stringify({ shoppingListExtraID, isChecked, name }),
 		headers: {
 			// This is required. NodeJS server won't know how to read it without it.

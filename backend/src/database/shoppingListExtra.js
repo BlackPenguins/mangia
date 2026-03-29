@@ -53,3 +53,15 @@ export const updateShoppingListExtra = (shoppingListExtraID, isChecked, name) =>
 		});
 	});
 };
+
+export const swapShoppingListExtra = (shoppingListExtraID) => {
+	return new Promise((resolve, reject) => {
+		pool.query('UPDATE SHOPPING_LIST_EXTRA SET IsWishlist = 1 - IsWishlist WHERE ShoppingListExtraID = ?', [shoppingListExtraID], (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve(result);
+			}
+		});
+	});
+};

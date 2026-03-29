@@ -1,6 +1,6 @@
 import express from 'express';
 import { checkAdminMiddleware } from './auth.js';
-import { insertShoppingListExtra, selectAllShoppingListExtra, updateShoppingListExtra } from  '#root/database/shoppingListExtra.js';
+import { insertShoppingListExtra, selectAllShoppingListExtra, swapShoppingListExtra, updateShoppingListExtra } from  '#root/database/shoppingListExtra.js';
 import { getOrInsertWeek } from  '#root/database/week.js';
 
 const router = express.Router();
@@ -46,6 +46,21 @@ const addShoppingListExtraHandler = async (req, res) => {
 	);
 };
 
+const swapShoppingListItemsHandler = async (req, res) => {
+	const shoppingListExtraID = req.body.shoppingListExtraID;
+
+	const insertPromise = swapShoppingListExtra(shoppingListExtraID);
+
+	insertPromise.then(
+		(result) => {
+			res.status(200).json({ success: true, result });
+		},
+		(error) => {
+			res.status(500).json({ message: error });
+		}
+	);
+};
+
 const updateShoppingListExtraHandler = (req, res) => {
 	const shoppingListExtraID = req.body.shoppingListExtraID;
 	const isChecked = req.body.isChecked;
@@ -65,6 +80,7 @@ const updateShoppingListExtraHandler = (req, res) => {
 };
 
 router.get('/api/shoppingListExtra', getShoppingListItemsHandler);
+router.post('/api/shoppingListExtra/swap', checkAdminMiddleware, swapShoppingListItemsHandler);
 router.put('/api/shoppingListExtra', checkAdminMiddleware, addShoppingListExtraHandler);
 router.patch('/api/shoppingListExtra', checkAdminMiddleware, updateShoppingListExtraHandler);
 

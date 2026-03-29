@@ -189,6 +189,18 @@ body {
 	}
 }
 
+.linked-recipes-section {
+	margin-top: 20px;
+
+	.link-row {
+		margin: 10px 0px;
+		.delete-btn {
+			padding: 5px 8px;
+			margin-right: 10px;
+		}
+	}
+}
+
 .ingredient-section {
 	margin: 50px 0px;
 

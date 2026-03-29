@@ -269,6 +269,15 @@ const migrationHandler = async (req, res) => {
 				await simpleDBQuery('Add Column', 'ALTER TABLE THUMBNAILS ADD COLUMN IsPrimary TINYINT', res);
 				await simpleDBQuery('Add Column', 'UPDATE THUMBNAILS SET IsPrimary = 1 WHERE ThumbnailID IN (SELECT MinThumb FROM (SELECT MIN(ThumbnailID) AS MinThumb FROM THUMBNAILS GROUP BY RecipeID) x)', res);
 				break;
+
+			case 'addLinkedRecipes':
+				await simpleDBQuery('Add Column', 'DROP TABLE LINKED_RECIPES', res);
+				await simpleDBQuery(
+					'Create SUGGESTIONS',
+					'CREATE TABLE LINKED_RECIPES (LinkedRecipesID INT AUTO_INCREMENT PRIMARY KEY, Recipe1ID INT, Recipe2ID INT, FOREIGN KEY (Recipe1ID) REFERENCES RECIPE(RecipeID), FOREIGN KEY (Recipe2ID) REFERENCES RECIPE(RecipeID))',
+					res
+				);
+				break;
 			default:
 				console.error('Migration not found!');
 				success = false;

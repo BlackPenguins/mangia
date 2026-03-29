@@ -83,6 +83,7 @@ const RecipePage = () => {
 					<Notes icon={<span className='section-icon'>&#128298;</span>} title="Day Preparation" notes={recipe?.DayPrep} />
 
 					<History history={recipe?.history} />
+					<LinkedRecipes links={recipe?.links} />
 
 					<Controls recipe={recipe} />
 				</div>
@@ -356,6 +357,25 @@ const Notes = ({ icon, title, notes }) => {
 	);
 };
 
+const LinkedRecipes = ( {links} ) => {
+	if( links?.length === 0 ) {
+		return null;
+	} 
+
+	return (
+		<div className='linked-recipes-section extraSection'>
+			<h4><span className='section-icon'>&#128279;</span> Related Recipes</h4>
+
+			{links && links.map( (link) => {
+				return (
+					<div className='link-row' key={link.recipeID}>
+						<a href={`/recipe/${link.recipeID}`}>{link.name}</a>
+					</div>
+				)
+			})}
+		</div>
+	)
+}
 const History = ({ history }) => {
 	return (
 		<div className="extraSection history">

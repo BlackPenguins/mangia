@@ -8,6 +8,7 @@ import ShoppingListExtraTable from './ShoppingListExtraTable';
 import ShoppingListTable from './ShoppingListItemTable';
 import StoreFilters from './StoreFilters';
 import { useAuth } from '@blackpenguins/penguinore-common-ext';
+import ShoppingListExtra from './ShoppingListExtra';
 
 const ShoppingList = () => {
 	const authContext = useAuth();
@@ -99,9 +100,7 @@ const ShoppingList = () => {
 							selectedStore={selectedStore}
 							updateShoppingListWithServerData={updateShoppingListWithServerData}
 						/>
-
-						<ShoppingListExtraTable showCheckedItems={showCheckedItems} isWishlist={false} />
-						<ShoppingListExtraTable showCheckedItems={showCheckedItems} isWishlist={true} />
+						<ShoppingListExtra showCheckedItems={showCheckedItems}/>
 					</Col>
 				</Row>
 			</div>
