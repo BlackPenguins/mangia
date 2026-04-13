@@ -4,7 +4,6 @@ import { Button, Col, Row } from 'reactstrap';
 
 import './ShoppingList.scss';
 import ShoppingListControls from './ShoppingListControls';
-import ShoppingListExtraTable from './ShoppingListExtraTable';
 import ShoppingListTable from './ShoppingListItemTable';
 import StoreFilters from './StoreFilters';
 import { useAuth } from '@blackpenguins/penguinore-common-ext';
@@ -54,9 +53,26 @@ const ShoppingList = () => {
 		showToast('Shopping List', 'Shopping list has been rebuilt.');
 	}, [fetchShoppingList, showToast, tokenFromStorage]);
 
+	const markIngredientAvailabilityHandler = async (ingredientTagID, storeID, isAvailable) => {
+		await fetch(`/api/ingredientAvailability`, {
+			method: 'PUT',
+			body: JSON.stringify({
+				storeID,
+				ingredientTagID,
+				isAvailable: isAvailable ? 1 : 0,
+			}),
+			headers: {
+				// This is required. NodeJS server won't know how to read it without it.
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${tokenFromStorage}`,
+			},
+		});
+	};
+
 	const [selectedStore, setSelectedStore] = useState(null);
 	const [showCheckedItems, setShowCheckedItems] = useState(false);
 	const [showPrices, setShowPrices] = useState(false);
+	const [checkedForStore, setCheckedForStore] = useState([]);
 
 	const totalUncheckedShoppingItems = shoppingListItems?.flatMap( i => i.ingredients).filter(s => s.isChecked === 0 ).length || 0;
 	
@@ -82,7 +98,7 @@ const ShoppingList = () => {
 
 				<Row>
 					<Col lg={3}>
-						<StoreFilters stores={stores} selectedStore={selectedStore} setSelectedStore={setSelectedStore} />
+						<StoreFilters stores={stores} selectedStore={selectedStore} setSelectedStore={setSelectedStore} setCheckedForStore={setCheckedForStore} />
 						<ShoppingListControls
 							showCheckedItems={showCheckedItems}
 							setShowCheckedItems={setShowCheckedItems}
@@ -99,6 +115,9 @@ const ShoppingList = () => {
 							tokenFromStorage={tokenFromStorage}
 							selectedStore={selectedStore}
 							updateShoppingListWithServerData={updateShoppingListWithServerData}
+							checkedForStore={checkedForStore}
+							setCheckedForStore={setCheckedForStore}
+							markIngredientAvailabilityHandler={markIngredientAvailabilityHandler}
 						/>
 						<ShoppingListExtra showCheckedItems={showCheckedItems}/>
 					</Col>

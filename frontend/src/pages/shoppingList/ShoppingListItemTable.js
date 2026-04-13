@@ -2,11 +2,12 @@ import LoadingText from 'components/Common/LoadingText';
 import { Col, Row } from 'reactstrap';
 import ShoppingListTableRow from './ShoppingListItemTableRow';
 
+// TODO: Combine this will the HEADERS in ShoppingList
 const NAME_WIDTH = 6;
 const RECIPE_COUNT_WIDTH = 6;
 
-const MOBILE_NAME_WIDTH = 10;
-const MOBILE_RECIPE_COUNT_WIDTH = 2;
+const MOBILE_NAME_WIDTH = 9;
+const MOBILE_RECIPE_COUNT_WIDTH = 3;
 
 const ShoppingListTable = ({
 	showCheckedItems,
@@ -16,7 +17,18 @@ const ShoppingListTable = ({
 	tokenFromStorage,
 	selectedStore,
 	updateShoppingListWithServerData,
+	checkedForStore,
+	setCheckedForStore,
+	markIngredientAvailabilityHandler
 }) => {
+	let storeColors = {};
+
+	if( selectedStore ) {
+		storeColors = {
+			backgroundColor: selectedStore.storeColor,
+			color: selectedStore.storeColor2
+		};
+	}
 	return (
 		<>
 			{shoppingListItems == null && <LoadingText text="Loading shopping list" />}
@@ -43,7 +55,7 @@ const ShoppingListTable = ({
 						return (
 							<div key={index} className="container">
 								<div className={classes.join(' ')}>
-									<Row className="heading">
+									<Row className="heading" style={storeColors}>
 										<Col className="col" lg={NAME_WIDTH} sm={MOBILE_NAME_WIDTH} xs={MOBILE_NAME_WIDTH}>
 											{group.department}
 										</Col>
@@ -62,6 +74,9 @@ const ShoppingListTable = ({
 											selectedStore={selectedStore}
 											storeHasLowestPrice={storeHasLowestPrice}
 											updateShoppingListWithServerData={updateShoppingListWithServerData}
+											checkedForStore={checkedForStore}
+											setCheckedForStore={setCheckedForStore}
+											markIngredientAvailabilityHandler={markIngredientAvailabilityHandler}
 										/>
 									))}
 								</div>

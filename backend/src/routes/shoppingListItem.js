@@ -6,6 +6,7 @@ import { getOrInsertWeek } from  '#root/database/week.js';
 import { checkAdminMiddleware } from './auth.js';
 import { getMenuForWeekOffset } from './menu.js';
 import { INGREDIENT_EXTRACT_REGEX } from '#root/scrapers/RecipeImporter.js';
+import { selectLatestByStore } from '#root/database/ingredientAvailabilty.js';
 
 const getShoppingListItemsHandler = async (req, res) => {
 	const shoppingList = await getCurrentShoppingList();
@@ -37,6 +38,7 @@ const getCurrentShoppingList = async () => {
 			department: shoppingListItem.Department,
 			departmentPosition: shoppingListItem.DepartmentPosition,
 			prices: await getPricesForStore(shoppingListItem.IngredientTagID),
+			availability: await getAvailability(shoppingListItem.IngredientTagID),
 		});
 	}
 
@@ -44,6 +46,8 @@ const getCurrentShoppingList = async () => {
 	const stores = storesFromDB.map((s) => ({
 		storeID: s.StoreID,
 		storeName: s.Name,
+		storeColor: s.Color,
+		storeColor2: s.Color2
 	}));
 
 	const departmentsWithIngredients = groupByDepartment(ingredientsWithPrices);
@@ -54,6 +58,39 @@ const getCurrentShoppingList = async () => {
 	};
 
 	return response;
+};
+
+export const getAvailability = async (ingredientTagID) => {
+	const availabilityFromDB = await selectLatestByStore(ingredientTagID);
+
+	// const result = availabilityFromDB.reduce((final, row) => {
+	// 	const storeId = row.StoreID;
+	// 	const count = row['COUNT(IsAvailable)'];
+
+	// 	if (!final[storeId]) {
+	// 		final[storeId] = {
+	// 		countAvailable: 0,
+	// 		countUnavailable: 0
+	// 		};
+	// 	}
+
+	// 	if (row.IsAvailable === 1) {
+	// 		final[storeId].countAvailable = count;
+	// 	} else {
+	// 		final[storeId].countUnavailable = count;
+	// 	}
+
+	// 	return final;
+	// }, {});
+
+	const result = availabilityFromDB.reduce((final, row) => {
+		const storeId = row.StoreID;
+		final[storeId] = { isAvailable: row.IsAvailable };
+
+		return final;
+	}, {});
+
+	return result;
 };
 
 export const getPricesForStore = async (ingredientTagID) => {

@@ -277,6 +277,15 @@ const migrationHandler = async (req, res) => {
 					res
 				);
 				break;
+			case 'storeMode':
+				await simpleDBQuery(
+					'Create INGREDIENT_AVAILABILITY',
+					'CREATE TABLE INGREDIENT_AVAILABILITY (IngredientAvailabilityID INT AUTO_INCREMENT PRIMARY KEY, StoreID INT NOT NULL, IngredientTagID INT NOT NULL, IsAvailable TINYINT, Date DATE, FOREIGN KEY (IngredientTagID) REFERENCES INGREDIENT_TAG(IngredientTagID), FOREIGN KEY (StoreID) REFERENCES STORE(StoreID))',
+					res
+				);
+				await simpleDBQuery('Add Column', 'ALTER TABLE STORE ADD COLUMN Color VARCHAR(10)', res);
+				await simpleDBQuery('Add Column', 'ALTER TABLE STORE ADD COLUMN Color2 VARCHAR(10)', res);
+				break;
 			default:
 				console.error('Migration not found!');
 				success = false;

@@ -1,8 +1,8 @@
 
 import './AboutPage.scss';
 
-export const LATEST_VERSION = "2.9.1";
-export const LATEST_VERSION_DATE = "Mar 29, 2026";
+export const LATEST_VERSION = "2.10";
+export const LATEST_VERSION_DATE = "Apr 12, 2026";
 
 const AboutPage = () => {
 	return (
@@ -12,6 +12,10 @@ const AboutPage = () => {
 					<h2>Change Log</h2>
 				</div>
 				<div className='change-log'>
+					<h3>Version 2.10 (04/12/2026)</h3>
+					<ul>
+						<li>Added Store Mode, does not work for Non-Menu yet (links to a different table for non tags)</li>
+					</ul>
 					<h3>Version 2.9 (03/06/2026)</h3>
 					<ul>
 						<li>Added linked recipes</li>

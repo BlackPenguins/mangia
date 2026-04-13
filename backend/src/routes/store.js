@@ -92,11 +92,21 @@ const updatePriceHandler = (req, res) => {
 const updateStoreHandler = (req, res) => {
 	const storeID = req.body.id;
 	const storeName = req.body.name;
+	const color = req.body.color;
+	const color2 = req.body.color2;
 
 	const update = {};
 
 	if (storeName) {
 		update.Name = storeName;
+	}
+
+	if (color) {
+		update.Color = color;
+	}
+
+	if (color2) {
+		update.Color2 = color2;
 	}
 
 	console.log(`Updating Store [${storeID}]`, update);

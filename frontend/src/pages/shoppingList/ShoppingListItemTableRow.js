@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Col, Input, Row } from 'reactstrap';
+import { Button, Col, Input, Row } from 'reactstrap';
 import PriceInput from './PriceInput';
 import { useAuth } from '@blackpenguins/penguinore-common-ext';
+import { ProductionQuantityLimits } from '@mui/icons-material';
 
 // 6 header
 const CHECKBOX_WIDTH = 1
@@ -13,10 +14,10 @@ const STORE_PRICES_SECTION_WIDTH = 5;
 
 // 10 header
 const MOBILE_CHECKBOX_WIDTH = 2;
-const MOBILE_NAME_WIDTH = 8;
+const MOBILE_NAME_WIDTH = 7;
 
 // 2 header
-const MOBILE_RECIPE_COUNT_WIDTH = 2;
+const MOBILE_RECIPE_COUNT_WIDTH = 3;
 const MOBILE_STORE_PRICES_SECTION_WIDTH = 12;
 
 const ShoppingListTableRow = ({
@@ -28,6 +29,9 @@ const ShoppingListTableRow = ({
 	selectedStore,
 	storeHasLowestPrice,
 	updateShoppingListWithServerData,
+	checkedForStore,
+	setCheckedForStore,
+	markIngredientAvailabilityHandler
 }) => {
 	const authContext = useAuth();
 	const [isChecked, setIsChecked] = useState(ingredient.isChecked);
@@ -40,22 +44,43 @@ const ShoppingListTableRow = ({
 	const setValue = (isChecked) => {
 		setIsChecked(isChecked);
 		updateShoppingList(ingredient.shoppingListItemID, isChecked, tokenFromStorage, updateShoppingListWithServerData);
+		
+		if( selectedStore ) {
+			markIngredientAvailabilityHandler(ingredient.ingredientTagID, selectedStore.storeID, true);
+		}
 	};
 
-	if (!storeHasLowestPrice(selectedStore, ingredient)) {
-		// Hide rows that don't have the lowest price for that selected store
-		return null;
-	}
+	// Stop doing this for now, because we a pivoting the use into Store Mode
+	// Instead of hiding rows that don't have lowest price, because the Pricing module is taking too long
+	// We are creating a check off mode per store and building a database of availabilty
+
+	// if (!storeHasLowestPrice(selectedStore, ingredient)) {
+	// 	// Hide rows that don't have the lowest price for that selected store
+	// 	return null;
+	// }
 
 	const classes = ['list-row'];
 
-	if (isChecked) {
+	if( selectedStore ) {
+		const availability = ingredient?.availability[selectedStore?.storeID];
+
+		if( availability ) {
+			const isOutOfStock = !availability.isAvailable;
+			if( isOutOfStock ){
+				classes.push('out-of-stock');
+			}
+		}
+	}
+
+	if (isChecked || checkedForStore.includes(ingredient.ingredientTagID)) {
 		classes.push('checked');
 
 		if (!showCheckedItems) {
 			return null;
 		}
 	}
+
+
 
 	let countWidth;
 	let mobileCountWidth;
@@ -66,6 +91,7 @@ const ShoppingListTableRow = ({
 		countWidth = RECIPE_COUNT_WIDTH;
 		mobileCountWidth = MOBILE_RECIPE_COUNT_WIDTH;
 	}
+
 
 	return (
 		<>
@@ -83,7 +109,6 @@ const ShoppingListTableRow = ({
 			</Col>
 			<Col className="name-col col" lg={NAME_WIDTH} sm={MOBILE_NAME_WIDTH} xs={MOBILE_NAME_WIDTH}>
 				{ingredient.amount} {ingredient.name}
-
 				{ingredient?.isMissingUnits === 1 && (
 					<span className='missing-units'>
 						Missing Units
@@ -95,10 +120,11 @@ const ShoppingListTableRow = ({
 					<div>
 						{ingredient.recipeCount}
 						<span className='recipeNames'>{ingredient.recipeNames}</span>
+						<OutOfStockButton tokenFromStorage={tokenFromStorage} selectedStore={selectedStore} ingredient={ingredient} setCheckedForStore={setCheckedForStore} markIngredientAvailabilityHandler={markIngredientAvailabilityHandler}/>
 					</div>
 				)}
 			</Col>
-			
+
 			{showPrices && (
 				<Col className="stores-col col" lg={STORE_PRICES_SECTION_WIDTH} sm={MOBILE_STORE_PRICES_SECTION_WIDTH} xs={MOBILE_STORE_PRICES_SECTION_WIDTH}>
 					<Row>
@@ -119,6 +145,24 @@ const ShoppingListTableRow = ({
 	);
 };
 
+const OutOfStockButton = ({markIngredientAvailabilityHandler, selectedStore, ingredient, setCheckedForStore}) => {
+	if( !selectedStore) {
+		return null;
+	}
+
+	const handleOutOfStockButton = async (ingredientID) => {
+		setCheckedForStore( (prevState) => {
+			return [ingredientID, ...prevState]
+		})
+		markIngredientAvailabilityHandler(ingredient.ingredientTagID, selectedStore.storeID, false);
+	}
+
+	return (
+		<Button className='out-of-stock-btn' color='link' inline onClick={() => handleOutOfStockButton(ingredient.ingredientTagID)}>
+			<ProductionQuantityLimits />
+		</Button>
+	)
+}
 const updateShoppingList = async (shoppingListItemID, isChecked, tokenFromStorage, updateShoppingListWithServerData) => {
 	const response = await fetch(`/api/shoppingListItem/checked`, {
 		method: 'PATCH',

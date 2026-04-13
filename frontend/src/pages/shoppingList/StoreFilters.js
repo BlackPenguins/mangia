@@ -1,6 +1,11 @@
 import { Button } from 'reactstrap';
 
-const StoreFilters = ({ stores, selectedStore, setSelectedStore }) => {
+const StoreFilters = ({ stores, selectedStore, setSelectedStore, setCheckedForStore }) => {
+	const handleLink = (store) => {
+		setCheckedForStore([]);
+		setSelectedStore(store);
+	}
+	
 	return (
 		<div className="hero__categories">
 			<div className="hero__categories__all">
@@ -8,7 +13,7 @@ const StoreFilters = ({ stores, selectedStore, setSelectedStore }) => {
 			</div>
 			<ul>
 				<li>
-					<Button className={selectedStore === null ? 'active' : 'non-active'} color="link" onClick={() => setSelectedStore(null)}>
+					<Button className={selectedStore === null ? 'active' : 'non-active'} color="link" onClick={() => handleLink(null)}>
 						All
 					</Button>
 				</li>
@@ -17,7 +22,7 @@ const StoreFilters = ({ stores, selectedStore, setSelectedStore }) => {
 					stores.map((store) => {
 						return (
 							<li key={store.storeID}>
-								<Button className={selectedStore === store.storeID ? 'active' : 'non-active'} color="link" onClick={() => setSelectedStore(store.storeID)}>
+								<Button className={selectedStore?.storeID === store.storeID ? 'active' : 'non-active'} color="link" onClick={() => handleLink(store)}>
 									{store.storeName}
 								</Button>
 							</li>

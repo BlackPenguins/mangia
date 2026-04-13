@@ -23,21 +23,31 @@ const ExtraControls = ( {element}) => {
 				<PositionInput element={element}/>
 			</Col>
 			<Col lg={6}>
-				<ColorInput element={element}/>
+				<ColorInput
+					element={element}
+					patchURL='/api/ingredientDepartments'
+					id={element.IngredientDepartmentID}
+					color={element.Color}
+					colorColumnName='color'
+					label='Color'
+				/>
 			</Col>
 		</Row>
 	)
 }
-const ColorInput = ({element}) => {
+export const ColorInput = ({patchURL, id, color, colorColumnName, label}) => {
 	const authContext = useAuth();
 	const tokenFromStorage = authContext.tokenFromStorage;
 
-	const [color, setColor] = useState(element.Color || "#000000");
+	const [newColor, setNewColor] = useState(color || "#000000");
 
-	const changeColor = async (option) => {
-		await fetch('/api/ingredientDepartments', {
+	const changeColor = async () => {
+		const payload = { id };
+		payload[colorColumnName] = newColor;
+		
+		await fetch(patchURL, {
 			method: 'PATCH',
-			body: JSON.stringify({ id: element.IngredientDepartmentID, color: option }),
+			body: JSON.stringify(payload),
 			headers: {
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${tokenFromStorage}`,
@@ -46,8 +56,7 @@ const ColorInput = ({element}) => {
 	};
 
 	const updateColor = (option) => {
-		setColor(option);
-		changeColor(option);
+		setNewColor(option);
 	};
 
 	return (
@@ -57,9 +66,12 @@ const ColorInput = ({element}) => {
 				onChange={(e) => {
 					updateColor(e.target.value);
 				}}
-				value={color}
+				onBlur={(e) => {
+					changeColor();
+				}}
+				value={newColor}
 			/>
-			<label htmlFor="edit-book-dropdown">Color</label>
+			<label htmlFor="edit-book-dropdown">{label}</label>
 		</span>
 		
 	)
