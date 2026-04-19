@@ -1,6 +1,7 @@
 import LoadingText from 'components/Common/LoadingText';
 import { Col, Row } from 'reactstrap';
 import ShoppingListTableRow from './ShoppingListItemTableRow';
+import { isIngredientChecked } from './ShoppingList';
 
 // TODO: Combine this will the HEADERS in ShoppingList
 const NAME_WIDTH = 6;
@@ -39,7 +40,7 @@ const ShoppingListTable = ({
 
 					// This isn't working as we check them off. We should move everything into states so the list can update easily without a fetch.
 					// Break this into components in a package so we can put a state in this callback
-					const hasAllChecked = group.ingredients.every((i) => i.isChecked);
+					const hasAllChecked = group.ingredients.every((i) => isIngredientChecked(i, checkedForStore));
 
 					const showGroup = hasLowestPriceInDepartment;
 

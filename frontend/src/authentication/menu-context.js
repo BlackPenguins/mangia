@@ -3,30 +3,33 @@ import { useNavigate } from 'react-router-dom';
 
 const MenuContext = React.createContext({
 	// Dummy data to VS Code has auto-complete
-	menuRecipeIDs: [],
+	menus: [],
 	redirectToPreviousRecipeHandler: () => {},
 	redirectToNextRecipeHandler: () => {},
 	isMenuRecipeHandler: () => {},
-	setMenuRecipeIDsHandler: () => {},
+	setMenusHandler: () => {},
+	getCurrentMenu: () => {},
 });
 
 export const MenuContextProvider = ({ children }) => {
 	const navigate = useNavigate();
-	const [menuRecipeIDs, setMenuRecipeIDs] = useState([]);
+	const [menus, setMenus] = useState([]);
 
-	const setMenuRecipeIDsHandler = useCallback((menuRecipeIDs) => {
-		setMenuRecipeIDs(menuRecipeIDs);
+	const setMenusHandler = useCallback((menus) => {
+		setMenus(menus);
 	},[]);
 
 	const redirectRecipeHandler = (isNextRecipe, currentRecipeID) => {
-		const index = menuRecipeIDs.indexOf(currentRecipeID);
+		const index = menus.findIndex(m => m.recipe?.RecipeID === currentRecipeID);
 
 		if (isNextRecipe) {
-			const nextRecipeID = menuRecipeIDs[(index + 1) % menuRecipeIDs.length];
+			const nextMenu = menus[(index + 1) % menus.length];
+			const nextRecipeID = nextMenu?.recipe?.RecipeID;
 			navigate(`/recipe/${nextRecipeID}`);
 		} else {
 			const previousIndex = index - 1;
-			const prevRecipeID = menuRecipeIDs[previousIndex >= 0 ? previousIndex : menuRecipeIDs.length - 1];
+			const previousMenu = menus[previousIndex >= 0 ? previousIndex : menus.length - 1];
+			const prevRecipeID = previousMenu?.recipe?.RecipeID;
 			navigate(`/recipe/${prevRecipeID}`);
 		}
 	};
@@ -40,7 +43,11 @@ export const MenuContextProvider = ({ children }) => {
 	};
 
 	const isMenuRecipeHandler = (currentRecipeID) => {
-		return menuRecipeIDs && menuRecipeIDs.indexOf(currentRecipeID) !== -1;
+		return menus && menus.map( m => m.recipe?.RecipeID).indexOf(currentRecipeID) !== -1;
+	};
+
+	const getCurrentMenu = (currentRecipeID) => {
+		return menus && menus.find( m => m.recipe?.RecipeID == currentRecipeID);
 	};
 
 	return (
@@ -48,8 +55,9 @@ export const MenuContextProvider = ({ children }) => {
 			value={{
 				redirectToNextRecipeHandler,
 				redirectToPreviousRecipeHandler,
-				setMenuRecipeIDsHandler,
+				setMenusHandler,
 				isMenuRecipeHandler,
+				getCurrentMenu,
 			}}
 		>
 			{children}

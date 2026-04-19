@@ -1,4 +1,4 @@
-import { Star } from 'react-feather';
+import { ThumbsUp, ThumbsDown, Heart } from 'react-feather';
 import './Rating.scss';
 
 const Rating = ({ rating, setRating, size }) => {
@@ -8,29 +8,36 @@ const Rating = ({ rating, setRating, size }) => {
 		return null;
 	}
 
-	let ratingRemaining = rating;
-	const stars = [];
-
 	const ratingClasses = ['rating-container'];
 
 	if (setRating) {
 		ratingClasses.push('editable');
 	}
 
-	for (let starNumber = 1; starNumber <= 5; starNumber++) {
-		const setRatingHandler = () => setRating && setRating(starNumber);
-		const fill = ratingRemaining > 0 ? 'yellow' : 'none';
+	return (
+		<span className={ratingClasses.join(' ')}>
+			<RatingButton Icon={ThumbsDown} strokeColor ='#06008d' fillColor='#605aff' currentRating={rating} setRating={setRating} ratingValue={1} size={size}/>
+			<RatingButton Icon={ThumbsUp} strokeColor ='#0b8500' fillColor='#6cff5f' currentRating={rating} setRating={setRating} ratingValue={2} size={size}/>
+			<RatingButton Icon={Heart} strokeColor='#9b0049' fillColor='#ff6dd5' currentRating={rating} setRating={setRating} ratingValue={3} size={size}/>
+		</span>
+	);
+};
 
-		stars.push(
-			<span key={starNumber} onClick={setRatingHandler}>
-				<Star color="#82ae46" size={size} fill={fill} />
-			</span>
-		);
+const RatingButton = ({Icon, strokeColor, fillColor, currentRating, setRating, ratingValue, size}) => {
 
-		ratingRemaining--;
+	const setRatingHandler = () => setRating && setRating(ratingValue);
+	let currentStroke = 'grey';
+	let currentFill = 'grey';
+
+	if( currentRating == ratingValue) {
+		// This value is selected
+		currentStroke = strokeColor;
+		currentFill = fillColor;
+	} else if( !setRating ) {
+		return null;
 	}
 
-	return <span className={ratingClasses.join(' ')}>{stars}</span>;
-};
+	return <Icon color={currentStroke} fill={currentFill} size={size} onClick={setRatingHandler} />
+}
 
 export default Rating;

@@ -401,7 +401,8 @@ const getWeightedRecipes = async (recipes) => {
 	const fridgeItems = await selectAllFridge();
 	let totalWeight = 0;
 
-	const filteredRecipes = recipes.filter((r) => r.Category === 'Dinner' && r.IsActive);
+	// Don't include recipes that are not dinner, not active, or they have a dislike rating
+	const filteredRecipes = recipes.filter((r) => r.Category === 'Dinner' && r.IsActive && r?.Rating !== 1);
 
 	// Recipes are assumed to be LastMade order with the newly made recipes first, with the lower weights
 	for (let itemIndex = 0; itemIndex < filteredRecipes.length; itemIndex++) {

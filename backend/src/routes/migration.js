@@ -286,6 +286,9 @@ const migrationHandler = async (req, res) => {
 				await simpleDBQuery('Add Column', 'ALTER TABLE STORE ADD COLUMN Color VARCHAR(10)', res);
 				await simpleDBQuery('Add Column', 'ALTER TABLE STORE ADD COLUMN Color2 VARCHAR(10)', res);
 				break;
+			case 'resetRating':
+				await simpleDBQuery('Add Column', 'UPDATE RECIPE SET Rating = 0', res);
+				break;
 			default:
 				console.error('Migration not found!');
 				success = false;

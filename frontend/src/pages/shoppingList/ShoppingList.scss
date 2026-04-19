@@ -62,7 +62,7 @@
 		&.out-of-stock {
 			.name-col {
 				font-weight: bold;
-				color: rgb(77, 77, 77);
+				color: #b1b1b1;
 			}
 		}
 
@@ -104,6 +104,13 @@
 				justify-content: center;
 				align-items: flex-start;
 
+
+				@media only screen and (min-width: 992px) {
+					div {
+						width: 100%;
+					}
+				}
+
 				@media only screen and (max-width: 992px) {
 					.recipeNames {
 						display: none;
@@ -122,6 +129,10 @@
 
 		.out-of-stock-btn {
 			color: darkred;
+
+			@media only screen and (min-width: 992px) {
+				float: right;
+			}
 		}
 
 		.col-border {

@@ -22,7 +22,7 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 	let thumbnail = (
 		<>
 			<div style={thumbnailStyle} className="thumbnail-container">
-				{!hideInformation && <Rating size="20" rating={recipe?.Rating} />}
+				{!hideInformation && <Rating size="30" rating={recipe?.Rating} />}
 			</div>
 		</>
 	);

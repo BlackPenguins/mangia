@@ -1,8 +1,8 @@
 
 import './AboutPage.scss';
 
-export const LATEST_VERSION = "2.10";
-export const LATEST_VERSION_DATE = "Apr 12, 2026";
+export const LATEST_VERSION = "3";
+export const LATEST_VERSION_DATE = "Apr 18, 2026";
 
 const AboutPage = () => {
 	return (
@@ -12,6 +12,17 @@ const AboutPage = () => {
 					<h2>Change Log</h2>
 				</div>
 				<div className='change-log'>
+					<h3>Version 3 (04/18/2026)</h3>
+					<ul>
+						<li>Switching to Firefox version format</li>
+						<li>Add thumbs up, thumbs down, heart rating system</li>
+						<li>Exclude dislikes from the algorithm</li>
+						<li>Show Daily Notes at the top of Recipe Details page</li>
+						<li>Default no &quot;steps&quot; header to &quot;Steps&quot;</li>
+						<li>Hide History title if there is none</li>
+						<li>Hiding shopping list departments and the unchecked count now take into account the out of stocks items</li>
+						<li>Out of stock items are light grey and button is on the far right</li>
+					</ul>
 					<h3>Version 2.10 (04/12/2026)</h3>
 					<ul>
 						<li>Added Store Mode, does not work for Non-Menu yet (links to a different table for non tags)</li>

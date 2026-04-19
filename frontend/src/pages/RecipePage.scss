@@ -70,6 +70,33 @@
 		}
 	}
 }
+.menu-announcements {
+	margin: {
+		top: 10px;
+	}
+	&.daily-notes {
+		background-color: #24691a;
+		color: white;
+		display: flex;
+		padding: 15px;
+
+		flex-direction: column;
+		align-content: center;
+		align-items: center;
+
+		.title {
+			font-weight: bold;
+			font-size: 1.1em;
+			text-transform: uppercase;
+			margin-bottom: 5px;
+		}
+
+		.content {
+			font-size: 0.9em;
+			color: #fff9c5;
+		}
+	}
+}
 .recipe-menu-buttons {
 	display: flex;
 	justify-content: space-between;

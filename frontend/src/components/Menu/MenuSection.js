@@ -22,7 +22,7 @@ import DailyNotesButton from './RecipeButtons/DailyNotesButton';
 const MenuSection = () => {
 	const [page, setPage] = useState(0);
 	const [currentRecipeIDs, setCurrentRecipeIDs] = useState([]);
-	const { setMenuRecipeIDsHandler } = useContext(MenuContext);
+	const { setMenusHandler } = useContext(MenuContext);
 
 	const [menus, setMenus] = useState(null);
 	const [suggestions, setSuggestions] = useState([]);
@@ -36,10 +36,10 @@ const MenuSection = () => {
 		setMenus(menu);
 		setSuggestions(data?.suggestions);
 		const recipeIDs = menu.map((m) => m.recipe?.RecipeID);
-		const menuRecipeIDs = menu.filter((m) => m.isSkipped !== 1 && m.isLeftovers !== 1).map((m) => m.recipe?.RecipeID);
+		const menus = menu.filter((m) => m.isSkipped !== 1 && m.isLeftovers !== 1);
 		setCurrentRecipeIDs(recipeIDs);
-		setMenuRecipeIDsHandler(menuRecipeIDs);
-	}, [setMenuRecipeIDsHandler]);
+		setMenusHandler(menus);
+	}, [setMenusHandler]);
 
 	useEffect(() => {
 		fetchMenu(page);

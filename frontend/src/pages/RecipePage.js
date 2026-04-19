@@ -121,10 +121,29 @@ const RecipeTitle = ({ recipe }) => {
 				<MenuButton isMenuRecipe={isMenuRecipe} isMobile label="<" action={() => menuContext.redirectToPreviousRecipeHandler(recipeID)} />
 				<MenuButton isMenuRecipe={isMenuRecipe} isMobile label=">" action={() => menuContext.redirectToPreviousRecipeHandler(recipeID)} />
 			</div>
+
+			<MenuAnnouncements menuContext={menuContext} recipeID={recipeID}/>
 		</>
 	);
 };
 
+const MenuAnnouncements = ({menuContext, recipeID}) => {
+	const isMenuRecipe = menuContext.isMenuRecipeHandler(recipeID);
+	const currentMenu = menuContext.getCurrentMenu(recipeID);
+	const dailyNotes = currentMenu?.dailyNotes;
+
+	if( !isMenuRecipe || !dailyNotes) {
+		return null;
+	}
+
+	return (
+		<div className='menu-announcements daily-notes'>
+			<div className="title">Daily Notes</div>
+			<div className="content">{dailyNotes}</div>
+		</div>
+	)
+
+}
 const MenuButton = ({ isMenuRecipe, label, isMobile, action }) => {
 	if (!isMenuRecipe) {
 		return null;
@@ -258,7 +277,7 @@ const HeaderImage = ({ recipe }) => {
 		<a href={thumbnailStyle.thumbnailImageURL} target='_blank' rel="noreferrer">
 			<div style={thumbnailStyle} className="thumbnail-container">
 				<NewArrivalTag recipe={recipe} />
-				<Rating rating={recipe?.Rating} size="20" />
+				<Rating rating={recipe?.Rating} size="30" />
 			</div>
 		</a>
 	);
@@ -308,7 +327,7 @@ const StepGroups = ({ stepGroups }) => {
 	return stepGroups.map( (stepGroup) => {
 		return (
 			<div key={stepGroup.id} className="steps">
-				<h4><span className='section-icon'>&#x1F4DD;</span>{stepGroup.header}</h4>
+				<h4><span className='section-icon'>&#x1F4DD;</span>{stepGroup.header || "Steps"}</h4>
 				<StepGroup stepGroup={stepGroup}/>
 			</div>
 		);
@@ -377,6 +396,10 @@ const LinkedRecipes = ( {links} ) => {
 	)
 }
 const History = ({ history }) => {
+	if( !history || history.length === 0 ) {
+		return null;
+	}
+
 	return (
 		<div className="extraSection history">
 			<h4><span className='section-icon'>&#x1F552;</span> History</h4>

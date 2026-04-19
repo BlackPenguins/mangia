@@ -74,7 +74,7 @@ const ShoppingList = () => {
 	const [showPrices, setShowPrices] = useState(false);
 	const [checkedForStore, setCheckedForStore] = useState([]);
 
-	const totalUncheckedShoppingItems = shoppingListItems?.flatMap( i => i.ingredients).filter(s => s.isChecked === 0 ).length || 0;
+	const totalUncheckedShoppingItems = shoppingListItems?.flatMap( i => i.ingredients).filter(s => !isIngredientChecked(s, checkedForStore)).length || 0;
 	
 	return (
 		<section className="hero">
@@ -126,5 +126,10 @@ const ShoppingList = () => {
 		</section>
 	);
 };
+
+export const isIngredientChecked = ( ingredient, checkedForStore) => {
+	return ingredient.isChecked === 1 || checkedForStore.includes(ingredient.ingredientTagID);
+}
+
 
 export default ShoppingList;
