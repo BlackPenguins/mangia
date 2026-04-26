@@ -13,23 +13,20 @@ export const scrapeGoogle = async (html) => {
 	try {
 		const $ = cheerio.load(html);
 
-		const googleSchema = $('script[type=application/ld+json]').text();
+		const scripts = $('script[type="application/ld+json"]');
 
-		console.log('Schema:', googleSchema);
+		let recipeJSON = null;
 
-		json = JSON.parse(googleSchema)[0];
+		scripts.each((_, el) => {
+    		const data = JSON.parse($(el).html());
+    		recipeJSON = extractRecipe(data);
+    		if (recipeJSON) return false;
+		});
 
-		if( json === undefined ) {
-			attemptPath.push('Root Extract')
-			json = JSON.parse(googleSchema);
-		}
-
-		if( !json.description && json['@graph'] ) {
-			attemptPath.push('@Graph')
-			json = json['@graph'].find(item => item['@type'] === 'Recipe');
-		}
+		// console.log('Schema:', recipeJSON);
 
 		const recipeObj = new Recipe();
+		const json = recipeJSON;
 
 		if (json) {
 			recipeObj.name = decodeHTMLEntities(json.headline || json.name);
@@ -81,8 +78,45 @@ export const scrapeGoogle = async (html) => {
 		console.log("JSON: ", json);
 		console.error('Failed to parse with Google!', e);
 		console.log("Attempt path: ", attemptPath.join(','));
-		return null;
+
+		return {
+			success: false,
+			errorMessage: e.message,
+		};
 	}
+};
+
+const extractRecipe = (obj) => {
+  	if (!obj) return null;
+
+	if (Array.isArray(obj)) {
+		for (const item of obj) {
+			const found = extractRecipe(item);
+			if (found) {
+				return found;
+			}
+		}
+	} else if (typeof obj === 'object') {
+		const type = obj['@type'];
+
+		if( Array.isArray(type)) {
+			// '@type': [ 'Recipe', 'NewsArticle' ]
+			if(type.includes('Recipe')) {
+				return obj;
+			}
+		} else {
+			// '@type': 'Recipe'
+			if (obj['@type'] === 'Recipe') {
+				return obj;
+			}
+		}
+
+		if (obj['@graph']) {
+			return extractRecipe(obj['@graph']);
+		}
+  	}
+
+  	return null;
 };
 
 function decodeHTMLEntities(rawStr) {

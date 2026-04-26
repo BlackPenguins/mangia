@@ -2,6 +2,10 @@ import { scrapeGoogle } from './GoogleScraper.js';
 import { scrapeNatasha } from './NatashaScraper.js';
 import axios from 'axios';
 
+const scraperMap = new Map();
+scraperMap.set('*', scrapeGoogle);
+scraperMap.set('natashaskitchen.com', scrapeNatasha);
+
 export const scrape = async (url) => {
 	console.log('Scraping URL...', url);
 
@@ -13,27 +17,32 @@ export const scrape = async (url) => {
 	const response = await axios.get(url);
 	const html = response.data;
 	
+	let recipeObj = {
+		success: false,
+	}
+
 
 	console.log('=== Running through all scrapers...');
-	let recipeObj = await scrapeGoogle(html);
+	for( const [domain, scraper] of scraperMap) {
+		if( domain === "*" || url.indexOf(domain)) {
+			recipeObj = await scraper(html);
 
-	if (!isScrapeSuccessful(recipeObj)) {
+			if( recipeObj?.errorMessage ) {
+				// Don't try the other scrapers, we have an error
+				break;
+			}
 
-		if (url.indexOf('natashaskitchen.com') !== -1) {
-			recipeObj = await scrapeNatasha(html);
+			if( recipeObj !== null && recipeObj?.name) {
+				// We found a recipe, don't try other scrapers
+				recipeObj.success = true;
+				break;
+			}
 		}
+	}
 
-		console.log('Recipe Object', recipeObj);
-		recipeObj.success = isScrapeSuccessful(recipeObj);
-	} else {
-		console.log('Recipe Object', recipeObj);
-		console.log('RECIPE SCRAPE WAS A SUCCESS!');
-		recipeObj.success = true;
+	if( !recipeObj.success && !recipeObj.errorMessage ) {
+		recipeObj.errorMessage = `Failed to parse recipe from the URL ${url}`;
 	}
 
 	return recipeObj;
-};
-
-const isScrapeSuccessful = (recipeObj) => {
-	return recipeObj !== null && recipeObj?.name;
 };

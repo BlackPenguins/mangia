@@ -1,7 +1,7 @@
 import express from 'express';
 import { addTag, deleteRecipe, deleteTag, insertRecipe, selectAllRecipes, selectimportFailureURLs, selectRecipeByID, selectTags, updateRecipe } from  '#root/database/recipes.js';
 import { breakdownIngredient, createIngredients, createSteps, importRecipe } from '#root/scrapers/RecipeImporter.js';
-import { deleteStepsByRecipeID, selectStepsByRecipeID } from  '#root/database/step.js';
+import { deleteStepsByRecipeID } from  '#root/database/step.js';
 import { deleteIngredient, deleteIngredientsByRecipeID, insertIngredient, selectIngredientByIngredientID, selectIngredientsByRecipeID, updateIngredient } from  '#root/database/ingredient.js';
 
 import Tesseract, { createWorker } from 'tesseract.js';

@@ -1,7 +1,7 @@
 
 import './AboutPage.scss';
 
-export const LATEST_VERSION = "3";
+export const LATEST_VERSION = "4";
 export const LATEST_VERSION_DATE = "Apr 18, 2026";
 
 const AboutPage = () => {
@@ -12,6 +12,11 @@ const AboutPage = () => {
 					<h2>Change Log</h2>
 				</div>
 				<div className='change-log'>
+					<h3>Version 4 (04/26/2026)</h3>
+					<ul>
+						<li>Improved the import process</li>
+						<li>Auto-tag on new ingredients</li>
+					</ul>
 					<h3>Version 3 (04/18/2026)</h3>
 					<ul>
 						<li>Switching to Firefox version format</li>

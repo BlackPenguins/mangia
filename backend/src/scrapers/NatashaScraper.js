@@ -21,7 +21,7 @@ export const scrapeNatasha = async (html) => {
 		const recipeObj = new Recipe();
 
 		let recipeJSON = null;
-		for (const i = 0; i < json.length; i++) {
+		for (let i = 0; i < json.length; i++) {
 			const tempJSON = json[i];
 			if (tempJSON['@type'] === 'Recipe') {
 				recipeJSON = tempJSON;
@@ -56,8 +56,11 @@ export const scrapeNatasha = async (html) => {
 
 		return recipeObj;
 	} catch (e) {
-		console.error('Failed to parse with Natasha!');
-		return null;
+		console.error('Failed to parse with Natasha!', e);
+		return {
+			success: false,
+			errorMessage: e.message,
+		};
 	}
 };
 

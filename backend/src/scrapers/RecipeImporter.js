@@ -1,4 +1,5 @@
 import { deleteIngredientsByRecipeID, insertIngredient } from  '#root/database/ingredient.js';
+import { selectAllIngredientTags } from '#root/database/ingredientTags.js';
 import { deleteRecipe, insertImportFailureURL, insertRecipe, selectRecipeByName, updateRecipe } from  '#root/database/recipes.js';
 import { deleteStepsByRecipeID, insertStep } from  '#root/database/step.js';
 import { deleteStepGroupByRecipeID, insertStepGroup } from '#root/database/stepGroup.js';
@@ -26,7 +27,12 @@ export const importRecipe = async (url, replaceRecipeID) => {
 
 		if (!scrapeSuccess) {
 			importResponse.success = false;
-			importResponse.status = `Failed to parse recipe from the URL "${url}"`;
+			if( recipeObject.errorMessage){
+				importResponse.status = recipeObject.errorMessage;
+			} else {
+				importResponse.status = `Failed to parse recipe from the URL "${url}"`;
+			}
+			
 			await insertImportFailureURL(url);
 		} else {
 			let recipeID = 0;
@@ -128,7 +134,7 @@ const downloadImage = (url, filePath) => {
     try {
       parsedUrl = new URL(url); // will throw on invalid URL
     } catch (err) {
-      console.log(`Invalid URL: ${url}`);
+      console.log(`Invalid Download Image URL: ${url}`);
       resolve(null);
       return;
     }
@@ -180,6 +186,8 @@ export const breakdownIngredient = (ingredient) => {
 export const createIngredients = async (recipeID, recipe, tagCache) => {
 	try {
 		if( recipe.ingredients ) {
+			const ingredientTags = await selectAllIngredientTags();
+
 			for (const ingredient of recipe.ingredients) {
 				if (ingredient) {
 					let formattedIngredient = ingredient;
@@ -206,6 +214,17 @@ export const createIngredients = async (recipeID, recipe, tagCache) => {
 						const cachedTagID = tagCache[formattedIngredient];
 						if (cachedTagID) {
 							ingredientToInsert.IngredientTagID = cachedTagID;
+						}
+					}
+
+					if(!ingredientToInsert?.IngredientTagID) {
+						// Not tag yet, even from the cache, find one
+						for( const ingredientTag of ingredientTags ) {
+							if( formattedIngredient.indexOf(ingredientTag.Name) != -1 ) {
+								console.log("Ingredient Name: ", formattedIngredient);
+								console.log("Matched Ingredient Tag: ", ingredientTag);
+								ingredientToInsert.IngredientTagID = ingredientTag.IngredientTagID;
+							}
 						}
 					}
 
