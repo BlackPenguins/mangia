@@ -4,7 +4,7 @@ const pool = getPool();
 
 export const selectAllRecipes = (excludedRecipeIDs = [0]) => {
 	return new Promise((resolve, reject) => {
-		pool.query('SELECT * FROM recipe WHERE RecipeID NOT IN (?) ORDER BY Name ASC', [excludedRecipeIDs], (error, result) => {
+		pool.query('SELECT * FROM recipe WHERE RecipeID NOT IN (?) ORDER BY RAND()', [excludedRecipeIDs], (error, result) => {
 			if (error) {
 				return reject(error.sqlMessage);
 			} else {

@@ -5,7 +5,7 @@ import { selectAllStores, selectPrices } from  '#root/database/store.js';
 import { getOrInsertWeek } from  '#root/database/week.js';
 import { checkAdminMiddleware } from './auth.js';
 import { getMenuForWeekOffset } from './menu.js';
-import { INGREDIENT_EXTRACT_REGEX } from '#root/scrapers/RecipeImporter.js';
+import { getFractionForDisplay, getSummarizedIngredientQuantity, consolidateIngredients } from '#root/scrapers/RecipeImporter.js';
 import { selectLatestByStore } from '#root/database/ingredientAvailabilty.js';
 
 const getShoppingListItemsHandler = async (req, res) => {
@@ -213,188 +213,15 @@ const buildShoppingListHandler = async (req, res) => {
 };
 
 const sumIngredients = (ingredients) => {
-	const finalIngredients = [];
+	const consolidatedIngredients = consolidateIngredients(ingredients);
 
-	for (const ingredient of ingredients) {
-		if (ingredient.tagID != null) {
-			const converted = convertToTeaspoons(ingredient.calculatedAmount);
-
-			const foundTotalIndex = finalIngredients.findIndex((i) => i.name === ingredient.tagName && i.wholeUnits === converted.wholeUnits);
-
-			if (foundTotalIndex === -1) {
-				finalIngredients.push({
-					name: ingredient.tagName,
-					tagID: ingredient.tagID,
-					value: converted.amount,
-					wholeUnits: converted.wholeUnits,
-					unit: converted.unit,
-					isMissingUnits: converted.isMissingUnits,
-					recipeCount: 1,
-					ingredientDepartment: ingredient.ingredientDepartment,
-					ingredientDepartmentPosition: ingredient.ingredientDepartmentPosition,
-					recipeNames: ingredient.recipeName
-				});
-			} else {
-				finalIngredients[foundTotalIndex].value += converted.amount;
-				finalIngredients[foundTotalIndex].recipeCount++;
-				finalIngredients[foundTotalIndex].recipeNames += `, ${ingredient.recipeName}`
-			}
-		}
+	for (const ingredient of consolidatedIngredients) {
+		ingredient.finalValue = getSummarizedIngredientQuantity(ingredient);
 	}
 
-	// 1 TB =  3 TSP
-	// 1/4 CUP = 12 TSP
-	// 1/3 CUP = 16 TSP
-	// 1/2 CUP = 24 TSP
-	// 2/3 CUP = 32 TSP
-	// 3/4 CUP = 36 TSP
-	//   1 CUP = 48 TSP
-
-	for (const finalIngredient of finalIngredients) {
-		if (!finalIngredient.wholeUnits) {
-			let convertedValue = '';
-			let totalCups = '';
-			let leftOverCups = '';
-			let teaspoonAmount = finalIngredient.value;
-			if (teaspoonAmount >= 48) {
-				totalCups = Math.floor(teaspoonAmount / 48);
-				leftOverCups = teaspoonAmount % 48;
-				convertedValue = totalCups;
-			} else {
-				leftOverCups = teaspoonAmount;
-			}
-
-			if (leftOverCups > 0) {
-				if (leftOverCups < 12) {
-					if (totalCups > 0) {
-						convertedValue += ' cups ';
-					}
-
-					if (leftOverCups < 2) {
-						if (leftOverCups === 0.25) {
-							leftOverCups = '1/4';
-						} else if (leftOverCups === 0.5) {
-							leftOverCups = '1/2';
-						}
-
-						convertedValue += ' ' + leftOverCups + ' teaspoon';
-					} else {
-						convertedValue += ' ' + Math.round(leftOverCups / 3) + ' tablespoon';
-					}
-				} else if (leftOverCups < 16) {
-					convertedValue += ' 1/4 cup';
-				} else if (leftOverCups < 24) {
-					convertedValue += ' 1/3 cup';
-				} else if (leftOverCups < 32) {
-					convertedValue += ' 1/2 cup';
-				} else if (leftOverCups < 36) {
-					convertedValue += ' 2/3 cup';
-				} else if (leftOverCups < 48) {
-					convertedValue += ' 3/4 cup';
-				}
-			} else {
-				convertedValue += ' cups';
-			}
-
-			finalIngredient.finalValue = convertedValue;
-		} else {
-			finalIngredient.finalValue = `${finalIngredient.value} ${finalIngredient.unit}`;
-		}
-	}
-
-	return finalIngredients;
+	return consolidatedIngredients;
 };
 
-export const convertToTeaspoons = (value) => {
-	if (!value) {
-		return {
-			unit: '',
-			amount: 1,
-			wholeUnits: true,
-			isMissingUnits: true
-		};
-	}
-
-	const matches = value.match(INGREDIENT_EXTRACT_REGEX);
-
-	const amount = matches[1]?.trim();
-	const measurement = matches[2]?.trim().toLowerCase();
-
-	let baseTeaspoons = 0;
-
-	let isWholeUnit = false;
-	let unit = null;
-
-	switch (measurement) {
-		case 'cup':
-		case 'c':
-			baseTeaspoons = 48;
-			break;
-		case 'tb':
-		case 'tablespoon':
-		case 'tbsp':
-			baseTeaspoons = 3;
-			break;
-		case 'tsp':
-		case 'teaspoon':
-			baseTeaspoons = 1;
-			break;
-		case 'ounce':
-		case 'oz':
-			isWholeUnit = true;
-			unit = 'ounce';
-			break;
-		case 'pound':
-		case 'lb':
-			isWholeUnit = true;
-			unit = 'pound';
-			break;
-		default:
-			isWholeUnit = true;
-			unit = '';
-	}
-
-	let totalBaseMultiplier = 0;
-	const splitAmounts = amount.split(' ');
-
-	// If we have 1/4 - then  our multiplier is 0.25
-	// If we have 1 1/4, then our multiplier is 1.25 (1 + 0.25)
-	// If we have 2 1/4, then our multiplier is 2.25 (2 + 0.25)
-	// We need to traverse each piece of the amount
-	for (const splitAmount of splitAmounts) {
-		totalBaseMultiplier += getMultiplier(splitAmount);
-	}
-
-	let convert;
-	if (isWholeUnit) {
-		convert = { isMissingUnits: false, wholeUnits: true, unit, amount: parseFloat(totalBaseMultiplier) };
-	} else {
-		convert = { isMissingUnits: false, wholeUnits: false, amount: parseFloat(baseTeaspoons * totalBaseMultiplier) };
-	}
-
-	// console.log(`IncomingValue [${value}] Amount [${amount}] Measurement [${measurement}] TotalMultipler[${totalBaseMultiplier}] Final [${convert.amount}]`);
-
-	return convert;
-};
-
-const getMultiplier = (amount) => {
-	switch (amount) {
-		case '1/2':
-			return 0.5;
-		case '1/4':
-			return 0.25;
-		case '1/3':
-			return 0.33333333;
-		case '2/3':
-			return 0.66666666;
-		case '1/8':
-			return 0.125;
-		case '3/4':
-			return 0.75;
-		default:
-			return parseInt(amount);
-	}
-};
 
 const router = express.Router();
 

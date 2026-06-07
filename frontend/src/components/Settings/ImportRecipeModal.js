@@ -23,6 +23,8 @@ const useImportRecipeModal = (replaceRecipeID) => {
 
 	const importHandler = async () => {
 		const url = importURL;
+		setStatusClasses('status in-progress');
+		setStatus('Importing...');
 		const response = await fetch(`/api/recipes/import`, {
 			method: 'POST',
 			body: JSON.stringify({ url, replaceRecipeID }),

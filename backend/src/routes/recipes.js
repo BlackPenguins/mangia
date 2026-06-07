@@ -1,7 +1,6 @@
 import express from 'express';
 import { addTag, deleteRecipe, deleteTag, insertRecipe, selectAllRecipes, selectimportFailureURLs, selectRecipeByID, selectTags, updateRecipe } from  '#root/database/recipes.js';
-import { breakdownIngredient, createIngredients, createSteps, importRecipe } from '#root/scrapers/RecipeImporter.js';
-import { deleteStepsByRecipeID } from  '#root/database/step.js';
+import { createIngredients, createSteps, importRecipe, parseIngredient } from '#root/scrapers/RecipeImporter.js';
 import { deleteIngredient, deleteIngredientsByRecipeID, insertIngredient, selectIngredientByIngredientID, selectIngredientsByRecipeID, updateIngredient } from  '#root/database/ingredient.js';
 
 import Tesseract, { createWorker } from 'tesseract.js';
@@ -15,10 +14,9 @@ import { insertTag, selectTagByName } from  '#root/database/tags.js';
 
 import fs from 'fs';
 import { checkAdminMiddleware } from './auth.js';
-import { insertIngredientTag, selectIngredientTagByName, selectIngredientTagsByRecipeID } from  '#root/database/ingredientTags.js';
+import { insertIngredientTag, selectIngredientTagsByRecipeID } from  '#root/database/ingredientTags.js';
 import { withDateDetails } from './menu.js';
 import { deletePrimaryThumbnail, deleteThumbnail, deleteThumbnailsForRecipe, insertThumbnail, selectAllThumbnails } from  '#root/database/thumbnails.js';
-import { convertToTeaspoons } from './shoppingListItem.js';
 import { deleteStepGroupByRecipeID, selectStepGroupsByRecipeID } from '#root/database/stepGroup.js';
 import { deleteLink, insertLink, selectAllLinks } from '#root/database/linkedRecipes.js';
 
@@ -133,18 +131,16 @@ export const addIngredientsToRecipe = async (recipe) => {
 
 	recipe.ingredients = [];
 	for (const ingredient of ingredients) {
-		const { extractedAmount, extractedName } = breakdownIngredient(ingredient?.Name);
+		const parsedIngredient = parseIngredient(ingredient?.Name);
 
 		recipe.ingredients.push({
 			ingredientID: ingredient.IngredientID,
 			name: ingredient.Name,
 			tagName: ingredient.TagName,
 			tagID: ingredient.IngredientTagID,
-			isMissingUnits: ingredient.IsMissingUnits,
-			calculatedAmount: extractedAmount,
-			calculatedValue: extractedName,
 			ingredientDepartment: ingredient.IngredientDepartment,
 			ingredientDepartmentPosition: ingredient.IngredientDepartmentPosition,
+			...parsedIngredient
 		});
 	}
 };
@@ -310,7 +306,7 @@ const addRecipe = (req, res) => {
 	const newRecipe = {
 		name: req.body.name,
 		description: req.body.description,
-		category: req.body.category,
+		category: 'Dinner',
 		protein: req.body.protein,
 		preheat: req.body.preheat,
 		prepTime: req.body.prepTime,
@@ -336,7 +332,8 @@ const addRecipe = (req, res) => {
 	insertPromise.then(
 		(result) => {
 			const recipeID = result.id;
-			updateStepsAndIngredients(req.body, recipeID);
+			const blankStepGroups = [ { id: Math.floor(Date.now() / 1000), header: 'Steps', steps: '' } ];
+			updateStepsAndIngredients(req.body.ingredients, blankStepGroups, recipeID);
 			res.status(200).json({ recipeID });
 		},
 		(error) => {
@@ -498,7 +495,7 @@ const updateRecipeProcessor = async (req, res) => {
 		recipe = await updateRecipe(updatedRecipe, recipeID);
 	}
 
-	await updateStepsAndIngredients(req.body, recipeID);
+	await updateStepsAndIngredients(req.body.ingredients, req.body.stepGroups, recipeID);
 
 	const finalRecipe = await buildFullRecipe(recipeID);
 	res.status(200).json({ success: true, finalRecipe });
@@ -553,9 +550,8 @@ const validateAndUpdateMissingUnits = async(ingredientID) => {
 		// No tag, nothing to track in shopping list, units don't matter
 		updatedIngredient.IsMissingUnits = false;
 	} else {
-		const { extractedAmount } = breakdownIngredient(ingredient.Name);
-		const converted = convertToTeaspoons(extractedAmount);
-		updatedIngredient.IsMissingUnits = converted.isMissingUnits;
+		const parsedIngredient = parseIngredient(ingredient.Name);
+		updatedIngredient.IsMissingUnits = parsedIngredient.isMissingUnits;
 	}
 
 	await updateIngredient(updatedIngredient, ingredientID);
@@ -584,12 +580,12 @@ const removeIngredientProcessor = async (req, res) => {
 	res.status(200).json({ success: true });
 };
 
-const updateStepsAndIngredients = async (body, recipeID) => {
+const updateStepsAndIngredients = async (_ingredients, stepGroups, recipeID) => {
 	const updatedRecipe = {};
 
 	// Now that we updated the recipe we can add in the data that is joined with the RECIPE table
-	if (body.ingredients) {
-		updatedRecipe.ingredients = body.ingredients;
+	if (_ingredients) {
+		updatedRecipe.ingredients = _ingredients;
 
 		// Cache the tags for the ingredients so we can re-add them after we delete the ingredients
 		const ingredients = await selectIngredientsByRecipeID(recipeID);
@@ -606,9 +602,8 @@ const updateStepsAndIngredients = async (body, recipeID) => {
 		await createIngredients(recipeID, updatedRecipe, tagCache);
 	}
 
-	if (body.stepGroups) {
-		updatedRecipe.stepGroups = body.stepGroups;
-		await deleteStepsByRecipeID(recipeID);
+	if (stepGroups) {
+		updatedRecipe.stepGroups = stepGroups;
 		await deleteStepGroupByRecipeID(recipeID);
 		await createSteps(recipeID, updatedRecipe);
 	}
@@ -664,7 +659,6 @@ const deleteRecipeProcessor = async (req, res) => {
 	const recipeID = req.params.recipeID;
 	await deleteWithRecipeID(recipeID);
 	await deleteIngredientsByRecipeID(recipeID);
-	await deleteStepsByRecipeID(recipeID);
 	await deleteStepGroupByRecipeID(recipeID);
 	await deleteThumbnailsForRecipe(recipeID);
 	await deleteRecipe(recipeID);

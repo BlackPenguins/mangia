@@ -7,7 +7,12 @@ export const UNCATEGORIZED_CATEGORY_FILTER = 'Uncategorized';
 export const NEW_ARRIVAL_CATEGORY_FILTER = 'NewArrival';
 
 const FilteredRecipes = (({ inputRef, CardType, layoutClass, onClickHandler, categoryFilter }) => {
-	const fetchRecipes = async () => {
+	const [allRecipes, setAllRecipes] = useState(null);
+	const [search, setSearch] = useState('');
+
+	const [filteredRecipes, setFilteredRecipes] = useState(null);
+
+	const fetchRecipes = useCallback(async () => {
 		const response = await fetch('/api/recipes');
 		const data = await response.json();
 		if (response.status === 200) {
@@ -17,18 +22,13 @@ const FilteredRecipes = (({ inputRef, CardType, layoutClass, onClickHandler, cat
 			setAllRecipes(data);
 			setFilteredRecipes(activeData);
 		} else {
-			console.log('ERR', data);
+			console.log('Error while fetching the recipes', data);
 		}
-	};
+	},[]);
 
 	useEffect(() => {
 		fetchRecipes();
-	}, []);
-
-	const [allRecipes, setAllRecipes] = useState(null);
-	const [search, setSearch] = useState('');
-
-	const [filteredRecipes, setFilteredRecipes] = useState(null);
+	}, [fetchRecipes]);
 
 	const isFilteredByCategory = useCallback(
 		(recipe) => {
@@ -42,15 +42,22 @@ const FilteredRecipes = (({ inputRef, CardType, layoutClass, onClickHandler, cat
 		[categoryFilter]
 	);
 	const filterRecipesHandler = useCallback(
-		(searchString) => {
+		(searchString, doSort) => {
 			const lowercaseSearchString = searchString.toLowerCase().trim();
-			setFilteredRecipes(
-				allRecipes &&
-					allRecipes.filter((recipe) => {
-						const matchesName = recipe && recipe.Name.toLowerCase().indexOf(lowercaseSearchString) !== -1;
-						return isFilteredByCategory(recipe) && matchesName;
-					})
-			);
+
+			if( allRecipes ) {
+				// Sort modifies the original, we want a copy
+				let filteredArray = [...allRecipes].filter((recipe) => {
+					const matchesName = recipe && recipe.Name.toLowerCase().indexOf(lowercaseSearchString) !== -1;
+					return isFilteredByCategory(recipe) && matchesName;
+				});
+				
+				if( doSort ) {
+					filteredArray.sort( (a,b) => a.Name.localeCompare(b.Name));
+				}
+				
+				setFilteredRecipes(filteredArray);
+			}
 		},
 		[allRecipes, isFilteredByCategory]
 	);
@@ -65,13 +72,13 @@ const FilteredRecipes = (({ inputRef, CardType, layoutClass, onClickHandler, cat
 	}, [categoryFilter, allRecipes, isFilteredByCategory]);
 
 	useEffect( () => {
-		filterRecipesHandler(search);
-	}, [categoryFilter])
+		filterRecipesHandler(search, false);
+	}, [categoryFilter, filterRecipesHandler, search])
 
 	return (
 		<section className="hero">
 			<div className="container">
-				<SearchBox inputRef={inputRef} search={search} setSearch={setSearch} filteredRecipes={filteredRecipes} filterRecipesHandler={filterRecipesHandler} />
+				<SearchBox inputRef={inputRef} search={search} setSearch={setSearch} filteredRecipes={filteredRecipes} filterRecipesHandler={(search) => filterRecipesHandler(search, true)} />
 
 				{filteredRecipes === null && <LoadingText text="Loading recipes" />}
 				{filteredRecipes?.length === 0 && <span>No recipes found</span>}

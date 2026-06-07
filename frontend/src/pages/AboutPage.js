@@ -1,8 +1,8 @@
 
 import './AboutPage.scss';
 
-export const LATEST_VERSION = "4";
-export const LATEST_VERSION_DATE = "Apr 18, 2026";
+export const LATEST_VERSION = "5";
+export const LATEST_VERSION_DATE = "Jun 7, 2026";
 
 const AboutPage = () => {
 	return (
@@ -12,6 +12,23 @@ const AboutPage = () => {
 					<h2>Change Log</h2>
 				</div>
 				<div className='change-log'>
+					<h3>Version 5 (06/07/2026)</h3>
+					<ul>
+						<li>Rebuilt the ingredient quantity parsing system with regex and tokens. Handles whole units better. Added unit tests.</li>
+						<li>Added support for summation of weight units.</li>
+						<li>Recipe book is in random order at start. Once searching it is alphabetic order.</li>
+						<li>Add a default step group for new recipes</li>
+						<li>Add a default &apos;Dinner&apos; category for new recipes and imported recipes</li>
+						<li>Case insenstive auto-tag</li>
+						<li>Bug-fix: Year 1970 in Extra Item Menu</li>
+						<li>Hide pricing section until its fixed</li>
+						<li>Added support for grams and kilograms</li>
+						<li>Improving the URL unfurling in slack</li>
+						<li>Improved the importer with mix of grouped instructions and single instructions</li>
+						<li>Importing in progress status</li>
+						<li>Better sanitizing of HTML entities in ingredients and steps of imported recipes</li>
+						<li>The STEP table is not used anymore - removed the references to it.</li>
+					</ul>
 					<h3>Version 4 (04/26/2026)</h3>
 					<ul>
 						<li>Improved the import process</li>

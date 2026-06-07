@@ -71,11 +71,11 @@ const Header = () => {
 				</div>
 			</li>
 
-			<li>
+			{/* Hide until its fixed <li>
 				<div className="nav-link" onClick={() => navigateTo('receipts')}>
 					<span>Pricing</span>
 				</div>
-			</li>
+			</li> */}
 
 			{authContext.isAdmin && (
 				<li>

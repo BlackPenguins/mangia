@@ -5,6 +5,10 @@
 		color: green;
 	}
 
+	&.in-progress {
+		color: rgb(128, 115, 0);
+	}
+
 	&.failure {
 		color: darkred;
 	}

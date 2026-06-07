@@ -8,9 +8,6 @@ import { selectAllMenuDay } from  '#root/database/menu.js';
 import { getWeekRange } from './menu.js';
 import { getPool } from  '#root/database/utils.js';
 import { insertThumbnail } from  '#root/database/thumbnails.js';
-import { selectIngredientsByRecipeID, updateIngredient } from  '#root/database/ingredient.js';
-import { breakdownIngredient } from '#root/scrapers/RecipeImporter.js';
-import { convertToTeaspoons } from './shoppingListItem.js';
 import { insertStepGroup, updateStepGroup } from '#root/database/stepGroup.js';
 
 const router = express.Router();
@@ -146,36 +143,6 @@ const migrationHandler = async (req, res) => {
 					break;
 			case 'addMatchedIngredients':
 				await simpleDBQuery('Add MENU_DAY Column', 'ALTER TABLE MENU_DAY ADD COLUMN MatchedIngredients INT', res);
-				break;
-			case 'calculateMissingForIngredients':
-				const recipesToCalc = await selectAllRecipes();
-				let total = 0;
-				for( const recipToCalc of recipesToCalc ) {
-
-					const ingredients = await selectIngredientsByRecipeID(recipToCalc.RecipeID);
-					for( const ingredient of ingredients ) {
-
-						// If it's not tracked for shopping list, we dont need a unit
-						if( ingredient.IngredientTagID != null ) {
-
-							if( ingredient.IsMissingUnits === 1 ) {
-								console.log( "Ingredient already missing units." );
-							} else {
-								const { extractedAmount } = breakdownIngredient(ingredient.Name);
-								const ingredientID = ingredient.IngredientID;
-
-								const converted = convertToTeaspoons(extractedAmount);
-								if( converted.isMissingUnits ) {
-									console.log(" ==== MISSING", { ingredientID, name: ingredient.Name } );
-									await updateIngredient({ IsMissingUnits: true }, ingredient.IngredientID);
-									total++;
-								}
-							}
-						}
-					}
-				
-				}
-				console.log(`Corrected [${total}] ingredients.` );
 				break;
 			case 'addSuggestions':
 				await simpleDBQuery(

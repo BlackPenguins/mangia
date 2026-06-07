@@ -1,5 +1,5 @@
 import express from 'express';
-import { selectAllRecipes, selectAllRecipesByLastMadeOrder, selectRecipeByID, updateRecipe } from  '#root/database/recipes.js';
+import { selectAllRecipesByLastMadeOrder, selectRecipeByID, updateRecipe } from  '#root/database/recipes.js';
 import { deleteMenu, insertMenu, selectByWeekID, selectMenuByDay, selectMenuByMenuID, swapMenu, updateMenu } from  '#root/database/menu.js';
 import { checkAdminMiddleware } from './auth.js';
 import { addIngredientsToRecipe, addIngredientTags, addThumbnails } from './recipes.js';
@@ -54,7 +54,7 @@ export const getMenuForWeekOffset = async (weekID, startDate) => {
 						isSkipped: menuDay.IsSkipped,
 						isLeftovers: menuDay.IsLeftovers,
 						skipReason: menuDay.skipReason,
-						weekID: menuDay.WeekID,
+						WeekID: menuDay.WeekID,
 						dailyNotes: menuDay.DailyNotes,
 						originalRanking: menuDay.OriginalRanking,
 						adjustedRanking: menuDay.AdjustedRanking,
@@ -75,7 +75,7 @@ export const getMenuForWeekOffset = async (weekID, startDate) => {
 						isSkipped: menuDay.IsSkipped,
 						isLeftovers: menuDay.IsLeftovers,
 						skipReason: menuDay.skipReason,
-						weekID: menuDay.WeekID,
+						WeekID: menuDay.WeekID,
 						dailyNotes: menuDay.DailyNotes,
 						originalRanking: menuDay.OriginalRanking,
 						adjustedRanking: menuDay.AdjustedRanking,
@@ -104,6 +104,7 @@ export const withDateDetails = async (day, data) => {
 	let dateToUse = day;
 
 	let hasNoDate = false;
+
 	if (data?.WeekID && (!dateToUse || dateToUse.getFullYear() <= 1970)) {
 		const weekDetails = await getWeekByID(data.WeekID);
 
