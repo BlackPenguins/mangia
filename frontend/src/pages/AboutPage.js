@@ -1,8 +1,8 @@
 
 import './AboutPage.scss';
 
-export const LATEST_VERSION = "5";
-export const LATEST_VERSION_DATE = "Jun 7, 2026";
+export const LATEST_VERSION = "6";
+export const LATEST_VERSION_DATE = "Jun 14, 2026";
 
 const AboutPage = () => {
 	return (
@@ -12,6 +12,12 @@ const AboutPage = () => {
 					<h2>Change Log</h2>
 				</div>
 				<div className='change-log'>
+					<h3>Version 6 (06/14/2026)</h3>
+					<ul>
+						<li>Bug Fix: Adding extra menu items in the menu page.</li>
+						<li>Headers are bold in shopping list.</li>
+						<li>Use the longest ingredient when auto-tagging. Choose &apos;butter&apos; over &apos;salt&apos; for &apos;unsalted butter&apos;</li>
+					</ul>
 					<h3>Version 5 (06/07/2026)</h3>
 					<ul>
 						<li>Rebuilt the ingredient quantity parsing system with regex and tokens. Handles whole units better. Added unit tests.</li>

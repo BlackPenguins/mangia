@@ -117,7 +117,7 @@ const MenuRow = ({ menus, fetchMenu, page, currentRecipeIDs, availableSwapDays, 
 	const authContext = useAuth();
 	const tokenFromStorage = authContext.tokenFromStorage;
 
-	const weekID = menus[0].weekID;
+	const weekID = menus[0].WeekID;
 
 	const addItemHandler = async (recipe, closeModal) => {
 		const recipeID = recipe.RecipeID;

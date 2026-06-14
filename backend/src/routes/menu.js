@@ -139,6 +139,7 @@ const moveMenuItem = async (req, res) => {
 	res.status(200).json({ success: true });
 };
 const addMenuItem = async (req, res) => {
+	// Adds an extra menu item in this weekID, it just goes at the end of the menu for that week
 	const weekID = req.body.weekID;
 	const recipeID = req.body.recipeID;
 

@@ -594,12 +594,30 @@ export const createIngredients = async (recipeID, recipe, tagCache) => {
 					if(!ingredientToInsert?.IngredientTagID) {
 						// Not tag yet, even from the cache, find one
 						// Auto-tag ingredients
+						let longestIngredientTagLength = 0;
+						let longestIngredientTagID = 0;
 						for( const ingredientTag of ingredientTags ) {
 							if( formattedIngredient.toLowerCase().indexOf(ingredientTag.Name.toLowerCase()) != -1 ) {
 								console.log("Ingredient Name: ", formattedIngredient);
 								console.log("Matched Ingredient Tag: ", ingredientTag);
-								ingredientToInsert.IngredientTagID = ingredientTag.IngredientTagID;
+								const sizeOfCurrentTag = ingredientTag.Name.length;
+
+								if( sizeOfCurrentTag > longestIngredientTagLength) {
+									// Ingredient name is "brown sugar"
+									// It tags on "sugar" first
+									// Then it finds "brown sugar" in next iteration
+									// The longest ingredient wins
+									longestIngredientTagLength = sizeOfCurrentTag;
+									longestIngredientTagID = ingredientTag.IngredientTagID;
+									console.log("Largest Ingredient Tag So Far", {longestIngredientTagLength, longestIngredientTagID})
+								}
 							}
+						}
+
+						if( longestIngredientTagID > 0 ) {
+							// Create the auto tag the longest ingredient
+							console.log("Inserting Largest Tag", {longestIngredientTagID})
+							ingredientToInsert.IngredientTagID = longestIngredientTagID;
 						}
 					}
 
