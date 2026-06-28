@@ -121,7 +121,19 @@ export const deleteTag = (recipeID, tagID) => {
 	});
 };
 
-export const selectTags = (recipeID) => {
+export const selectAllRecipeTags = () => {
+	return new Promise((resolve, reject) => {
+		pool.query('SELECT rt.RecipeID, t.* FROM RECIPE_TAG rt JOIN TAG t ON rt.TagID = t.TagID', (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve(result);
+			}
+		});
+	});
+};
+
+export const selectRecipeTagsByID = (recipeID) => {
 	return new Promise((resolve, reject) => {
 		pool.query('SELECT t.* FROM RECIPE_TAG rt JOIN TAG t ON rt.TagID = t.TagID where RecipeID = ?', [recipeID], (error, result) => {
 			if (error) {

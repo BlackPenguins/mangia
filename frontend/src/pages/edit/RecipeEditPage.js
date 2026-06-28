@@ -287,8 +287,9 @@ const RecipeEditPage = () => {
 										<option className="none" value="None">None</option>
 										<option className="dinner" value="Dinner">Dinner</option>
 										<option className="sidedish" value="Sidedish">Sidedish</option>
-										<option className="appetizer" value="Appetizer">Appetizer</option>
+										<option className="partytreats" value="Party Treats">Party Treats</option>
 										<option className="dessert" value="Dessert">Dessert</option>
+										<option className="drinks" value="Drinks">Drinks</option>
 									</EditDropdown>
 								</Col>
 								<Col lg={8}>

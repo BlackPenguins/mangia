@@ -2,7 +2,19 @@ import { getPool } from './utils.js';
 
 const pool = getPool();
 
-export const selectAllThumbnails = (recipeID) => {
+export const selectAllThumbnails = () => {
+	return new Promise((resolve, reject) => {
+		pool.query('SELECT RecipeID, ThumbnailID, FileName, IsPrimary FROM THUMBNAILS', (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve(result);
+			}
+		});
+	});
+};
+
+export const selectThumbnailsByID = (recipeID) => {
 	return new Promise((resolve, reject) => {
 		pool.query('SELECT ThumbnailID, FileName, IsPrimary FROM THUMBNAILS WHERE RecipeID = ?', [recipeID], (error, result) => {
 			if (error) {

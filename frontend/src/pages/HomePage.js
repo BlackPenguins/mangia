@@ -22,14 +22,17 @@ const HomePage = () => {
 									<li className={categoryFilter === 'Dinner' ? 'active' : ''} data-filter=".dinner" onClick={() => setCategoryFilter('Dinner')}>
 										Dinner
 									</li>
-									<li className={categoryFilter === 'Appetizer' ? 'active' : ''} data-filter=".appetizers" onClick={() => setCategoryFilter('Appetizer')}>
-										Appetizers
+									<li className={categoryFilter === 'Party Treats' ? 'active' : ''} data-filter=".partytreats" onClick={() => setCategoryFilter('Party Treats')}>
+										Party Treats
 									</li>
 									<li className={categoryFilter === 'Sidedish' ? 'active' : ''} data-filter=".sidedish" onClick={() => setCategoryFilter('Sidedish')}>
 										Sidedish
 									</li>
 									<li className={categoryFilter === 'Dessert' ? 'active' : ''} data-filter=".dessert" onClick={() => setCategoryFilter('Dessert')}>
 										Dessert
+									</li>
+									<li className={categoryFilter === 'Drinks' ? 'active' : ''} data-filter=".drinks" onClick={() => setCategoryFilter('Drinks')}>
+										Drinks
 									</li>
 									<li
 										className={categoryFilter === NEW_ARRIVAL_CATEGORY_FILTER ? 'active' : ''}

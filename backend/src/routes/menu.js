@@ -2,7 +2,7 @@ import express from 'express';
 import { selectAllRecipesByLastMadeOrder, selectRecipeByID, updateRecipe } from  '#root/database/recipes.js';
 import { deleteMenu, insertMenu, selectByWeekID, selectMenuByDay, selectMenuByMenuID, swapMenu, updateMenu } from  '#root/database/menu.js';
 import { checkAdminMiddleware } from './auth.js';
-import { addIngredientsToRecipe, addIngredientTags, addThumbnails } from './recipes.js';
+import { addIngredientsToRecipe, addIngredientTags, addThumbnailsAndTags, addThumbnailsAndTagsToSingleRecipe } from './recipes.js';
 import { getOrInsertWeek, getWeekByID } from  '#root/database/week.js';
 import { selectAllSuggestions, selectTwoSuggestions } from  '#root/database/suggestions.js';
 import { selectAllFridge } from  '#root/database/fridge.js';
@@ -44,7 +44,7 @@ export const getMenuForWeekOffset = async (weekID, startDate) => {
 		for (const menuDay of menuDays) {
 			if (menuDay?.RecipeID) {
 				const recipeFromDB = await selectRecipeByID(menuDay.RecipeID);
-				const recipeWithThumbnails = await addThumbnails(recipeFromDB);
+				const recipeWithThumbnails = await addThumbnailsAndTagsToSingleRecipe(recipeFromDB);
 				const recipeWithThumbnailsAndTags = await addIngredientTags(recipeWithThumbnails);
 				await addIngredientsToRecipe(recipeWithThumbnailsAndTags);
 				formattedDaysArray.push(
@@ -390,10 +390,10 @@ const leftoversMenuItem = async (req, res) => {
 };
 
 const auditHandler = async (req, res) => {
-	let recipes = await selectAllRecipesByLastMadeOrder();
+	const recipesFromDB = await selectAllRecipesByLastMadeOrder();
+	const recipes = addThumbnailsAndTags(recipesFromDB);
 
-	const recipesWithThumbnails = await Promise.all(recipes.map((r) => addThumbnails(r)));
-	const { sortedRecipes } = await getWeightedRecipes( recipesWithThumbnails );
+	const { sortedRecipes } = await getWeightedRecipes( recipes );
 
 	res.status(200).json({sortedRecipes});
 };

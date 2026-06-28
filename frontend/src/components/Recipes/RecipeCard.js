@@ -7,6 +7,7 @@ import NewArrivalTag from './NewArrivalTag';
 import { useThumbnailBackgroundStyle } from './RecipeRow';
 import { TZDate } from '@date-fns/tz';
 import { useMemo, useState } from 'react';
+import { Tag } from 'react-feather';
 
 const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottomButtons, isMenu }) => {
 	let recipeName = '';
@@ -64,6 +65,14 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 					</div>
 				</div>
 
+				{recipe?.tags.length > 0 && (
+					<div className="tag-container">
+						{recipe?.tags.map((tag, index) => {
+							return <TagDisplay key={index} tag={tag}/>
+						})}
+					</div>
+				)}
+
 				<div className="bottom-area d-flex px-3">
 					<div className="m-auto d-flex">{bottomButtons}</div>
 				</div>
@@ -71,6 +80,14 @@ const RecipeCard = ({ recipe, isMade, isSkipped, skipReason, isLeftovers, bottom
 		</div>
 	);
 };
+
+export const TagDisplay = ( { tag }) => {
+	return (
+		<span className="tag-box-1 recipe">
+			<span className="tag-name-1"><Tag size={21}/>{tag.Name}</span>
+		</span>
+	)
+}
 
 export const useThumbnailImage = (recipe, hideInformation) => {
 	const [thumbnailError, setThumbnailError] = useState(false);

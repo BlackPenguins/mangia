@@ -4,7 +4,7 @@ import Header from './components/Common/Header';
 import NotFoundPage from './pages/NotFound.Page';
 import HomePage from './pages/HomePage';
 import RecipeEditPage from './pages/edit/RecipeEditPage';
-import RecipePage from './pages/RecipePage';
+import RecipeDetailsPage from './pages/RecipeDetailsPage';
 import Footer from './components/Common/Footer.js';
 import MenuPage from './pages/MenuPage';
 import ShoppingList from './pages/shoppingList/ShoppingList';
@@ -48,7 +48,7 @@ function App() {
 							<Route path="*" element={<SuggestionsTab />} />
 						</Route>
 						<Route path="recipe" element={<RecipeEditPage />} />
-						<Route path="recipe/:recipeID" element={<RecipePage />} />
+						<Route path="recipe/:recipeID" element={<RecipeDetailsPage />} />
 						<Route path="recipe/:recipeID/edit" element={<RecipeEditPage />} />
 						<Route path="*" element={<NotFoundPage />} />
 					</Routes>

@@ -4,6 +4,8 @@
 	flex-direction: row;
 	align-items: center;
 	justify-content: flex-start;
+	flex-wrap: wrap;
+	gap: 8px;
 
 	&.ingredient-tag {
 		height: 100%;
@@ -57,14 +59,14 @@
 }
 
 
-$recipe-tag-color: rgb(148, 150, 24);
+$recipe-tag-color: rgb(24, 150, 34);
 
 .tag-box-1 {
     display: flex;
     align-items: center;
-    width: 100%; /* Make it take full width of parent */
     border-radius: 5px;
     overflow: hidden;
+	margin-right: 10px;
 
 	&.recipe {
 		.tag-name-1 {
@@ -134,5 +136,12 @@ $recipe-tag-color: rgb(148, 150, 24);
 		background-color: lightblue;
 		flex-grow: 1;  /* Allows it to expand */
 		padding: 5px 10px;
+		white-space: nowrap;
+
+		svg {
+			margin: {
+				right: 7px;
+			}
+		}
 	}
 }

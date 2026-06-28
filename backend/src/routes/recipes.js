@@ -1,5 +1,5 @@
 import express from 'express';
-import { addTag, deleteRecipe, deleteTag, insertRecipe, selectAllRecipes, selectimportFailureURLs, selectRecipeByID, selectTags, updateRecipe } from  '#root/database/recipes.js';
+import { addTag, deleteRecipe, deleteTag, insertRecipe, selectAllRecipes, selectAllRecipeTags, selectimportFailureURLs, selectRecipeByID, selectRecipeTagsByID, updateRecipe } from  '#root/database/recipes.js';
 import { createIngredients, createSteps, importRecipe, parseIngredient } from '#root/scrapers/RecipeImporter.js';
 import { deleteIngredient, deleteIngredientsByRecipeID, insertIngredient, selectIngredientByIngredientID, selectIngredientsByRecipeID, updateIngredient } from  '#root/database/ingredient.js';
 
@@ -10,14 +10,14 @@ import Jimp from "jimp";
 import fileType from "file-type";
 
 import { deleteWithRecipeID, selectByRecipeID } from  '#root/database/menu.js';
-import { insertTag, selectTagByName } from  '#root/database/tags.js';
+import { insertTag, selectAllTags, selectTagByName } from  '#root/database/tags.js';
 
 import fs from 'fs';
 import { checkAdminMiddleware } from './auth.js';
 import { insertIngredientTag, selectIngredientTagsByRecipeID } from  '#root/database/ingredientTags.js';
 import { withDateDetails } from './menu.js';
-import { deletePrimaryThumbnail, deleteThumbnail, deleteThumbnailsForRecipe, insertThumbnail, selectAllThumbnails } from  '#root/database/thumbnails.js';
-import { deleteStepGroupByRecipeID, selectStepGroupsByRecipeID } from '#root/database/stepGroup.js';
+import { deletePrimaryThumbnail, deleteThumbnail, deleteThumbnailsForRecipe, insertThumbnail, selectAllThumbnails, selectThumbnailsByID } from  '#root/database/thumbnails.js';
+import { deleteLegacyStepByRecipeID, deleteStepGroupByRecipeID, selectStepGroupsByRecipeID } from '#root/database/stepGroup.js';
 import { deleteLink, insertLink, selectAllLinks } from '#root/database/linkedRecipes.js';
 
 export const THUMBNAIL_DIRECTORY = './images/thumbnails';
@@ -59,7 +59,7 @@ const uploadAttachments = multer({ storage: attachmentStorageEngine, limits: { f
 const getTagsForRecipe = (req, res) => {
 	const recipeID = req.params.recipeID;
 
-	const foundTagPromise = selectTags(recipeID);
+	const foundTagPromise = selectRecipeTagsByID(recipeID);
 
 	foundTagPromise.then(
 		async (result) => {
@@ -92,11 +92,12 @@ const buildFullRecipe = async (recipeID) => {
 	if (!recipe) {
 		return null;
 	} else {
-		const recipeWithThumbnails = await addThumbnails(recipe);
-		const links = await addLinks(recipe);
-		const stepGroups = await selectStepGroupsByRecipeID(recipeID);
+		const recipeWithThumbnails = await addThumbnailsAndTagsToSingleRecipe(recipe);
 
+		const links = await addLinks(recipe);
 		recipeWithThumbnails.links = links; 
+
+		const stepGroups = await selectStepGroupsByRecipeID(recipeID);
 
 		recipeWithThumbnails.stepGroups = [];
 		for (const stepGroup of stepGroups) {
@@ -145,16 +146,50 @@ export const addIngredientsToRecipe = async (recipe) => {
 	}
 };
 
-export const addThumbnails = async (recipe) => {
+export const addThumbnailsAndTagsToSingleRecipe = async (recipe) => {
 	const recipeID = recipe.RecipeID;
+	const thumbnails = await selectThumbnailsByID(recipeID);
+	const tags = await selectRecipeTagsByID(recipeID);
 
-	const thumbnails = await selectAllThumbnails(recipeID);
 
 	return {
 		thumbnails,
+		tags,
 		...recipe,
-	};
+	}
 };
+
+export const addThumbnailsAndTags = async (recipes) => {
+	const thumbnails = await selectAllThumbnails();
+	const tags = await selectAllRecipeTags();
+
+	const tagsByRecipe = new Map();
+
+	for (const tag of tags) {
+		if (!tagsByRecipe.has(tag.RecipeID)) {
+			tagsByRecipe.set(tag.RecipeID, []);
+		}
+
+		tagsByRecipe.get(tag.RecipeID).push(tag);
+	}
+
+	const thumbnailsByRecipe = new Map();
+
+	for (const thumbnail of thumbnails) {
+		if (!thumbnailsByRecipe.has(thumbnail.RecipeID)) {
+			thumbnailsByRecipe.set(thumbnail.RecipeID, []);
+		}
+
+		thumbnailsByRecipe.get(thumbnail.RecipeID).push(thumbnail);
+	}
+
+	return recipes.map(recipe => ({
+		...recipe,
+		thumbnails: thumbnailsByRecipe.get(recipe.RecipeID) ?? [],
+		tags: tagsByRecipe.get(recipe.RecipeID) ?? []
+	}));
+};
+
 
 export const addLinks = async (recipe) => {
 	const recipeID = recipe.RecipeID;
@@ -189,18 +224,15 @@ export const addIngredientTags = async (recipe) => {
 }
 
 
-const getAllRecipes = (req, res) => {
-	const selectPromise = selectAllRecipes();
+const getAllRecipes = async (req, res) => {
+	try {
+		const recipesFromDB = await selectAllRecipes();
+		const allRecipes = await addThumbnailsAndTags(recipesFromDB);
 
-	selectPromise.then(
-		async (result) => {
-			const recipeWithThumbnails = await Promise.all(result.map((r) => addThumbnails(r)));
-			res.status(200).json(recipeWithThumbnails);
-		},
-		(error) => {
-			res.status(500).json({ message: error });
-		}
-	);
+		res.status(200).json(allRecipes);
+	} catch (e) {
+		res.status(200).json({ success: false });
+	}
 };
 
 const importRecipeProcessor = async (req, res) => {
@@ -347,9 +379,16 @@ const addTagToRecipe = async (req, res) => {
 	// Either isNewValue is true, and only a name is passed in
 	// Or isNewValue is false, and an id and name is passed in (then we only use the id)
 	const recipeID = req.params.recipeID;
-	const tagName = req.body.name;
-	const isNewValue = req.body.isNewValue;
-	let tagID = req.body.id;
+	const tag = req.body.tag;
+
+	let tagName = tag.name;
+	let isNewValue = tag.isNewValue;
+	let tagID = tag.id;
+
+	if(!tagName) {
+		isNewValue = true;
+		tagName = tag;
+	}
 
 	console.log(`Incoming Add Tag Recipe for ${recipeID}`, req.body);
 
@@ -358,7 +397,7 @@ const addTagToRecipe = async (req, res) => {
 		tagID = createdTag.id;
 	}
 
-	const recipeTags = await selectTags(recipeID);
+	const recipeTags = await selectRecipeTagsByID(recipeID);
 	const recipeTagExists = recipeTags.some((recipeTag) => recipeTag.TagID === tagID);
 
 	if (recipeTagExists) {
@@ -660,6 +699,7 @@ const deleteRecipeProcessor = async (req, res) => {
 	await deleteWithRecipeID(recipeID);
 	await deleteIngredientsByRecipeID(recipeID);
 	await deleteStepGroupByRecipeID(recipeID);
+	await deleteLegacyStepByRecipeID(recipeID);
 	await deleteThumbnailsForRecipe(recipeID);
 	await deleteRecipe(recipeID);
 	res.status(200).json(recipeID);

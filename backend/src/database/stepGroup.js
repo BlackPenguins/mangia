@@ -53,3 +53,15 @@ export const deleteStepGroupByRecipeID = (recipeID) => {
 		});
 	});
 };
+
+export const deleteLegacyStepByRecipeID = (recipeID) => {
+	return new Promise((resolve, reject) => {
+		pool.query('DELETE FROM STEP WHERE RecipeID = ?', [recipeID], (error, result) => {
+			if (error) {
+				return reject(error.sqlMessage);
+			} else {
+				return resolve(result);
+			}
+		});
+	});
+};

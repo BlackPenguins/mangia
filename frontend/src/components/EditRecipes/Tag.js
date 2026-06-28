@@ -41,7 +41,7 @@ const Tag = ({ recipeID }) => {
 
 		await fetch(`/api/recipes/${recipeID}/addTag`, {
 			method: 'POST',
-			body: JSON.stringify(value),
+			body: JSON.stringify({ tag: value }),
 			headers: {
 				// This is required. NodeJS server won't know how to read it without it.
 				'Content-Type': 'application/json',

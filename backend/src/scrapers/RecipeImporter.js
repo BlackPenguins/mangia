@@ -188,14 +188,15 @@ export const parseIngredient = (ingredientLine) => {
 	}
 
 	// simple fraction or integer: "1/2" or "4"
-	else if (/^\d+(?:\/\d+)?$/.test(tokens[0])) {
+	else if (/^\d+(?:[\/|.]\d+)?$/.test(tokens[0])) {
 		quantity = tokens[0];
 		tokenIndex = 1;
 	}
 
 	// measurement unit
-	if (tokens[tokenIndex] && SUPPORTED_UNITS.has(tokens[tokenIndex].toLowerCase())) {
-		unit = tokens[tokenIndex];
+	const santizedUnit = tokens[tokenIndex].toLowerCase().replace(".", "");
+	if (tokens[tokenIndex] && SUPPORTED_UNITS.has(santizedUnit)) {
+		unit = santizedUnit;
 		tokenIndex++;
 	}
 
@@ -213,6 +214,7 @@ export const parseIngredient = (ingredientLine) => {
 	} else {
 		decimalQuantity = convertFractionToDecimal(quantity);
 		({unitType, teaspoonQuantity} = getTeaspoonQuantity(decimalQuantity, unit));
+		isMissingUnits = unitType == null || teaspoonQuantity == null;
 	}
 
 	return {

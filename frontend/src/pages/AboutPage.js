@@ -1,8 +1,8 @@
 
 import './AboutPage.scss';
 
-export const LATEST_VERSION = "6";
-export const LATEST_VERSION_DATE = "Jun 14, 2026";
+export const LATEST_VERSION = "7";
+export const LATEST_VERSION_DATE = "Jun 28, 2026";
 
 const AboutPage = () => {
 	return (
@@ -12,11 +12,23 @@ const AboutPage = () => {
 					<h2>Change Log</h2>
 				</div>
 				<div className='change-log'>
+					<h3>Version 7 (06/28/2026)</h3>
+					<ul>
+						<li>Add support for decimals in the unit (oz.) and in the quantity (14.5)</li>
+						<li>Highlight the quantity and unit in the ingredients on Recipe Details, so we know what is being counted in the shopping list</li> 
+						<li>Renamed appetizer to party treats</li> 
+						<li>Added drinks category</li> 
+						<li>Bug Fix: Adding tags</li> 
+						<li>Tags are not full width, have tag icons, are green and not yellow.</li> 
+						<li>Tags are used in the search</li> 
+						<li>Show tags in recipe cards (search, menu)</li> 
+					</ul>
 					<h3>Version 6 (06/14/2026)</h3>
 					<ul>
 						<li>Bug Fix: Adding extra menu items in the menu page.</li>
-						<li>Headers are bold in shopping list.</li>
+						<li>Headers are bold in shopping list.</li> 
 						<li>Use the longest ingredient when auto-tagging. Choose &apos;butter&apos; over &apos;salt&apos; for &apos;unsalted butter&apos;</li>
+						<li>Security upgrades! Added fail2ban. Moved the SSH port from 22. Removed 22 from my router port foward. Blocked 22 from the SSHD config.</li>
 					</ul>
 					<h3>Version 5 (06/07/2026)</h3>
 					<ul>

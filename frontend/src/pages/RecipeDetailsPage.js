@@ -1,11 +1,11 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import './RecipePage.scss';
+import './RecipeDetailsPage.scss';
 import { Button, Col, Row } from 'reactstrap';
 import Rating from '../components/Settings/Rating';
 import { formatDistance } from 'date-fns';
-import { Edit, Trash2 } from 'react-feather';
+import { Edit, Tag, Trash2 } from 'react-feather';
 import useWakeLock from '../components/Common/useWakeLock';
 import LoadingText from '../components/Common/LoadingText';
 import { PrepTimeLabel, ThumbnailPreview } from './edit/RecipeEditPage';
@@ -14,8 +14,9 @@ import MenuContext from 'authentication/menu-context';
 import { useAuth, useBetterModal } from '@blackpenguins/penguinore-common-ext';
 import { useThumbnailBackgroundStyle } from 'components/Recipes/RecipeRow';
 import { TZDate } from '@date-fns/tz';
+import { TagDisplay } from 'components/Recipes/RecipeCard';
 
-const RecipePage = () => {
+const RecipeDetailsPage = () => {
 	// Keep screen alive on mobile phones on this page
 	useWakeLock();
 
@@ -166,35 +167,21 @@ const MenuButton = ({ isMenuRecipe, label, isMobile, action }) => {
 
 const Statistics = ({ recipe, book }) => {
 	const lastMadeDateUTC = new Date(recipe.lastmade);
-	const [recipeTags, setRecipeTags] = useState([]);
 
 	const lastMadeDate = new TZDate(lastMadeDateUTC, 'America/New_York');
 
 	const days = formatDistance(lastMadeDate, new Date(), { addSuffix: true });
 
-	const fetchRecipeTags = useCallback(async () => {
-		const response = await fetch(`/api/recipes/${recipe.RecipeID}/tags`);
-		const data = await response.json();
-		console.log('Retrieved Recipe Tags from Server', data);
-		setRecipeTags(data);
-	}, [recipe]);
-
-	useEffect(() => {
-		fetchRecipeTags();
-	}, [fetchRecipeTags]);
-
 	const categoryLabel = !recipe.Category ? <span className='uncategorized'>Uncategorized</span> : recipe.Category;
+
+	const recipeTags = recipe?.tags;
 
 	return (
 		<div className="quick-facts">
 			{recipeTags.length > 0 && (
 				<div className="tag-container">
 					{recipeTags.map((tag, index) => {
-						return (
-							<span key={index} className="tag-box-1 recipe">
-								<span className="tag-name-1">{tag.Name}</span>
-							</span>
-						);
+						return <TagDisplay key={index} tag={tag}/>
 					})}
 				</div>
 			)}
@@ -297,15 +284,30 @@ const Ingredients = ({ ingredients }) => {
 			<ul>
 				{ingredients &&
 					ingredients.map((ingredient, index) => {
+
 						const classes = [];
 						if (ingredient.tagID != null) {
 							classes.push('tagged');
 						}
+
+						let ingredientDisplay;
+
+						if( ingredient.quantity == null) {
+							ingredientDisplay = ingredient.name;
+						} else {
+							ingredientDisplay = (
+								<>
+									<b>{ingredient.quantity} {ingredient.unit}</b>
+									&nbsp;{ingredient.ingredient}
+								</>
+							);
+						}
+
 						return (
 							<li className={classes.join(' ')} key={index}>
-								{ingredient.name}
+								{ingredientDisplay}
 
-								{ingredient?.isMissingUnits === 1 && (
+								{ingredient?.isMissingUnits === true && (
 									<span className='missing-units'>
 										Missing Units
 									</span>
@@ -465,4 +467,4 @@ const useConfirmDeleteModal = (recipeID) => {
 	return { modal, openModal };
 };
 
-export default RecipePage;
+export default RecipeDetailsPage;

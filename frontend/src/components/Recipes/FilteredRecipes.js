@@ -49,7 +49,8 @@ const FilteredRecipes = (({ inputRef, CardType, layoutClass, onClickHandler, cat
 				// Sort modifies the original, we want a copy
 				let filteredArray = [...allRecipes].filter((recipe) => {
 					const matchesName = recipe && recipe.Name.toLowerCase().indexOf(lowercaseSearchString) !== -1;
-					return isFilteredByCategory(recipe) && matchesName;
+					const matchesTag = recipe && recipe.tags.some( (tag) => tag.Name.toLowerCase().indexOf(lowercaseSearchString) !== -1);
+					return isFilteredByCategory(recipe) && ( matchesName || matchesTag );
 				});
 				
 				if( doSort ) {
